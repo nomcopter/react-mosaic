@@ -1,0 +1,108 @@
+/**
+ * @license
+ * Copyright 2016 Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import (reference) '../node_modules/@blueprintjs/core/dist/variables';
+
+.mosaic-root.mosaic-blueprint-theme {
+  background: @gray4;
+
+  .mosaic-zero-state {
+    background: @light-gray3;
+    border-radius: 3px;
+    box-shadow: 0 0 1px fade(@black, 20%);
+  }
+
+  .mosaic-tile .mosaic-split:hover {
+    background: none;
+    .mosaic-split-line {
+      box-shadow: 0 0 0 1px @blue4;
+    }
+  }
+
+  &.mosaic-drop-target, .mosaic-drop-target {
+    .drop-target-container .drop-target {
+      background: fade(@blue5, 20%);
+      border: 2px solid @blue4;
+      transition: opacity 100ms;
+    }
+  }
+
+  .mosaic-window, .mosaic-preview {
+    box-shadow: 0 0 1px fade(@black, 20%);
+    border-radius: 3px;
+
+    .mosaic-window-toolbar {
+      box-shadow: 0 1px 1px fade(@black, 20%);
+      border-top-right-radius: 3px;
+      border-top-left-radius: 3px;
+
+      &.draggable:hover {
+        .mosaic-window-title {
+          color: @black;
+        }
+        background: linear-gradient(to bottom, @white, @light-gray5);
+      }
+    }
+
+    .mosaic-window-title {
+      font-weight: 600;
+      color: @dark-gray5;
+    }
+
+    .mosaic-window-controls {
+      .separator {
+        border-left: 1px solid @light-gray2;
+      }
+      .pt-button {
+        &, &:before {
+          color: @gray2;
+        }
+      }
+    }
+
+    .mosaic-window-body {
+      border-top-width: 0;
+      background: @light-gray5;
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    .mosaic-window-additional-actions-bar {
+      transition: height 250ms;
+      box-shadow: 0 1px 1px fade(@black, 20%);
+
+      .pt-button {
+        &, &:before {
+          color: @gray2;
+        }
+      }
+    }
+
+    &.additional-controls-open {
+      .mosaic-window-toolbar {
+        box-shadow: 0 1px 0 fade(@black, 20%);
+      }
+    }
+
+    .mosaic-preview {
+      border: 1px solid @gray3;
+
+      h4 {
+        color: @dark-gray5;
+      }
+    }
+  }
+}

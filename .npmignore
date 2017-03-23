@@ -1,0 +1,15 @@
+.idea/
+.editorconfig
+.gitignore
+.npmignore
+.npmrc
+.tsdrc
+circle.yml
+extra-typings.d.ts
+tsconfig*.json
+tsd.json
+dev/
+scripts/
+typings/
+webpack.config*.js
+screencast.gif

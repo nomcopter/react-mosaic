@@ -1,0 +1,180 @@
+/**
+ * @license
+ * Copyright 2016 Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import * as _ from 'lodash';
+import { MosaicNode, MosaicParent, MosaicDirection, MosaicBranch, MosaicPath } from './types';
+
+function alternateDirection<T>(node: MosaicNode<T>, direction: MosaicDirection = 'row'): MosaicNode<T> {
+    if (isParent(node)) {
+        const nextDirection = getOtherDirection(direction);
+        return {
+            direction,
+            first: alternateDirection(node.first, nextDirection),
+            second: alternateDirection(node.second, nextDirection)
+        }
+    } else {
+        return node;
+    }
+}
+
+export enum Corner {
+    TOP_LEFT = 1,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT
+}
+
+/**
+ * Returns `true` if `node` is a MosaicParent
+ * @param node
+ * @returns {boolean}
+ */
+export function isParent<T>(node: MosaicNode<T>): node is MosaicParent<T> {
+    return (node as MosaicParent<T>).direction != null;
+}
+
+/**
+ * Creates a balanced binary tree from `leaves` with the goal of making them as equal area as possible
+ * @param leaves
+ * @param startDirection
+ * @returns {MosaicNode<T>}
+ */
+export function createBalancedTreeFromLeaves<T>(leaves: MosaicNode<T>[],
+                                                startDirection: MosaicDirection = 'row'): MosaicNode<T> | null {
+    if (leaves.length === 0) {
+        return null;
+    }
+
+    let current: MosaicNode<T>[] = _.clone(leaves);
+    let next: MosaicNode<T>[] = [];
+
+    while (current.length > 1) {
+        while (current.length > 0) {
+            if (current.length > 1) {
+                next.push({
+                    direction: 'row',
+                    first: current.shift()!,
+                    second: current.shift()!
+                });
+            } else {
+                next.unshift(current.shift()!);
+            }
+        }
+        current = next;
+        next = [];
+    }
+    return alternateDirection(current[0], startDirection);
+}
+
+/**
+ * Gets the sibling of `branch`
+ * @param branch
+ * @returns {any}
+ */
+export function getOtherBranch(branch: MosaicBranch): MosaicBranch {
+    if (branch === 'first') {
+        return 'second';
+    } else if (branch === 'second') {
+        return 'first';
+    } else {
+        throw new Error(`Branch '${branch}' not a valid branch`);
+    }
+}
+
+/**
+ * Gets the opposite of `direction`
+ * @param direction
+ * @returns {any}
+ */
+export function getOtherDirection(direction: MosaicDirection): MosaicDirection {
+    if (direction === 'row') {
+        return 'column';
+    } else {
+        return 'row';
+    }
+}
+
+/**
+ * Traverses `tree` to find the path to the specified `corner`
+ * @param tree
+ * @param corner
+ * @returns {MosaicPath}
+ */
+export function getPathToCorner(tree: MosaicNode<any>, corner: Corner): MosaicPath {
+    let currentNode: MosaicNode<any> = tree;
+    let currentPath: MosaicPath = [];
+    while (isParent(currentNode)) {
+        if (currentNode.direction === 'row' && (corner === Corner.TOP_LEFT || corner === Corner.BOTTOM_LEFT)) {
+            currentPath.push('first');
+            currentNode = currentNode.first;
+        } else if (currentNode.direction === 'column' && (corner === Corner.TOP_LEFT || corner === Corner.TOP_RIGHT)) {
+            currentPath.push('first');
+            currentNode = currentNode.first;
+        } else {
+            currentPath.push('second');
+            currentNode = currentNode.second;
+        }
+    }
+
+    return currentPath;
+}
+
+/**
+ * Gets all leaves of `tree`
+ * @param tree
+ * @returns {T[]}
+ */
+export function getLeaves<T>(tree: MosaicNode<T> | null): T[] {
+    if (tree == null) {
+        return [];
+    } else if (isParent(tree)) {
+        return getLeaves(tree.first)
+            .concat(getLeaves(tree.second));
+    } else {
+        return [tree];
+    }
+}
+
+/**
+ * Gets node at `path` from `tree`
+ * @param tree
+ * @param path
+ * @returns {MosaicNode<T>|null}
+ */
+export function getNodeAtPath<T>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> | null {
+    if (path.length > 0) {
+        return _.get<MosaicNode<T>>(tree, path) || null;
+    } else {
+        return tree;
+    }
+}
+
+/**
+ * Gets node at `path` from `tree` and verifies that neither `tree` nor the result are null
+ * @param tree
+ * @param path
+ * @returns {MosaicNode<T>}
+ */
+export function getAndAssertNodeAtPathExists<T>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> {
+    if (tree == null) {
+        throw new Error('Root is empty, cannot fetch path');
+    }
+    const node = getNodeAtPath(tree, path);
+    if (node == null) {
+        throw new Error(`Path [${path.join(', ')}] did not resolve to a node`);
+    }
+    return node;
+}

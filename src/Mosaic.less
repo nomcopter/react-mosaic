@@ -1,0 +1,189 @@
+/**
+ * @license
+ * Copyright 2016 Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import (reference) "./mixins";
+
+@split-size: 6px;
+
+.mosaic-root {
+  height: 100%;
+  width: 100%;
+  padding: @split-size;
+
+  &, * {
+    box-sizing: border-box;
+  }
+
+  .mosaic-zero-state {
+    height: 100%;
+    width: 100%;
+    max-width: none;
+
+    .pt-non-ideal-state-icon .pt-icon {
+      font-size: 120px;
+    }
+  }
+
+  > :not(.drop-target-container) {
+    z-index: 1;
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.mosaic-tile {
+  position: relative;
+
+  .mosaic-branch {
+    position: absolute;
+
+    > * {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .mosaic-split {
+    position: absolute;
+    z-index: 1;
+
+    &:hover {
+      background: black;
+    }
+
+    .mosaic-split-line {
+      position: absolute;
+    }
+  }
+
+  &.-row {
+    > .mosaic-branch, > .mosaic-split {
+      top: 0;
+      bottom: 0;
+    }
+    > .mosaic-branch {
+      &.-first {
+        left: 0;
+        &, > .mosaic-tile {
+          padding-right: @split-size / 2;
+        }
+      }
+      &.-second {
+        right: 0;
+        &, > .mosaic-tile {
+          padding-left: @split-size / 2;
+        }
+      }
+    }
+    > .mosaic-split {
+      margin-left: -@split-size / 2;
+      width: @split-size;
+      cursor: ew-resize;
+
+      .mosaic-split-line {
+        top: 0;
+        bottom: 0;
+        left: @split-size / 2;
+        right: @split-size / 2;
+      }
+    }
+  }
+
+  &.-column {
+    > .mosaic-branch, > .mosaic-split {
+      left: 0;
+      right: 0;
+    }
+    > .mosaic-branch {
+      &.-first {
+        top: 0;
+        &, > .mosaic-tile {
+          padding-bottom: @split-size / 2;
+        }
+      }
+      &.-second {
+        bottom: 0;
+        &, > .mosaic-tile {
+          padding-top: @split-size / 2;
+        }
+      }
+    }
+    > .mosaic-split {
+      margin-top: -@split-size / 2;
+      height: @split-size;
+      cursor: ns-resize;
+
+      .mosaic-split-line {
+        top: @split-size / 2;
+        bottom: @split-size / 2;
+        left: 0;
+        right: 0;
+      }
+    }
+  }
+}
+
+.split-percentages(@split-amount) {
+  @amount: ~"calc(100% - " @split-amount ~")";
+  &.left {
+    right: @amount;
+  }
+  &.right {
+    left: @amount;
+  }
+  &.bottom {
+    top: @amount;
+  }
+  &.top {
+    bottom: @amount;
+  }
+}
+
+.mosaic-drop-target {
+  position: relative;
+
+  &.drop-target-hover .drop-target-container {
+    display: block;
+  }
+
+  &.mosaic-root > .drop-target-container {
+    display: block;
+    .drop-target {
+      .split-percentages(10px);
+    }
+  }
+
+  .drop-target-container {
+    .absolute-fill();
+    display: none;
+
+    .drop-target {
+      .absolute-fill();
+      .split-percentages(30%);
+      background: fade(black, 20%);
+      border: 2px solid black;
+      opacity: 0;
+      z-index: 5;
+
+      &.drop-target-hover {
+        opacity: 1;
+        .split-percentages(50%);
+      }
+    }
+  }
+}
+

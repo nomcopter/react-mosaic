@@ -1,0 +1,146 @@
+/**
+ * @license
+ * Copyright 2016 Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import (reference) "../mixins";
+
+.mosaic-window, .mosaic-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 1px fade(black, 20%);
+
+  @toolbar-height: 30px;
+  .mosaic-window-toolbar {
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    height: @toolbar-height;
+    background: white;
+    box-shadow: 0 1px 1px fade(black, 20%);
+
+    &.draggable {
+      cursor: move;
+    }
+  }
+
+  .mosaic-window-title {
+    padding-left: 15px;
+    flex: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .mosaic-window-controls {
+    display: flex;
+    height: 100%;
+
+    .separator {
+      @separator-height: 20px;
+      height: @separator-height;
+      border-left: 1px solid black;
+      margin: (@toolbar-height - @separator-height)/2 4px;
+    }
+  }
+
+  .mosaic-window-body {
+    position: relative;
+    flex: 1;
+    height: 0;
+    background: white;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .mosaic-window-additional-actions-bar {
+    .absolute-fill(@top: @toolbar-height; @bottom: initial);
+    height: 0;
+    overflow: hidden;
+    background: white;
+    justify-content: flex-end;
+    display: flex;
+    z-index: 3;
+
+    .pt-button {
+      margin: 0;
+
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  .mosaic-window-body-overlay {
+    .absolute-fill();
+    opacity: 0;
+    background: white;
+    display: none;
+    z-index: 2;
+  }
+
+  &.additional-controls-open {
+    .mosaic-window-additional-actions-bar {
+      height: @toolbar-height;
+    }
+    .mosaic-window-body-overlay {
+      display: block;
+    }
+  }
+
+  .mosaic-preview {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 0;
+    border: 1px solid black;
+    max-height: 400px;
+
+    .mosaic-window-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h4 {
+      margin-bottom: 10px;
+    }
+
+    .pt-icon {
+      font-size: 72px;
+    }
+  }
+}
+
+.mosaic-root:not(.mosaic-blueprint-theme) {
+  .mosaic-default-control {
+    &.pt-icon-cross:before {
+      content: 'Close';
+    }
+    &.pt-icon-add-column-right:before {
+      content: 'Split';
+    }
+    &.pt-icon-exchange:before {
+      content: 'Replace';
+    }
+    &.pt-icon-maximize:before {
+      content: 'Expand';
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": true,
+        "outDir": "lib",
+        "experimentalDecorators": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "strictNullChecks": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true
+    },
+    "exclude": [
+        "node_modules",
+        "lib",
+        "dev/react-mosaic",
+        "webpack.config*.js"
+    ]
+}

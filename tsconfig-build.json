@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "rootDir": "src",
+        "declaration": true
+    },
+    "exclude": [
+        "node_modules",
+        "lib",
+        "test",
+        "dev",
+        "webpack.config*.js"
+    ],
+    "extends": "./tsconfig.json"
+}

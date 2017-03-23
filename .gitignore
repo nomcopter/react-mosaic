@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+lib/
+dev/react-mosaic/
+.*.swp
+react-mosaic.tar.bz2
+npm-debug.log
