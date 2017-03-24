@@ -1,5 +1,5 @@
 # react-mosaic
-[![CircleCI](https://circleci.com/gh/palantir/react-mosaic.svg?style=svg)](https://circleci.com/gh/palantir/react-mosaic)
+[![CircleCI](https://circleci.com/gh/palantir/react-mosaic.svg?style=svg&circle-token=86249c5568e6487ca0a01409b9a27e9839664a80)](https://circleci.com/gh/palantir/react-mosaic)
 [![npm](NPM_LINKfreact-mosaic.svg)](NPM_LINK/react-mosaic)
 
 react-mosaic is a full-featured React Tiling Window Manager meant to give a user complete control over their workspace.
