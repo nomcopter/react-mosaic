@@ -60,7 +60,7 @@ export interface MosaicUpdate<T> {
  * Mosaic needs a way to resolve `T` into react elements for display.
  * This provides a way to look them up. If `T` is a `React.ReactElement`, then this can simply be `_.identity`
  */
-export type ElementRetriever<T> = (t: T) => React.ReactElement<any>
+export type TileRenderer<T> = (t: T) => React.ReactElement<any>
 
 /**
  * Function that provides a new node to put into the tree

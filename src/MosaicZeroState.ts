@@ -19,7 +19,7 @@ import * as _ from 'lodash';
 import { NonIdealStateFactory } from '@blueprintjs/core';
 import * as PureRenderDecorator from 'pure-render-decorator';
 import { CreateNode } from './types';
-import { MosaicContext, MosaicActionsPropType } from './contextTypes';
+import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 
 const { button } = React.DOM;
 

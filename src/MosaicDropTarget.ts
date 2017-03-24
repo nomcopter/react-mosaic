@@ -17,8 +17,8 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { DropTarget, ConnectDropTarget } from 'react-dnd';
-import { MosaicDragType, MosaicDropTargetPosition, MosaicDropData, MosaicPath } from './types';
+import { ConnectDropTarget, DropTarget } from 'react-dnd';
+import { MosaicDragType, MosaicDropData, MosaicDropTargetPosition, MosaicPath } from './types';
 import DropTargetMonitor = __ReactDnd.DropTargetMonitor;
 
 const { div } = React.DOM;

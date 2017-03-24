@@ -20,12 +20,12 @@ import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { MosaicNode, ElementRetriever, MosaicUpdate, MosaicPath, MosaicDropTargetPosition } from './types';
+import { MosaicDropTargetPosition, MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
 import { MosaicTile } from './MosaicTile';
 import { MosaicZeroStateFactory } from './MosaicZeroState';
-import { createRemoveUpdate, createExpandUpdate, createHideUpdate, updateTree } from './mosaicUpdates';
+import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
 import { MosaicWindowDropTarget } from './MosaicDropTarget';
-import { MosaicRootActions, MosaicContext, MosaicActionsPropType } from './contextTypes';
+import { MosaicActionsPropType, MosaicContext, MosaicRootActions } from './contextTypes';
 
 const { div } = React.DOM;
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -34,7 +34,7 @@ export interface MosaicBaseProps<T> {
     /**
      * Lookup function to convert `T` to a displayable `ReactElement`
      */
-    elementRetriever: ElementRetriever<T>;
+    renderTile: TileRenderer<T>;
     /**
      * Called when a user initiates any change to the tree (removing, adding, moving, resizing, etc.)
      */
@@ -106,7 +106,7 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
     };
 
     render() {
-        const { className, elementRetriever, resizeable, zeroStateView } = this.props;
+        const { className, renderTile, resizeable, zeroStateView } = this.props;
         const node = this.getRoot();
 
         return div({
@@ -115,7 +115,7 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
             node == null ?
                 zeroStateView :
                 MosaicTile<T>({
-                    node, elementRetriever,
+                    node, renderTile,
                     resizeable: resizeable!,
                     getPath: this.getPath
                 }),

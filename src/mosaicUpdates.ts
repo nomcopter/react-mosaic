@@ -18,13 +18,13 @@ import * as _ from 'lodash';
 import * as update from 'immutability-helper';
 import {
     MosaicBranch,
-    MosaicUpdate,
     MosaicDirection,
-    MosaicNode,
     MosaicDropTargetPosition,
-    MosaicUpdateSpec,
+    MosaicNode,
     MosaicParent,
-    MosaicPath
+    MosaicPath,
+    MosaicUpdate,
+    MosaicUpdateSpec
 } from './types';
 import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 

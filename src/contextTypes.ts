@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import * as React from 'react';
-import { MosaicPath, MosaicNode, MosaicUpdate } from './types';
+import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
 
 /**
  * Mosaic provides functionality on the context for components within

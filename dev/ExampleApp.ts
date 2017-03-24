@@ -90,7 +90,7 @@ class ExampleAppClass extends React.Component<Props, State> {
                 )
             ),
             MosaicFactory<number>({
-                elementRetriever: (count: number) => MosaicWindowFactory<number>({
+                renderTile: (count: number) => MosaicWindowFactory<number>({
                         additionalControls: count === 3 ? additionalControls : [],
                         title: `Window ${count}`,
                         createNode: this.createNode

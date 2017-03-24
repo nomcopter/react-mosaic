@@ -4,6 +4,7 @@
 
 react-mosaic is a full-featured React Tiling Window Manager meant to give a user complete control over their workspace.
 It provides a simple and flexible API to tile arbitrarily complex react components across a user's view.
+react-mosaic is written in Typescript and provides typings but can be used in Javascript as well.
 
 The best way to see it is a simple [**Demo**](https://palantir.github.io/react-mosaic/).
 
@@ -34,9 +35,14 @@ See [BlueprintTheme.less](./src/BlueprintTheme.less) for an example of creating 
 
 #### Simple tiling of `ReactElement`s
 ```tsx
+import { Mosaic } from 'react-mosaic-component';
+
+// Make a simple extension class to preserve generic type checking in TSX
+class ElementMosaic extends Mosaic<React.ReactElement> { }
+
 export const app = (
-  <Mosaic
-    elementRetriever={ e => e }
+  <ElementMosaic
+    renderTile={ e => e }
     initialValue={{
       direction: 'row',
       first: <div>Left Window</div>,
@@ -49,14 +55,18 @@ export const app = (
   />
 );
 ```
-`elementRetriever` is a stateless lookup function to convert `T` into a displayable `ReactElement`.
-Here `T` is already a `ReactElement`, so `elementRetriever` can simply be the identity function.
+`renderTile` is a stateless lookup function to convert `T` into a displayable `ReactElement`.
+Here `T` is already a `ReactElement`, so `renderTile` can simply be the identity function.
 This example renders a simple tiled interface with one element on the left half, and two stacked elements on the right half. 
 The user can resize these panes but there is no other advanced functionality.
 
 #### Tiling with IDs
 ```tsx
 export type ViewId = string;
+
+// Make a simple extension class to preserve generic type checking in TSX
+class ViewIdMosaic extends Mosaic<ViewId> { }
+
 const ELEMENT_MAP: { [viewId: string]: React.ReactElement<any> } = {
   a: <div>Left Window</div>,
   b: <div>Top Right Window</div>,
@@ -64,8 +74,8 @@ const ELEMENT_MAP: { [viewId: string]: React.ReactElement<any> } = {
 };
 
 export const app = (
-  <Mosaic
-    elementRetriever={ id => ELEMENT_MAP[id] }
+  <ViewIdMosaic
+    renderTile={ id => ELEMENT_MAP[id] }
     initialValue={{
       direction: 'row',
       first: 'a',
@@ -95,8 +105,8 @@ const TITLE_MAP: { [viewId: string]: string } = {
 };
 
 export const app = (
-  <Mosaic
-    elementRetriever={ id => (
+  <ViewIdMosaic
+    renderTile={ id => (
       <MosaicWindow
         createNode={ () => 'new' }
         title={ TITLE_MAP[id] }
@@ -146,7 +156,7 @@ export interface MosaicBaseProps<T> {
     /**
      * Lookup function to convert `T` to a displayable `ReactElement`
      */
-    elementRetriever: ElementRetriever<T>;
+    renderTile: TileRenderer<T>;
     /**
      * Called when a user initiates any change to the tree (removing, adding, moving, resizing, etc.)
      */

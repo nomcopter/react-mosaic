@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import * as _ from 'lodash';
-import { MosaicNode, MosaicParent, MosaicDirection, MosaicBranch, MosaicPath } from './types';
+import { MosaicBranch, MosaicDirection, MosaicNode, MosaicParent, MosaicPath } from './types';
 
 function alternateDirection<T>(node: MosaicNode<T>, direction: MosaicDirection = 'row'): MosaicNode<T> {
     if (isParent(node)) {

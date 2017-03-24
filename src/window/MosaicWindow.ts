@@ -18,10 +18,14 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { DragSource, DropTarget, ConnectDragSource, ConnectDragPreview, ConnectDropTarget } from 'react-dnd';
-import { MosaicDirection, MosaicDragType, MosaicDropTargetPosition, MosaicDropData, CreateNode } from '../types';
+import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
+import { CreateNode, MosaicDirection, MosaicDragType, MosaicDropData, MosaicDropTargetPosition } from '../types';
 import { MosaicWindowDropTarget } from '../MosaicDropTarget';
-import { SeparatorFactory, DEFAULT_CONTROLS_WITHOUT_CREATION, DEFAULT_CONTROLS_WITH_CREATION } from './defaultToolbarControls';
+import {
+    DEFAULT_CONTROLS_WITH_CREATION,
+    DEFAULT_CONTROLS_WITHOUT_CREATION,
+    SeparatorFactory
+} from './defaultToolbarControls';
 import { getAndAssertNodeAtPathExists } from '../mosaicUtilities';
 import { createDragToUpdates } from '../mosaicUpdates';
 import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';

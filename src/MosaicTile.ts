@@ -17,16 +17,16 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { MosaicNode, ElementRetriever, MosaicUpdateSpec, MosaicPath } from './types';
+import { MosaicNode, MosaicPath, MosaicUpdateSpec, TileRenderer } from './types';
 import { Split } from './Split';
 import { isParent } from './mosaicUtilities';
-import { MosaicContext, MosaicActionsPropType, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
+import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
 
 const { div } = React.DOM;
 
 export interface MosaicTileProps<T> {
     node: MosaicNode<T>;
-    elementRetriever: ElementRetriever<T>;
+    renderTile: TileRenderer<T>;
     resizeable: boolean;
     getPath: () => MosaicPath;
     className?: string;
@@ -51,7 +51,7 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
     }
 
     render(): JSX.Element {
-        const { node, elementRetriever, resizeable } = this.props;
+        const { node, renderTile, resizeable } = this.props;
 
         if (isParent(node)) {
             const splitPercentage = node.splitPercentage == null ? 50 : node.splitPercentage;
@@ -69,7 +69,7 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
                         }
                     },
                     MosaicTile<T>({
-                        elementRetriever, resizeable,
+                        renderTile, resizeable,
                         node: node.first,
                         getPath: this.getFirstBranchPath
                     })),
@@ -85,13 +85,13 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
                         }
                     },
                     MosaicTile<T>({
-                        elementRetriever, resizeable,
+                        renderTile, resizeable,
                         node: node.second,
                         getPath: this.getSecondBranchPath
                     }))
             );
         } else {
-            return elementRetriever(node);
+            return renderTile(node);
         }
     }
 
