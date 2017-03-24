@@ -16,7 +16,7 @@ let config = {
   },
   output: {
     filename: '[name].js',
-    path: path.join(__dirname, 'dev/dist'),
+    path: path.join(__dirname, 'dev/docs'),
     publicPath: '/'
   },
   devtool: '#source-map',
