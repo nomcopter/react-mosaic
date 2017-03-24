@@ -16,7 +16,7 @@ The core of react-mosaic's operations revolve around the simple binary tree [spe
 
 ### Installation
 1. `yarn add react-mosaic-component`
-1. Make sure `lib/react-mosaic.css` is included on your page.
+1. Make sure `react-mosaic-component.css` is included on your page.
 1. Import the `Mosaic` component and use it in your app.
 
 ### Blueprint Theme
@@ -26,7 +26,7 @@ making it easier for the consumer to style it to match their own app.
 By default, Mosaic renders with the `mosaic-blueprint-theme` class. 
 This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to provide a good starting state.
 It is recommended to at least start developing with this theme. 
-To use it install Blueprint `npm install --save @blueprintjs/core` and add its CSS to your page.
+To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your page.
 
 See [BlueprintTheme.less](./src/BlueprintTheme.less) for an example of creating a theme.
 

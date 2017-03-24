@@ -19,7 +19,7 @@
     "dist": "yarn run bundle && tar cjf react-mosaic.tar.bz2 -C dev react-mosaic/",
     "test": "mocha --opts test/mocha.opts 'test/*.ts'",
     "lib.compile.ts": "tsc -p tsconfig-build.json",
-    "lib.compile.less": " lessc --source-map src/index.less lib/react-mosaic.css",
+    "lib.compile.less": " lessc --source-map src/index.less react-mosaic-component.css",
     "lib.remove.type.references": "replace '^/// <reference.+?\\n' '' lib -r --include='*.d.ts'"
   },
   "devDependencies": {

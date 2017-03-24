@@ -2,6 +2,7 @@
 node_modules/
 lib/
 dev/react-mosaic/
+/react-mosaic-component.css*
 .*.swp
 react-mosaic.tar.bz2
 npm-debug.log
