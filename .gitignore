@@ -1,7 +1,7 @@
 .idea/
 node_modules/
 lib/
-dev/react-mosaic/
+dev/dist/
 /react-mosaic-component.css*
 .*.swp
 react-mosaic.tar.bz2

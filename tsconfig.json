@@ -14,7 +14,7 @@
     "exclude": [
         "node_modules",
         "lib",
-        "dev/react-mosaic",
+        "dev/dist",
         "webpack.config*.js"
     ]
 }

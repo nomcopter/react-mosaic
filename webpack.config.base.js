@@ -16,7 +16,7 @@ let config = {
   },
   output: {
     filename: '[name].js',
-    path: path.join(__dirname, 'dev/react-mosaic'),
+    path: path.join(__dirname, 'dev/dist'),
     publicPath: '/'
   },
   devtool: '#source-map',

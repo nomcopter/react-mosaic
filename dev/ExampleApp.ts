@@ -34,7 +34,6 @@ import {
 import './example.less';
 import '../src/index.less';
 import '@blueprintjs/core/dist/blueprint.css';
-import '@elements/blueprint-palantir/dist/blueprint-palantir.css';
 import { MosaicDirection } from '../src/types';
 
 const { div, h1, a, button, span } = React.DOM;
@@ -71,7 +70,7 @@ class ExampleAppClass extends React.Component<Props, State> {
             div({ className: 'pt-navbar pt-dark' },
                 div({ className: 'pt-navbar-group pt-align-left' },
                     div({ className: 'pt-logo' }),
-                    div({ className: 'pt-navbar-heading pt-blender' },
+                    div({ className: 'pt-navbar-heading' },
                         a({
                             className: 'pt-app-title',
                             href: 'https://github.com/palantir/react-mosaic'
@@ -90,24 +89,22 @@ class ExampleAppClass extends React.Component<Props, State> {
                     }, 'Add Window to Top Right')
                 )
             ),
-            div({ className: 'pt-app' },
-                MosaicFactory<number>({
-                    elementRetriever: (count: number) => MosaicWindowFactory<number>({
-                            additionalControls: count === 3 ? additionalControls : [],
-                            title: `Window ${count}`,
-                            createNode: this.createNode
-                        },
-                        div({ className: 'example-window' },
-                            h1({}, `Window ${count}`)
-                        )
-                    ),
-                    zeroStateView: MosaicZeroStateFactory({
+            MosaicFactory<number>({
+                elementRetriever: (count: number) => MosaicWindowFactory<number>({
+                        additionalControls: count === 3 ? additionalControls : [],
+                        title: `Window ${count}`,
                         createNode: this.createNode
-                    }),
-                    value: this.state.currentNode,
-                    onChange: this.onChange
-                })
-            )
+                    },
+                    div({ className: 'example-window' },
+                        h1({}, `Window ${count}`)
+                    )
+                ),
+                zeroStateView: MosaicZeroStateFactory({
+                    createNode: this.createNode
+                }),
+                value: this.state.currentNode,
+                onChange: this.onChange
+            })
         );
     }
 

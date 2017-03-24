@@ -11,12 +11,11 @@
     "url": "https://github.com/palantir/react-mosaic.git"
   },
   "scripts": {
-    "clean": "rm -rf lib/ dev/react-mosaic/",
-    "dev": "webpack-dev-server --config webpack.config.hot.js --inline --hot --content-base dev/react-mosaic/ --host 0.0.0.0 --port 8092",
+    "clean": "rm -rf lib/ dev/dist/",
+    "dev": "webpack-dev-server --config webpack.config.hot.js --inline --hot --content-base dev/dist/ --host 0.0.0.0 --port 8092",
     "build": "npm-run-all clean lib.compile.ts lib.compile.less lib.remove.type.references",
     "prepublish": "yarn run build",
     "bundle": "yarn run clean && webpack",
-    "dist": "yarn run bundle && tar cjf react-mosaic.tar.bz2 -C dev react-mosaic/",
     "test": "mocha --opts test/mocha.opts 'test/*.ts'",
     "lib.compile.ts": "tsc -p tsconfig-build.json",
     "lib.compile.less": " lessc --source-map src/index.less react-mosaic-component.css",
