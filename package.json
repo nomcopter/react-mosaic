@@ -70,5 +70,14 @@
   },
   "peerDependencies": {
     "react": "^15.0.0 || ^0.14.0"
-  }
+  },
+  "keywords": [
+    "ui",
+    "palantir",
+    "react",
+    "component",
+    "typescript",
+    "tiling-window-manager",
+    "window-manager"
+  ]
 }
