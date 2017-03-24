@@ -339,20 +339,6 @@ export interface MosaicUpdateSpec<T> {
 }
 ```
 
-## Changelog
-
-### 0.8.1
-
-* Strip reference comments from generated *.d.ts files to workaround https://github.com/Microsoft/TypeScript/issues/11634#issuecomment-264279606
-
-### 0.8.0
-
-* (BREAKING) Switch to [context](#advanced-api). 
-If you use props that were cloned in to components then you need to update them to use the methods provided on context instead.
-* (BREAKING) Upgrade to new TS and OS blueprint and old closed-source peer dependency removed.
-* (BREAKING) Add [themes](#blueprint-theme)
-* (BREAKING) Moved compiled CSS to `lib/`
-
 ## License
 Copyright 2016 Palantir Technologies
 
