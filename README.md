@@ -1,11 +1,11 @@
 # react-mosaic
-[![CircleCI](https://img.shields.io/circleci/token/b53188a70d37f7a225235198c6216287bf6a24c7/project/github/palantir/react-mosaic.svg)](https://circleci.com/gh/palantir/react-mosaic)
+[![CircleCI](https://img.shields.io/circleci/token/b53188a70d37f7a225235198c6216287bf6a24c7/project/github/palantir/react-mosaic/master.svg)](https://circleci.com/gh/palantir/react-mosaic)
 [![npm](https://img.shields.io/npm/v/react-mosaic-component.svg)](https://www.npmjs.com/package/react-mosaic-component)
 
 react-mosaic is a full-featured React Tiling Window Manager meant to give a user complete control over their workspace.
 It provides a simple and flexible API to tile arbitrarily complex react components across a user's view.
 
-The best way to see it is a simple [**Demo**](DEMO_URL).
+The best way to see it is a simple [**Demo**](https://palantir.github.io/react-mosaic/).
 
 #### Screencast
 [![screencast demo](./screencast.gif)](./screencast.gif)
