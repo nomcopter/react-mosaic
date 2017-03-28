@@ -23,3 +23,8 @@ test:
     - "yarn run test -- --reporter mocha-junit-reporter":
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+general:
+  branches:
+    ignore:
+      - gh-pages # list of branches to ignore
+
