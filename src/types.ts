@@ -47,7 +47,7 @@ export interface MosaicUpdateSpec<T> {
     };
     direction?: {
         $set: MosaicDirection;
-    }
+    };
     first?: MosaicUpdateSpec<T>;
     second?: MosaicUpdateSpec<T>;
 }

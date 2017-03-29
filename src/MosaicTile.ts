@@ -47,7 +47,7 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
     getChildContext(): Partial<MosaicTileContext<T>> {
         return {
             getMosaicPath: this.props.getPath
-        }
+        };
     }
 
     render(): JSX.Element {

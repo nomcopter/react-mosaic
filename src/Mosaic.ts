@@ -98,7 +98,7 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
     getChildContext(): MosaicContext<T> {
         return {
             mosaicActions: this.actions
-        }
+        };
     }
 
     state: State<T> = {

@@ -58,7 +58,7 @@ class SplitClass extends React.Component<SplitProps, void> {
         const positionStyle = this.props.direction === 'column' ? 'top' : 'left';
         return {
             [positionStyle]: `${this.props.splitPercentage}%`
-        }
+        };
     }
 
     private onMouseDown = () => {

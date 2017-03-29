@@ -44,7 +44,7 @@ class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStatePr
                 className: 'pt-button pt-icon-add',
                 onClick: this.replace
             }, 'Add New Window')
-        })
+        });
     }
 
     private replace = () =>

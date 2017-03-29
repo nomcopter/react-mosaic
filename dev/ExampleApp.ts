@@ -117,7 +117,7 @@ class ExampleAppClass extends React.Component<Props, State> {
 
         this.setState({
             currentNode: createBalancedTreeFromLeaves(leaves)
-        })
+        });
     };
 
     private addToTopRight = () => {

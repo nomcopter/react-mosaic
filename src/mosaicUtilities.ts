@@ -24,7 +24,7 @@ function alternateDirection<T>(node: MosaicNode<T>, direction: MosaicDirection =
             direction,
             first: alternateDirection(node.first, nextDirection),
             second: alternateDirection(node.second, nextDirection)
-        }
+        };
     } else {
         return node;
     }

@@ -124,7 +124,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
                 split: this.split,
                 replaceWithNew: this.swap
             }
-        }
+        };
     }
 
     private rootElement: HTMLElement;
@@ -222,7 +222,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
         return MosaicWindowDropTarget({
             position, path,
             key: position
-        })
+        });
     };
 
     private checkCreateNode() {
@@ -246,7 +246,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
                 mosaicActions.replaceWith(path, {
                     direction, second,
                     first: getAndAssertNodeAtPathExists(root, path)
-                }))
+                }));
     };
 
     private swap = () => {
@@ -255,7 +255,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
         const { createNode } = this.props;
         return Promise.resolve(createNode!())
             .then((node) =>
-                mosaicActions.replaceWith(getMosaicPath(), node))
+                mosaicActions.replaceWith(getMosaicPath(), node));
     };
 }
 export const MosaicWindow: React.ComponentClass<MosaicWindowProps<any>> = MosaicWindowComponentClass;
