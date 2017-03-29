@@ -14,7 +14,7 @@
     "clean": "rm -rf lib/ dev/docs/",
     "dev": "webpack-dev-server --config webpack.config.hot.js --inline --hot --content-base dev/docs/ --host 0.0.0.0 --port 8092",
     "build": "npm-run-all clean lib.compile.ts lib.compile.less lib.remove.type.references",
-    "prepublish": "yarn run build",
+    "prepublishOnly": "yarn run build",
     "bundle": "yarn run clean && webpack",
     "test": "mocha --opts test/mocha.opts 'test/*.ts'",
     "lib.compile.ts": "tsc -p tsconfig-build.json",
