@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
 import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { MosaicNode, MosaicPath, MosaicUpdateSpec, TileRenderer } from './types';
-import { Split } from './Split';
-import { isParent } from './mosaicUtilities';
+import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
+import { isParent } from './mosaicUtilities';
+import { Split } from './Split';
+import { MosaicNode, MosaicPath, MosaicUpdateSpec, TileRenderer } from './types';
 
 const { div } = React.DOM;
 
@@ -37,16 +37,16 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
     context: MosaicContext<T>;
 
     static contextTypes = {
-        mosaicActions: MosaicActionsPropType
+        mosaicActions: MosaicActionsPropType,
     };
 
     static childContextTypes = {
-        getMosaicPath: MosaicPathGetterPropType
+        getMosaicPath: MosaicPathGetterPropType,
     };
 
     getChildContext(): Partial<MosaicTileContext<T>> {
         return {
-            getMosaicPath: this.props.getPath
+            getMosaicPath: this.props.getPath,
         };
     }
 
@@ -59,36 +59,36 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
             return div({
                     className: classNames('mosaic-tile', this.props.className, {
                         '-column': node.direction === 'column',
-                        '-row': node.direction === 'row'
-                    })
+                        '-row': node.direction === 'row',
+                    }),
                 },
                 div({
                         className: 'mosaic-branch -first',
                         style: {
-                            [sizeStyle]: `${splitPercentage}%`
-                        }
+                            [sizeStyle]: `${splitPercentage}%`,
+                        },
                     },
                     MosaicTile<T>({
                         renderTile, resizeable,
                         node: node.first,
-                        getPath: this.getFirstBranchPath
+                        getPath: this.getFirstBranchPath,
                     })),
                 resizeable && Split({
                     splitPercentage,
                     direction: node.direction,
-                    onChange: this.onResize
+                    onChange: this.onResize,
                 }),
                 div({
                         className: 'mosaic-branch -second',
                         style: {
-                            [sizeStyle]: `${100 - splitPercentage}%`
-                        }
+                            [sizeStyle]: `${100 - splitPercentage}%`,
+                        },
                     },
                     MosaicTile<T>({
                         renderTile, resizeable,
                         node: node.second,
-                        getPath: this.getSecondBranchPath
-                    }))
+                        getPath: this.getSecondBranchPath,
+                    })),
             );
         } else {
             return renderTile(node);
@@ -98,14 +98,14 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
     private replaceWith = (spec: MosaicUpdateSpec<T>) =>
         this.context.mosaicActions.updateTree([{
             path: this.props.getPath(),
-            spec
+            spec,
         }]);
 
     private onResize = (percentage: number) => {
         this.replaceWith({
             splitPercentage: {
-                $set: percentage
-            }
+                $set: percentage,
+            },
         });
     };
 

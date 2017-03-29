@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import * as _ from 'lodash';
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
-import { CreateNode, MosaicDirection, MosaicDragType, MosaicDropData, MosaicDropTargetPosition } from '../types';
+import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';
 import { MosaicWindowDropTarget } from '../MosaicDropTarget';
+import { createDragToUpdates } from '../mosaicUpdates';
+import { getAndAssertNodeAtPathExists } from '../mosaicUtilities';
+import { CreateNode, MosaicDirection, MosaicDragType, MosaicDropData, MosaicDropTargetPosition } from '../types';
 import {
     DEFAULT_CONTROLS_WITH_CREATION,
     DEFAULT_CONTROLS_WITHOUT_CREATION,
-    SeparatorFactory
+    SeparatorFactory,
 } from './defaultToolbarControls';
-import { getAndAssertNodeAtPathExists } from '../mosaicUtilities';
-import { createDragToUpdates } from '../mosaicUpdates';
-import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';
 import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
 
 const { div, span, button, h4 } = React.DOM;
@@ -64,13 +64,13 @@ interface DragDropContainerComponent extends React.Component<any, any> {
 }
 
 const dragSource = {
-    beginDrag: (props: Props<any>, monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
+    beginDrag: (_props: Props<any>, _monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
         const context = component.getDecoratedComponentInstance().context;
         // The defer is necessary as the element must be present on start for HTML DnD to not cry
         _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
         return {};
     },
-    endDrag: (props: Props<any>, monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
+    endDrag: (_props: Props<any>, monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
         const context = component.getDecoratedComponentInstance().context;
         const path = context.getMosaicPath();
         const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
@@ -83,51 +83,52 @@ const dragSource = {
                 path: _.dropRight(path),
                 spec: {
                     splitPercentage: {
-                        $set: null
-                    }
-                }
+                        $set: null,
+                    },
+                },
             }]);
         }
-    }
+    },
 };
 
 const dropTarget = {};
 
-@(DragSource(MosaicDragType.WINDOW, dragSource, (connect, monitor): DragSourceProps => ({
+@(DragSource(MosaicDragType.WINDOW, dragSource, (connect, _monitor): DragSourceProps => ({
     connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview()
+    connectDragPreview: connect.dragPreview(),
 })) as ClassDecorator)
 @(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
 })) as ClassDecorator)
 @PureRenderDecorator
 class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
     static defaultProps = {
         additionalControlButtonText: 'More',
-        draggable: true
+        draggable: true,
     } as any;
-    state: State = {
-        additionalControlsOpen: false
-    };
-    context: MosaicTileContext<T>;
 
     static contextTypes = MosaicTileContext;
 
     static childContextTypes = {
-        mosaicWindowActions: MosaicWindowActionsPropType
+        mosaicWindowActions: MosaicWindowActionsPropType,
     };
+
+    state: State = {
+        additionalControlsOpen: false,
+    };
+    context: MosaicTileContext<T>;
+
+    private rootElement: HTMLElement;
 
     getChildContext(): Partial<MosaicWindowContext<T>> {
         return {
             mosaicWindowActions: {
                 split: this.split,
-                replaceWithNew: this.swap
-            }
+                replaceWithNew: this.swap,
+            },
         };
     }
-
-    private rootElement: HTMLElement;
 
     render() {
         const { className, isOver, title, additionalControls, connectDropTarget, connectDragPreview } = this.props;
@@ -135,20 +136,20 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
         return connectDropTarget(div({
                 className: classNames('mosaic-window mosaic-drop-target', className, {
                     'drop-target-hover': isOver,
-                    'additional-controls-open': this.state.additionalControlsOpen
+                    'additional-controls-open': this.state.additionalControlsOpen,
                 }),
-                ref: (element) => this.rootElement = element
+                ref: (element) => this.rootElement = element,
             },
             this.renderToolbar(),
             div({ className: 'mosaic-window-body' },
-                this.props.children!
+                this.props.children!,
             ),
             div({
                 className: 'mosaic-window-body-overlay',
-                onClick: () => this.setState({ additionalControlsOpen: false })
+                onClick: () => this.setState({ additionalControlsOpen: false }),
             }),
             div({ className: 'mosaic-window-additional-actions-bar' },
-                additionalControls
+                additionalControls,
             ),
             connectDragPreview(
                 div({ className: 'mosaic-preview' },
@@ -156,13 +157,13 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
                         div({ className: 'mosaic-window-title' }, title)),
                     div({ className: 'mosaic-window-body' },
                         h4({}, title),
-                        span({ className: 'pt-icon pt-icon-application' })
-                    )
-                )
+                        span({ className: 'pt-icon pt-icon-application' }),
+                    ),
+                ),
             ),
             div({ className: 'drop-target-container' },
-                _.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget)
-            )
+                _.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget),
+            ),
         ));
     }
 
@@ -180,7 +181,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
     private renderToolbar() {
         const {
             title, draggable, additionalControls, additionalControlButtonText,
-            connectDragSource
+            connectDragSource,
         } = this.props;
         const { additionalControlsOpen } = this.state;
         const toolbarControls = this.getToolbarControls();
@@ -188,7 +189,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
         let titleDiv: React.ReactElement<any> =
             div({
                 title,
-                className: 'mosaic-window-title'
+                className: 'mosaic-window-title',
             }, title);
 
         const draggableAndNotRoot = draggable && this.context.getMosaicPath().length > 0;
@@ -199,20 +200,20 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
         const hasAdditionalControls = !_.isEmpty(additionalControls);
 
         return div({
-                className: classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot })
+                className: classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot }),
             },
             titleDiv,
             div({ className: 'mosaic-window-controls pt-button-group' },
                 hasAdditionalControls && button({
                         onClick: () => this.setState({ additionalControlsOpen: !additionalControlsOpen }),
                         className: classNames('pt-button pt-minimal pt-icon-more', {
-                            'pt-active': additionalControlsOpen
-                        })
+                            'pt-active': additionalControlsOpen,
+                        }),
                     },
-                    span({ className: 'control-text' }, additionalControlButtonText!)
+                    span({ className: 'control-text' }, additionalControlButtonText!),
                 ),
                 hasAdditionalControls && SeparatorFactory(),
-                toolbarControls
+                toolbarControls,
             ));
     }
 
@@ -221,7 +222,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
 
         return MosaicWindowDropTarget({
             position, path,
-            key: position
+            key: position,
         });
     };
 
@@ -245,7 +246,7 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
             .then((second) =>
                 mosaicActions.replaceWith(path, {
                     direction, second,
-                    first: getAndAssertNodeAtPathExists(root, path)
+                    first: getAndAssertNodeAtPathExists(root, path),
                 }));
     };
 

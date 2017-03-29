@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
 import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import { MosaicDirection } from './types';
 
 const { div } = React.DOM;
@@ -37,7 +37,7 @@ class SplitClass extends React.Component<SplitProps, void> {
 
     static defaultProps = {
         onChange: () => void 0,
-        onRelease: () => void 0
+        onRelease: () => void 0,
     } as any;
 
     render() {
@@ -45,7 +45,7 @@ class SplitClass extends React.Component<SplitProps, void> {
             className: 'mosaic-split',
             ref: (el) => this.rootElement = el,
             onMouseDown: this.onMouseDown,
-            style: this.computeStyle()
+            style: this.computeStyle(),
         }, div({ className: 'mosaic-split-line' }));
     }
 
@@ -57,7 +57,7 @@ class SplitClass extends React.Component<SplitProps, void> {
     private computeStyle() {
         const positionStyle = this.props.direction === 'column' ? 'top' : 'left';
         return {
-            [positionStyle]: `${this.props.splitPercentage}%`
+            [positionStyle]: `${this.props.splitPercentage}%`,
         };
     }
 

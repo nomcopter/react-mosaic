@@ -1,58 +1,33 @@
 {
-    "rules": {
-        "class-name": true,
-        "comment-format": [
-            true,
-            "check-space"
-        ],
-        "indent": [
-            true,
-            "spaces"
-        ],
-        "no-duplicate-variable": true,
-        "no-eval": true,
-        "no-internal-module": true,
-        "no-trailing-whitespace": true,
-        "no-var-keyword": true,
-        "one-line": [
-            true,
-            "check-open-brace",
-            "check-whitespace"
-        ],
-        "quotemark": [
-            true,
-            "single"
-        ],
-        "semicolon": [
-            true,
-            "always",
-            "ignore-bound-class-methods"
-        ],
-        "triple-equals": [
-            true,
-            "allow-null-check"
-        ],
-        "typedef-whitespace": [
-            true,
-            {
-                "call-signature": "nospace",
-                "index-signature": "nospace",
-                "parameter": "nospace",
-                "property-declaration": "nospace",
-                "variable-declaration": "nospace"
-            }
-        ],
-        "variable-name": [
-            true,
-            "ban-keywords"
-        ],
-        "whitespace": [
-            true,
-            "check-branch",
-            "check-decl",
-            "check-operator",
-            "check-separator",
-            "check-type"
-        ]
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "array-type": false,
+    "interface-name": {
+      "options": "never-prefix"
+    },
+    "max-classes-per-file": false,
+    "max-line-length": {
+      "options": 150
+    },
+    "member-access": false,
+    "member-ordering": false,
+    "object-literal-sort-keys": false,
+    "quotemark": {
+      "options": "single"
+    },
+    "semicolon": {
+      "options": "ignore-bound-class-methods"
+    },
+    "variable-name": {
+      "options": [
+        "allow-leading-underscore",
+        "allow-pascal-case"
+      ]
     }
+  },
+  "rulesDirectory": []
 }

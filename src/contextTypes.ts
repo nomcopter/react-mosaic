@@ -108,14 +108,14 @@ export const MosaicActionsPropType = React.PropTypes.shape({
     hide: React.PropTypes.func.isRequired,
     replaceWith: React.PropTypes.func.isRequired,
     updateTree: React.PropTypes.func.isRequired,
-    getRoot: React.PropTypes.func.isRequired
+    getRoot: React.PropTypes.func.isRequired,
 }).isRequired;
 
 export const MosaicPathGetterPropType = React.PropTypes.func.isRequired;
 
 export const MosaicWindowActionsPropType = React.PropTypes.shape({
     split: React.PropTypes.func.isRequired,
-    replaceWithNew: React.PropTypes.func.isRequired
+    replaceWithNew: React.PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
@@ -124,11 +124,11 @@ export const MosaicWindowActionsPropType = React.PropTypes.shape({
 
 export const MosaicTileContext = {
     mosaicActions: MosaicActionsPropType,
-    getMosaicPath: MosaicPathGetterPropType
+    getMosaicPath: MosaicPathGetterPropType,
 };
 
 export const MosaicWindowContext = {
     mosaicWindowActions: MosaicWindowActionsPropType,
     mosaicActions: MosaicActionsPropType,
-    getMosaicPath: MosaicPathGetterPropType
+    getMosaicPath: MosaicPathGetterPropType,
 };

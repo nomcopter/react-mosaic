@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as _ from 'lodash';
 import * as update from 'immutability-helper';
+import * as _ from 'lodash';
+import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 import {
     MosaicBranch,
     MosaicDirection,
@@ -24,12 +25,12 @@ import {
     MosaicParent,
     MosaicPath,
     MosaicUpdate,
-    MosaicUpdateSpec
+    MosaicUpdateSpec,
 } from './types';
-import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 
 // https://github.com/Microsoft/TypeScript/issues/9944
 let FIX_9944: MosaicParent<any>;
+FIX_9944 = null!;
 
 /**
  * Used to prepare `update` for `immutability-helper`
@@ -66,7 +67,7 @@ export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
  * @returns {{path: T[], spec: {$set: MosaicNode<T>}}}
  */
 export function createRemoveUpdate<T>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
-    let parentPath = _.dropRight(path);
+    const parentPath = _.dropRight(path);
     const nodeToRemove = _.last(path);
     const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove));
     const sibling = getAndAssertNodeAtPathExists(root, siblingPath);
@@ -74,11 +75,10 @@ export function createRemoveUpdate<T>(root: MosaicNode<T> | null, path: MosaicPa
     return {
         path: parentPath,
         spec: {
-            $set: sibling
-        }
+            $set: sibling,
+        },
     };
 }
-
 
 function isPathPrefixEqual(a: MosaicPath, b: MosaicPath, length: number) {
     return _.isEqual(_.take(a, length), _.take(b, length));
@@ -98,13 +98,13 @@ export function createDragToUpdates<T>(root: MosaicNode<T>,
                                        destinationPath: MosaicPath,
                                        position: MosaicDropTargetPosition): MosaicUpdate<T>[] {
     let destinationNode = getAndAssertNodeAtPathExists(root, destinationPath);
-    let updates: MosaicUpdate<T>[] = [];
+    const updates: MosaicUpdate<T>[] = [];
 
     const destinationIsParentOfSource = isPathPrefixEqual(sourcePath, destinationPath, destinationPath.length);
     if (destinationIsParentOfSource) {
         // Must explicitly remove source from the destination node
         destinationNode = updateTree(destinationNode, [
-            createRemoveUpdate(destinationNode, _.drop(sourcePath, destinationPath.length))
+            createRemoveUpdate(destinationNode, _.drop(sourcePath, destinationPath.length)),
         ]);
     } else {
         // Can remove source normally
@@ -136,8 +136,8 @@ export function createDragToUpdates<T>(root: MosaicNode<T>,
     updates.push({
         path: destinationPath,
         spec: {
-            $set: { first, second, direction }
-        }
+            $set: { first, second, direction },
+        },
     });
 
     return updates;
@@ -162,9 +162,9 @@ export function createHideUpdate<T>(path: MosaicPath): MosaicUpdate<T> {
         path: targetPath,
         spec: {
             splitPercentage: {
-                $set: splitPercentage
-            }
-        }
+                $set: splitPercentage,
+            },
+        },
     };
 }
 
@@ -178,17 +178,17 @@ export function createExpandUpdate<T>(path: MosaicPath, percentage: number): Mos
     let spec: MosaicUpdateSpec<T> = {};
     for (let i = path.length - 1; i >= 0; i--) {
         const branch: MosaicBranch = path[i];
-        let splitPercentage = branch === 'first' ? percentage : 100 - percentage;
+        const splitPercentage = branch === 'first' ? percentage : 100 - percentage;
         spec = {
             splitPercentage: {
-                $set: splitPercentage
+                $set: splitPercentage,
             },
-            [branch]: spec
+            [branch]: spec,
         };
     }
 
     return {
         spec,
-        path: []
+        path: [],
     };
 }

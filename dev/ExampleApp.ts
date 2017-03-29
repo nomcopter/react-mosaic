@@ -14,27 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
+import '@blueprintjs/core/dist/blueprint.css';
 import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import {
-    MosaicFactory,
-    MosaicWindowFactory,
     Corner,
-    MosaicNode,
-    MosaicParent,
-    MosaicZeroStateFactory,
     createBalancedTreeFromLeaves,
     getLeaves,
-    getOtherDirection,
     getNodeAtPath,
+    getOtherDirection,
     getPathToCorner,
-    updateTree
+    MosaicFactory,
+    MosaicNode,
+    MosaicParent,
+    MosaicWindowFactory,
+    MosaicZeroStateFactory,
+    updateTree,
 } from '../src/index';
-import './example.less';
 import '../src/index.less';
-import '@blueprintjs/core/dist/blueprint.css';
 import { MosaicDirection } from '../src/types';
+import './example.less';
 
 const { div, h1, a, button, span } = React.DOM;
 
@@ -43,26 +43,22 @@ let windowCount = 4;
 class NoOpButton extends React.Component<{}, void> {
     render() {
         return div({ className: 'pt-button-group pt-minimal' },
-            button({ className: 'pt-button' }, 'Proof of Concept Button!')
+            button({ className: 'pt-button' }, 'Proof of Concept Button!'),
         );
     }
 }
 const additionalControls = [
-    React.createElement(NoOpButton, { key: 'no-op' })
+    React.createElement(NoOpButton, { key: 'no-op' }),
 ];
-
-interface Props {
-
-}
 
 interface State {
     currentNode: MosaicNode<number> | null;
 }
 
 @PureRenderDecorator
-class ExampleAppClass extends React.Component<Props, State> {
+class ExampleAppClass extends React.Component<void, State> {
     state: State = {
-        currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1))
+        currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1)),
     };
 
     render() {
@@ -73,9 +69,9 @@ class ExampleAppClass extends React.Component<Props, State> {
                     div({ className: 'pt-navbar-heading' },
                         a({
                             className: 'pt-app-title',
-                            href: 'https://github.com/palantir/react-mosaic'
-                        }, 'react-mosaic')
-                    )
+                            href: 'https://github.com/palantir/react-mosaic',
+                        }, 'react-mosaic'),
+                    ),
                 ),
                 div({ className: 'pt-navbar-group pt-align-right pt-button-group' },
                     span({ className: 'actions-label' }, 'Example Actions:'),
@@ -86,25 +82,25 @@ class ExampleAppClass extends React.Component<Props, State> {
                     button({
                         className: 'pt-button pt-icon-arrow-top-right',
                         onClick: this.addToTopRight,
-                    }, 'Add Window to Top Right')
-                )
+                    }, 'Add Window to Top Right'),
+                ),
             ),
             MosaicFactory<number>({
                 renderTile: (count: number) => MosaicWindowFactory<number>({
                         additionalControls: count === 3 ? additionalControls : [],
                         title: `Window ${count}`,
-                        createNode: this.createNode
+                        createNode: this.createNode,
                     },
                     div({ className: 'example-window' },
-                        h1({}, `Window ${count}`)
-                    )
+                        h1({}, `Window ${count}`),
+                    ),
                 ),
                 zeroStateView: MosaicZeroStateFactory({
-                    createNode: this.createNode
+                    createNode: this.createNode,
                 }),
                 value: this.state.currentNode,
-                onChange: this.onChange
-            })
+                onChange: this.onChange,
+            }),
         );
     }
 
@@ -116,7 +112,7 @@ class ExampleAppClass extends React.Component<Props, State> {
         const leaves = getLeaves(this.state.currentNode);
 
         this.setState({
-            currentNode: createBalancedTreeFromLeaves(leaves)
+            currentNode: createBalancedTreeFromLeaves(leaves),
         });
     };
 
@@ -142,9 +138,9 @@ class ExampleAppClass extends React.Component<Props, State> {
                 path,
                 spec: {
                     $set: {
-                        direction, first, second
-                    }
-                }
+                        direction, first, second,
+                    },
+                },
             }]);
         } else {
             currentNode = ++windowCount;

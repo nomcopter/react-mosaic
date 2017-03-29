@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
 import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import { ConnectDropTarget, DropTarget } from 'react-dnd';
 import { MosaicDragType, MosaicDropData, MosaicDropTargetPosition, MosaicPath } from './types';
 import DropTargetMonitor = __ReactDnd.DropTargetMonitor;
@@ -36,15 +36,15 @@ interface DropTargetProps {
 type Props = MosaicWindowDropTargetProps & DropTargetProps;
 
 const dropTarget = {
-    drop: (props: Props, monitor: DropTargetMonitor): MosaicDropData => ({
+    drop: (props: Props, _monitor: DropTargetMonitor): MosaicDropData => ({
         path: props.path,
-        position: props.position
-    })
+        position: props.position,
+    }),
 };
 
 @(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
     connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver()
+    isOver: monitor.isOver(),
 })) as ClassDecorator)
 @PureRenderDecorator
 class MosaicWindowDropTargetClass extends React.Component<Props, void> {
@@ -52,8 +52,8 @@ class MosaicWindowDropTargetClass extends React.Component<Props, void> {
         const { position, isOver, connectDropTarget } = this.props;
         return connectDropTarget(div({
             className: classNames('drop-target', position, {
-                'drop-target-hover': isOver
-            })
+                'drop-target-hover': isOver,
+            }),
         }));
     }
 }

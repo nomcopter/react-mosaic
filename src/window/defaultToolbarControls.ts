@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import * as _ from 'lodash';
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import { MosaicWindowContext } from '../contextTypes';
 
 const { button, div, span } = React.DOM;
@@ -29,9 +29,9 @@ export function createDefaultToolbarButton(title: string,
     return button({
             title,
             onClick,
-            className: classNames('mosaic-default-control pt-button pt-minimal', className)
+            className: classNames('mosaic-default-control pt-button pt-minimal', className),
         },
-        text! && span({ className: 'control-text' }, text!)
+        text! && span({ className: 'control-text' }, text!),
     );
 }
 
@@ -135,9 +135,9 @@ export const DEFAULT_CONTROLS_WITH_CREATION = [
     ReplaceButtonFactory({ key: 'REPLACE' }),
     SplitButtonFactory({ key: 'SPLIT' }),
     ExpandButtonFactory({ key: 'EXPAND' }),
-    RemoveButtonFactory({ key: 'REMOVE' })
+    RemoveButtonFactory({ key: 'REMOVE' }),
 ];
 export const DEFAULT_CONTROLS_WITHOUT_CREATION = [
     ExpandButtonFactory({ key: 'EXPAND' }),
-    RemoveButtonFactory({ key: 'REMOVE' })
+    RemoveButtonFactory({ key: 'REMOVE' }),
 ];
