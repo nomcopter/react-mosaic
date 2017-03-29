@@ -16,7 +16,7 @@
     "build": "npm-run-all clean lib.compile.ts lib.compile.less lib.remove.type.references",
     "prepublishOnly": "yarn run build",
     "bundle": "yarn run clean && webpack",
-    "test": "mocha --opts test/mocha.opts 'test/*.ts' && tslint src/**/*.ts dev/**/*.ts",
+    "test": "tslint src/**/*.ts dev/**/*.ts && mocha --opts test/mocha.opts 'test/*.ts'",
     "lib.compile.ts": "tsc -p tsconfig-build.json",
     "lib.compile.less": " lessc --source-map src/index.less react-mosaic-component.css",
     "lib.remove.type.references": "replace '^/// <reference.+?\\n' '' lib -r --include='*.d.ts'"
