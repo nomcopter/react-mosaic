@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 import { expect } from 'chai';
-import { MosaicNode, getNodeAtPath } from '../src/index';
-import { updateTree, createRemoveUpdate, createDragToUpdates } from '../src/mosaicUpdates';
-import { MosaicPath, MosaicDropTargetPosition, MosaicParent } from '../src/types';
+import { getNodeAtPath, MosaicNode } from '../src/index';
+import { createDragToUpdates, createRemoveUpdate, updateTree } from '../src/mosaicUpdates';
+import { MosaicDropTargetPosition, MosaicParent, MosaicPath } from '../src/types';
 
 const MEDIUM_TREE: MosaicNode<number> = {
     direction: 'row',
@@ -27,10 +27,10 @@ const MEDIUM_TREE: MosaicNode<number> = {
         first: {
             direction: 'column',
             first: 2,
-            second: 3
+            second: 3,
         },
-        second: 4
-    }
+        second: 4,
+    },
 };
 
 describe('mosaicUpdates', () => {
@@ -38,8 +38,8 @@ describe('mosaicUpdates', () => {
         const simpleUpdatedTree = updateTree(MEDIUM_TREE, [{
             path: ['first'],
             spec: {
-                $set: 5
-            }
+                $set: 5,
+            },
         }]);
         it('should apply update', () => {
             expect(getNodeAtPath(simpleUpdatedTree, ['first'])).to.equal(5);
@@ -127,7 +127,7 @@ describe('mosaicUpdates', () => {
             it('direction should be correct', () => {
                 expect((getNodeAtPath(updatedTree, []) as MosaicParent<number>).direction).to.equal('row');
             });
-        })
+        });
     });
     // TODO: createHideUpdate
     // TODO: createExpandUpdate

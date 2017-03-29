@@ -23,7 +23,7 @@ function alternateDirection<T>(node: MosaicNode<T>, direction: MosaicDirection =
         return {
             direction,
             first: alternateDirection(node.first, nextDirection),
-            second: alternateDirection(node.second, nextDirection)
+            second: alternateDirection(node.second, nextDirection),
         };
     } else {
         return node;
@@ -34,7 +34,7 @@ export enum Corner {
     TOP_LEFT = 1,
     TOP_RIGHT,
     BOTTOM_LEFT,
-    BOTTOM_RIGHT
+    BOTTOM_RIGHT,
 }
 
 /**
@@ -67,7 +67,7 @@ export function createBalancedTreeFromLeaves<T>(leaves: MosaicNode<T>[],
                 next.push({
                     direction: 'row',
                     first: current.shift()!,
-                    second: current.shift()!
+                    second: current.shift()!,
                 });
             } else {
                 next.unshift(current.shift()!);
@@ -115,7 +115,7 @@ export function getOtherDirection(direction: MosaicDirection): MosaicDirection {
  */
 export function getPathToCorner(tree: MosaicNode<any>, corner: Corner): MosaicPath {
     let currentNode: MosaicNode<any> = tree;
-    let currentPath: MosaicPath = [];
+    const currentPath: MosaicPath = [];
     while (isParent(currentNode)) {
         if (currentNode.direction === 'row' && (corner === Corner.TOP_LEFT || corner === Corner.BOTTOM_LEFT)) {
             currentPath.push('first');

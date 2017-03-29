@@ -16,10 +16,14 @@
  */
 import { expect } from 'chai';
 import * as _ from 'lodash';
-import { MosaicNode, getNodeAtPath } from '../src/index';
+import { getNodeAtPath, MosaicNode } from '../src/index';
 import {
-    getAndAssertNodeAtPathExists, getLeaves, createBalancedTreeFromLeaves,
-    isParent, getPathToCorner, Corner
+    Corner,
+    createBalancedTreeFromLeaves,
+    getAndAssertNodeAtPathExists,
+    getLeaves,
+    getPathToCorner,
+    isParent,
 } from '../src/mosaicUtilities';
 
 const ROOT_ONLY_TREE: MosaicNode<number> = 1;
@@ -31,16 +35,16 @@ const MEDIUM_TREE: MosaicNode<number> = {
         first: {
             direction: 'column',
             first: 2,
-            second: 3
+            second: 3,
         },
-        second: 4
-    }
+        second: 4,
+    },
 };
 
 const NINE_LEAVES = _.range(1, 10);
 const THOUSAND_AND_ONE_LEAVES = _.range(1, 1002);
 
-const NUMERICAL_SORT = (a: number, b: number) => (a-b);
+const NUMERICAL_SORT = (a: number, b: number) => (a - b);
 
 function getTreeDepths(tree: MosaicNode<any>): { min: number, max: number } {
     if (isParent(tree)) {
@@ -48,49 +52,49 @@ function getTreeDepths(tree: MosaicNode<any>): { min: number, max: number } {
         const second = getTreeDepths(tree.second);
         return {
             min: _.min([first.min, second.min]) + 1,
-            max: _.max([first.max, second.max]) + 1
-        }
+            max: _.max([first.max, second.max]) + 1,
+        };
     } else {
         return {
             min: 0,
-            max: 0
-        }
+            max: 0,
+        };
     }
 }
 
 describe('mosaicUtilities', () => {
     describe('getNodeAtPath', () => {
         it('should get root', () => {
-            expect(getNodeAtPath(MEDIUM_TREE, [])).to.equal(MEDIUM_TREE)
+            expect(getNodeAtPath(MEDIUM_TREE, [])).to.equal(MEDIUM_TREE);
         });
         it('should get MosaicParent', () => {
-            expect(getNodeAtPath(MEDIUM_TREE, ['second'])).to.equal(MEDIUM_TREE.second)
+            expect(getNodeAtPath(MEDIUM_TREE, ['second'])).to.equal(MEDIUM_TREE.second);
         });
         it('should get leaf', () => {
-            expect(getNodeAtPath(MEDIUM_TREE, ['second','first','second'])).to.equal(3)
+            expect(getNodeAtPath(MEDIUM_TREE, ['second', 'first', 'second'])).to.equal(3);
         });
         it('should return null on incorrect path', () => {
-            expect(getNodeAtPath(MEDIUM_TREE, ['second','first','second', 'first'])).to.equal(null)
+            expect(getNodeAtPath(MEDIUM_TREE, ['second', 'first', 'second', 'first'])).to.equal(null);
         });
         it('should return null on null root', () => {
-            expect(getNodeAtPath(null, ['second','first','second', 'first'])).to.equal(null)
+            expect(getNodeAtPath(null, ['second', 'first', 'second', 'first'])).to.equal(null);
         });
     });
     describe('getAndAssertNodeAtPathExists', () => {
         it('should get root', () => {
-            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, [])).to.equal(MEDIUM_TREE)
+            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, [])).to.equal(MEDIUM_TREE);
         });
         it('should get MosaicParent', () => {
-            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second'])).to.equal(MEDIUM_TREE.second)
+            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second'])).to.equal(MEDIUM_TREE.second);
         });
         it('should get leaf', () => {
-            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second','first','second'])).to.equal(3)
+            expect(getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second', 'first', 'second'])).to.equal(3);
         });
         it('should error on incorrect path', () => {
-            expect(() => getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second','first','second', 'first'])).to.throw(Error)
+            expect(() => getAndAssertNodeAtPathExists(MEDIUM_TREE, ['second', 'first', 'second', 'first'])).to.throw(Error);
         });
         it('should error on null root', () => {
-            expect(() => getAndAssertNodeAtPathExists(null, ['second','first','second', 'first'])).to.throw(Error)
+            expect(() => getAndAssertNodeAtPathExists(null, ['second', 'first', 'second', 'first'])).to.throw(Error);
         });
     });
     describe('getLeaves', () => {
@@ -98,7 +102,7 @@ describe('mosaicUtilities', () => {
             expect(getLeaves(ROOT_ONLY_TREE)).to.deep.equal([1]);
         });
         it('should get leaves of medium tree', () => {
-            expect(getLeaves(MEDIUM_TREE).sort(NUMERICAL_SORT)).to.deep.equal([1,2,3,4]);
+            expect(getLeaves(MEDIUM_TREE).sort(NUMERICAL_SORT)).to.deep.equal([1, 2, 3, 4]);
         });
         it('should return empty array when provided an empty tree', () => {
             expect(getLeaves(null)).to.deep.equal([]);

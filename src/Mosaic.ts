@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import * as _ from 'lodash';
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
+import * as PureRenderDecorator from 'pure-render-decorator';
+import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
-import * as PureRenderDecorator from 'pure-render-decorator';
-import { MosaicDropTargetPosition, MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
-import { MosaicTile } from './MosaicTile';
-import { MosaicZeroStateFactory } from './MosaicZeroState';
-import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
-import { MosaicWindowDropTarget } from './MosaicDropTarget';
 import { MosaicActionsPropType, MosaicContext, MosaicRootActions } from './contextTypes';
+import { MosaicWindowDropTarget } from './MosaicDropTarget';
+import { MosaicTile } from './MosaicTile';
+import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
+import { MosaicZeroStateFactory } from './MosaicZeroState';
+import { MosaicDropTargetPosition, MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
 
 const { div } = React.DOM;
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -88,22 +88,22 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
         onChange: () => void 0,
         resizeable: true,
         zeroStateView: MosaicZeroStateFactory(),
-        className: 'mosaic-blueprint-theme'
+        className: 'mosaic-blueprint-theme',
     } as any;
 
     static childContextTypes = {
-        mosaicActions: MosaicActionsPropType
+        mosaicActions: MosaicActionsPropType,
+    };
+
+    state: State<T> = {
+        currentNode: null,
     };
 
     getChildContext(): MosaicContext<T> {
         return {
-            mosaicActions: this.actions
+            mosaicActions: this.actions,
         };
     }
-
-    state: State<T> = {
-        currentNode: null
-    };
 
     render() {
         const { className, renderTile, resizeable, zeroStateView } = this.props;
@@ -117,18 +117,33 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
                 MosaicTile<T>({
                     node, renderTile,
                     resizeable: resizeable!,
-                    getPath: this.getPath
+                    getPath: this.getPath,
                 }),
             div({ className: 'drop-target-container' },
                 _.values<string>(MosaicDropTargetPosition).map((position) =>
                     MosaicWindowDropTarget({
                         position,
                         path: [],
-                        key: position
-                    })
-                )
-            )
+                        key: position,
+                    }),
+                ),
+            ),
         );
+    }
+
+    componentWillReceiveProps(nextProps: MosaicProps<T>) {
+        if (isUncontrolled(nextProps) &&
+            nextProps.initialValue !== (this.props as MosaicUncontrolledProps<T>).initialValue) {
+
+            this.setState({ currentNode: nextProps.initialValue });
+        }
+    }
+
+    componentWillMount() {
+        const props: MosaicProps<T> = this.props;
+        if (isUncontrolled(props)) {
+            this.setState({ currentNode: props.initialValue });
+        }
     }
 
     private getRoot(): MosaicNode<T> | null {
@@ -143,7 +158,7 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
     private getPath = (): MosaicPath => [];
 
     private updateRoot = (updates: MosaicUpdate<T>[]) => {
-        let currentNode = this.getRoot() || {} as MosaicNode<T>;
+        const currentNode = this.getRoot() || {} as MosaicNode<T>;
 
         this.replaceRoot(updateTree(currentNode, updates));
     };
@@ -174,25 +189,10 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
             this.updateRoot([{
                 path,
                 spec: {
-                    $set: newNode
-                }
-            }])
+                    $set: newNode,
+                },
+            }]),
     };
-
-    componentWillReceiveProps(nextProps: MosaicProps<T>) {
-        if (isUncontrolled(nextProps) &&
-            nextProps.initialValue !== (this.props as MosaicUncontrolledProps<T>).initialValue) {
-
-            this.setState({ currentNode: nextProps.initialValue });
-        }
-    }
-
-    componentWillMount() {
-        const props: MosaicProps<T> = this.props;
-        if (isUncontrolled(props)) {
-            this.setState({ currentNode: props.initialValue });
-        }
-    }
 }
 export const Mosaic: React.ComponentClass<MosaicProps<any>> = MosaicComponentClass;
 

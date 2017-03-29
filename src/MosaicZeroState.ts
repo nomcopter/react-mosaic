@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
-import * as _ from 'lodash';
 import { NonIdealStateFactory } from '@blueprintjs/core';
+import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
-import { CreateNode } from './types';
+import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
+import { CreateNode } from './types';
 
 const { button } = React.DOM;
 
@@ -32,7 +32,7 @@ class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStatePr
     context: MosaicContext<T>;
 
     static contextTypes = {
-        mosaicActions: MosaicActionsPropType
+        mosaicActions: MosaicActionsPropType,
     };
 
     render() {
@@ -42,8 +42,8 @@ class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStatePr
             title: 'No Windows Present',
             description: this.props.createNode && button({
                 className: 'pt-button pt-icon-add',
-                onClick: this.replace
-            }, 'Add New Window')
+                onClick: this.replace,
+            }, 'Add New Window'),
         });
     }
 

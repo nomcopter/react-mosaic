@@ -9,7 +9,10 @@
         "noFallthroughCasesInSwitch": true,
         "strictNullChecks": true,
         "noImplicitThis": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "forceConsistentCasingInFileNames": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true
     },
     "exclude": [
         "node_modules",
