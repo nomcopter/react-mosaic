@@ -22,7 +22,7 @@
     "lib.remove.type.references": "replace '^/// <reference.+?\\n' '' lib -r --include='*.d.ts'"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.4.0",
+    "@blueprintjs/core": "^1.13.0",
     "@types/assertion-error": "^1.0.30",
     "@types/chai": "^3.4.34",
     "@types/classnames": "^0.0.32",
