@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NonIdealStateFactory } from '@blueprintjs/core';
 import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 import { CreateNode } from './types';
 
-const { button } = React.DOM;
+const { div, span, h4, button } = React.DOM;
 
 export interface MosaicZeroStateProps<T> {
     createNode?: CreateNode<T>;
@@ -36,15 +35,18 @@ class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStatePr
     };
 
     render() {
-        return NonIdealStateFactory({
-            visual: 'pt-icon-applications',
-            className: 'mosaic-zero-state',
-            title: 'No Windows Present',
-            description: this.props.createNode && button({
-                className: 'pt-button pt-icon-add',
-                onClick: this.replace,
-            }, 'Add New Window'),
-        });
+        return div({ className: 'pt-non-ideal-state' },
+            div({ className: 'pt-non-ideal-state-visual pt-non-ideal-state-icon' },
+                span({ className: 'pt-icon pt-icon-applications' }),
+            ),
+            h4({ className: 'pt-non-ideal-state-title' }, 'No Windows Present'),
+            div({ className: 'pt-non-ideal-state-description' },
+                this.props.createNode && button({
+                    className: 'pt-button pt-icon-add',
+                    onClick: this.replace,
+                }, 'Add New Window'),
+            ),
+        );
     }
 
     private replace = () =>

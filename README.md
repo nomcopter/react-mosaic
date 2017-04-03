@@ -19,6 +19,7 @@ The core of react-mosaic's operations revolve around the simple binary tree [spe
 1. `yarn add react-mosaic-component`
 1. Make sure `react-mosaic-component.css` is included on your page.
 1. Import the `Mosaic` component and use it in your app.
+1. (Optional) Install Blueprint
 
 ### Blueprint Theme
 Without a theme, Mosaic only loads the styles necessary for it to function - 
@@ -113,7 +114,7 @@ export const app = (
       >
         <div>title</div>
       </MosaicWindow>
-    )},
+    )}
     initialValue={{
       direction: 'row',
       first: 'a',
@@ -139,14 +140,16 @@ Using this API, the consumer can perform any operation upon the tree to change t
 See [Controlled Components](https://facebook.github.io/react/docs/forms.html#controlled-components).
 
 All of the previous examples show use of Mosaic in an Uncontrolled fashion.
-See [ExampleApp](./dev/ExampleApp.ts) (the application used in the [Demo](http://il-pg-alpha-466977.usw1.palantir.global:8000/))
-for a more interesting example that shows the usage of Mosaic as a controlled component and modifications of the tree structure.
 
 #### TS/JS vs. TSX/JSX
 Components export both factories and component classes.
 If you are using TS/JS then use the factories; if you are using TSX/JSX then use the exported class but know that you will lose the generics if you aren't careful.
 The exported classes are named as the base name of the component (e.g. `MosaicWindow`) while the exported factories
 have 'Factory' appended (e.g. `MosaicWindowFactory`).
+
+#### Example Application
+See [ExampleApp](./dev/ExampleApp.ts) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
+for a more interesting example that shows the usage of Mosaic as a controlled component and modifications of the tree structure.
 
 ## API
 
