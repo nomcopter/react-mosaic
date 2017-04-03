@@ -4,10 +4,11 @@
         "declaration": true
     },
     "exclude": [
-        "node_modules",
-        "lib",
-        "test",
         "dev",
+        "docs",
+        "lib",
+        "node_modules",
+        "test",
         "webpack.config*.js"
     ],
     "extends": "./tsconfig.json"

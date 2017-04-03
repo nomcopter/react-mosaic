@@ -4,7 +4,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const VENDOR_LIBS = _.keys(require('./package.json').dependencies);
-const NODE_DIR = path.join(__dirname, 'node_modules');
 
 let config = {
   entry: {
@@ -13,7 +12,7 @@ let config = {
   },
   output: {
     filename: '[name].js',
-    path: path.join(__dirname, 'dev/docs')
+    path: path.join(__dirname, 'docs')
   },
   devtool: '#source-map',
   resolve: {

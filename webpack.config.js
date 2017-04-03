@@ -7,10 +7,14 @@ config.plugins.push(new webpack.DefinePlugin({
   'process.env.NODE_ENV': '"production"'
 }));
 
+// Finds duplicate files and collapses them to reduce bundle size
+config.plugins.push(new webpack.optimize.DedupePlugin());
+
 config.plugins.push(new webpack.optimize.UglifyJsPlugin({
   compress: {
     warnings: false
-  }
+  },
+  sourceMap: true
 }));
 
 module.exports = config;

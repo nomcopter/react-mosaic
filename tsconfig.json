@@ -15,9 +15,9 @@
         "noUnusedLocals": true
     },
     "exclude": [
-        "node_modules",
+        "docs",
         "lib",
-        "dev/docs",
+        "node_modules",
         "webpack.config*.js"
     ]
 }
