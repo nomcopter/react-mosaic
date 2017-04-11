@@ -8,6 +8,7 @@ deployment:
     commands:
       - touch .npmrc
       - printf "\n$NPM_REGISTRY_CREDS\n" >> .npmrc
+      - yarn run build
       - npm publish
 dependencies:
   pre:
