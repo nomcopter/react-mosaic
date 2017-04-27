@@ -30,7 +30,7 @@ This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to
 It is recommended to at least start developing with this theme. 
 To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your page.
 
-See [BlueprintTheme.less](./src/BlueprintTheme.less) for an example of creating a theme.
+See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
 ### Examples
 

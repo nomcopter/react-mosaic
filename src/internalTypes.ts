@@ -14,41 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import (reference) '~@blueprintjs/core/dist/variables';
+import { MosaicPath } from './types';
 
-html, body, #app, .react-mosaic-example-app {
-  margin: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+export type MosaicDropTargetPosition = 'top' | 'bottom' | 'left' | 'right';
+export const MosaicDropTargetPosition = {
+    TOP: 'top' as 'top',
+    BOTTOM: 'bottom' as 'bottom',
+    LEFT: 'left' as 'left',
+    RIGHT: 'right' as 'right',
+};
+
+export interface MosaicDropData {
+    path?: MosaicPath;
+    position?: MosaicDropTargetPosition;
 }
 
-.react-mosaic-example-app {
-  .actions-label {
-    margin-right: 10px;
-  }
-
-  .pt-logo {
-    background: url(http://blueprintjs.com/assets/img/palantir.svg) no-repeat 50%;
-    width: 50px;
-    height: 50px;
-  }
-
-  .pt-app-title {
-    color: @white;
-  }
-
-  > .mosaic-root {
-    height: ~"calc(100% - 50px)";
-  }
-}
-
-body {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.example-window {
-  padding: 20px;
-  text-align: center;
+export interface MosaicDragItem {
+    mosaicId: string;
 }

@@ -20,12 +20,14 @@ import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
-import { MosaicActionsPropType, MosaicContext, MosaicRootActions } from './contextTypes';
+import { v4 as uuid } from 'uuid';
+import { MosaicContext, MosaicRootActions } from './contextTypes';
+import { MosaicDropTargetPosition } from './internalTypes';
 import { MosaicWindowDropTarget } from './MosaicDropTarget';
 import { MosaicTile } from './MosaicTile';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
 import { MosaicZeroStateFactory } from './MosaicZeroState';
-import { MosaicDropTargetPosition, MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
+import { MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
 
 const { div } = React.DOM;
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -77,13 +79,14 @@ function isUncontrolled<T>(props: MosaicProps<T>): props is MosaicUncontrolledPr
     return (props as MosaicUncontrolledProps<T>).initialValue != null;
 }
 
-interface State<T> {
+export interface MosaicState<T> {
     currentNode: MosaicNode<T> | null;
+    mosaicId: string;
 }
 
 @(DragDropContext(HTML5) as ClassDecorator)
 @PureRenderDecorator
-class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> {
+export class Mosaic<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
     static defaultProps = {
         onChange: () => void 0,
         resizeable: true,
@@ -91,17 +94,17 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
         className: 'mosaic-blueprint-theme',
     } as any;
 
-    static childContextTypes = {
-        mosaicActions: MosaicActionsPropType,
-    };
+    static childContextTypes = MosaicContext;
 
-    state: State<T> = {
+    state: MosaicState<T> = {
         currentNode: null,
+        mosaicId: uuid(),
     };
 
     getChildContext(): MosaicContext<T> {
         return {
             mosaicActions: this.actions,
+            mosaicId: this.state.mosaicId,
         };
     }
 
@@ -120,7 +123,7 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
                     getPath: this.getPath,
                 }),
             div({ className: 'drop-target-container' },
-                _.values<string>(MosaicDropTargetPosition).map((position) =>
+                _.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) =>
                     MosaicWindowDropTarget({
                         position,
                         path: [],
@@ -134,7 +137,6 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
     componentWillReceiveProps(nextProps: MosaicProps<T>) {
         if (isUncontrolled(nextProps) &&
             nextProps.initialValue !== (this.props as MosaicUncontrolledProps<T>).initialValue) {
-
             this.setState({ currentNode: nextProps.initialValue });
         }
     }
@@ -194,11 +196,10 @@ class MosaicComponentClass<T> extends React.Component<MosaicProps<T>, State<T>> 
             }]),
     };
 }
-export const Mosaic: React.ComponentClass<MosaicProps<any>> = MosaicComponentClass;
 
 // Factory that works with generics
 export function MosaicFactory<T>(props: MosaicProps<T> & React.Attributes, ...children: React.ReactNode[]) {
     const element: React.ReactElement<MosaicProps<T>> =
-        React.createElement(MosaicComponentClass as React.ComponentClass<MosaicProps<T>>, props, ...children);
+        React.createElement(Mosaic as React.ComponentClass<MosaicProps<T>>, props, ...children);
     return element;
 }

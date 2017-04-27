@@ -23,13 +23,14 @@ import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } f
 import { MosaicWindowDropTarget } from '../MosaicDropTarget';
 import { createDragToUpdates } from '../mosaicUpdates';
 import { getAndAssertNodeAtPathExists } from '../mosaicUtilities';
-import { CreateNode, MosaicDirection, MosaicDragType, MosaicDropData, MosaicDropTargetPosition } from '../types';
+import { CreateNode, MosaicDirection, MosaicDragType } from '../types';
 import {
     DEFAULT_CONTROLS_WITH_CREATION,
     DEFAULT_CONTROLS_WITHOUT_CREATION,
     SeparatorFactory,
 } from './defaultToolbarControls';
 import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
+import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from '../internalTypes';
 
 const { div, span, button, h4 } = React.DOM;
 
@@ -51,6 +52,7 @@ interface DragSourceProps {
 interface DropTargetProps {
     connectDropTarget: ConnectDropTarget;
     isOver: boolean;
+    draggedMosaicId: string | undefined;
 }
 
 type Props<T> = MosaicWindowProps<T> & DropTargetProps & DragSourceProps;
@@ -59,19 +61,15 @@ interface State {
     additionalControlsOpen: boolean;
 }
 
-interface DragDropContainerComponent extends React.Component<any, any> {
-    getDecoratedComponentInstance: () => MosaicWindowComponentClass<any>;
-}
-
 const dragSource = {
-    beginDrag: (_props: Props<any>, _monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
-        const context = component.getDecoratedComponentInstance().context;
+    beginDrag: (_props: Props<any>, _monitor: DragSourceMonitor, { context }: MosaicWindowClass<any>): MosaicDragItem => {
         // The defer is necessary as the element must be present on start for HTML DnD to not cry
         _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
-        return {};
+        return {
+            mosaicId: context.mosaicId,
+        };
     },
-    endDrag: (_props: Props<any>, monitor: DragSourceMonitor, component: DragDropContainerComponent) => {
-        const context = component.getDecoratedComponentInstance().context;
+    endDrag: (_props: Props<any>, monitor: DragSourceMonitor, { context }: MosaicWindowClass<any>) => {
         const path = context.getMosaicPath();
         const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
         const { position, path: destinationPath } = dropResult;
@@ -91,18 +89,19 @@ const dragSource = {
     },
 };
 
-const dropTarget = {};
+const dropTarget = { };
 
+@(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
+})) as ClassDecorator)
 @(DragSource(MosaicDragType.WINDOW, dragSource, (connect, _monitor): DragSourceProps => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
 })) as ClassDecorator)
-@(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-})) as ClassDecorator)
 @PureRenderDecorator
-class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
+class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
     static defaultProps = {
         additionalControlButtonText: 'More',
         draggable: true,
@@ -131,11 +130,11 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
     }
 
     render() {
-        const { className, isOver, title, additionalControls, connectDropTarget, connectDragPreview } = this.props;
+        const { className, isOver, title, additionalControls, connectDropTarget, connectDragPreview, draggedMosaicId } = this.props;
 
         return connectDropTarget(div({
                 className: classNames('mosaic-window mosaic-drop-target', className, {
-                    'drop-target-hover': isOver,
+                    'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
                     'additional-controls-open': this.state.additionalControlsOpen,
                 }),
                 ref: (element) => this.rootElement = element,
@@ -259,11 +258,11 @@ class MosaicWindowComponentClass<T> extends React.Component<Props<T>, State> {
                 mosaicActions.replaceWith(getMosaicPath(), node));
     };
 }
-export const MosaicWindow: React.ComponentClass<MosaicWindowProps<any>> = MosaicWindowComponentClass;
+export const MosaicWindow: React.ComponentClass<MosaicWindowProps<any>> = MosaicWindowClass;
 
 // Factory that works with generics
 export function MosaicWindowFactory<T>(props: MosaicWindowProps<T> & React.Attributes, ...children: React.ReactNode[]) {
     const element: React.ReactElement<MosaicWindowProps<T>> = React.createElement(
-        MosaicWindowComponentClass as React.ComponentClass<MosaicWindowProps<T>>, props, ...children);
+        MosaicWindowClass as React.ComponentClass<MosaicWindowProps<T>>, props, ...children);
     return element;
 }

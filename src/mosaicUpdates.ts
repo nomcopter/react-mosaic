@@ -16,11 +16,11 @@
  */
 import * as update from 'immutability-helper';
 import * as _ from 'lodash';
+import { MosaicDropTargetPosition } from './internalTypes';
 import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 import {
     MosaicBranch,
     MosaicDirection,
-    MosaicDropTargetPosition,
     MosaicNode,
     MosaicParent,
     MosaicPath,

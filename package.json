@@ -17,7 +17,7 @@
     "docs": "rm -rf docs/ && webpack",
     "test": "tslint --project tsconfig.json && mocha --opts test/mocha.opts 'test/*.ts'",
     "lib.compile.ts": "tsc -p tsconfig-build.json",
-    "lib.compile.less": " lessc --source-map src/index.less react-mosaic-component.css",
+    "lib.compile.less": " lessc --source-map styles/index.less react-mosaic-component.css",
     "lib.remove.type.references": "replace '^/// <reference.+?\\n' '' lib -r --include='*.d.ts'"
   },
   "devDependencies": {
@@ -30,10 +30,11 @@
     "@types/lodash": "^4.14.43",
     "@types/mocha": "^2.2.33",
     "@types/pure-render-decorator": "^0.2.27",
-    "@types/react": "^0.14.55",
+    "@types/react": "^15.0.23",
     "@types/react-dnd": "^2.0.31",
     "@types/react-dnd-html5-backend": "^2.1.6",
-    "@types/react-dom": "^0.14.19",
+    "@types/react-dom": "^15.5.0",
+    "@types/uuid": "^2.0.29",
     "chai": "^3.5.0",
     "css-loader": "^0.26.1",
     "file-loader": "^0.9.0",
@@ -66,7 +67,8 @@
     "lodash": "^4.17.2",
     "pure-render-decorator": "^1.2.1",
     "react-dnd": "^2.1.4",
-    "react-dnd-html5-backend": "^2.1.2"
+    "react-dnd-html5-backend": "^2.1.2",
+    "uuid": "^3.0.1"
   },
   "peerDependencies": {
     "react": "^15.0.0 || ^0.14.0"

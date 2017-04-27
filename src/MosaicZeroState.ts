@@ -27,7 +27,7 @@ export interface MosaicZeroStateProps<T> {
 }
 
 @PureRenderDecorator
-class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStateProps<T>, void> {
+export class MosaicZeroState<T> extends React.Component<MosaicZeroStateProps<T>, void> {
     context: MosaicContext<T>;
 
     static contextTypes = {
@@ -54,11 +54,10 @@ class MosaicZeroStateComponentClass<T> extends React.Component<MosaicZeroStatePr
             .then((node) => this.context.mosaicActions.replaceWith([], node))
             .catch(_.noop); // Swallow rejections (i.e. on user cancel)
 }
-export const MosaicZeroState: React.ComponentClass<MosaicZeroStateProps<any>> = MosaicZeroStateComponentClass;
 
 // Factory that works with generics
 export function MosaicZeroStateFactory<T>(props?: MosaicZeroStateProps<T> & React.Attributes, ...children: React.ReactNode[]) {
     const element: React.ReactElement<MosaicZeroStateProps<T>> = React.createElement(
-        MosaicZeroStateComponentClass as React.ComponentClass<MosaicZeroStateProps<T>>, props, ...children);
+        MosaicZeroState as React.ComponentClass<MosaicZeroStateProps<T>>, props, ...children);
     return element;
 }
