@@ -57,7 +57,7 @@ export interface MosaicUpdate<T> {
 
 /**
  * Mosaic needs a way to resolve `T` into react elements for display.
- * This provides a way to look them up. If `T` is a `React.ReactElement`, then this can simply be `_.identity`
+ * This provides a way to look them up. If `T` is a `JSX.Element`, then this can simply be `_.identity`
  */
 export type TileRenderer<T> = (t: T) => JSX.Element;
 
