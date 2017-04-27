@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
 
 /**
  * Base type for the Mosaic binary tree
@@ -60,7 +59,7 @@ export interface MosaicUpdate<T> {
  * Mosaic needs a way to resolve `T` into react elements for display.
  * This provides a way to look them up. If `T` is a `React.ReactElement`, then this can simply be `_.identity`
  */
-export type TileRenderer<T> = (t: T) => React.ReactElement<any>;
+export type TileRenderer<T> = (t: T) => JSX.Element;
 
 /**
  * Function that provides a new node to put into the tree
@@ -74,16 +73,3 @@ export type CreateNode<T> = () => Promise<MosaicNode<T>> | MosaicNode<T>;
 export const MosaicDragType = {
     WINDOW: 'MosaicWindow',
 };
-
-export type MosaicDropTargetPosition = string;
-export const MosaicDropTargetPosition = {
-    TOP: 'top',
-    BOTTOM: 'bottom',
-    LEFT: 'left',
-    RIGHT: 'right',
-};
-
-export interface MosaicDropData {
-    path: MosaicPath;
-    position: MosaicDropTargetPosition;
-}

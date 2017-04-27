@@ -27,6 +27,7 @@ import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
  */
 export interface MosaicContext<T> {
     mosaicActions: MosaicRootActions<T>;
+    mosaicId: string;
 }
 
 /**
@@ -122,13 +123,17 @@ export const MosaicWindowActionsPropType = React.PropTypes.shape({
  * Bundled PropTypes for convenience
  */
 
-export const MosaicTileContext = {
+export const MosaicContext = {
     mosaicActions: MosaicActionsPropType,
+    mosaicId: React.PropTypes.string.isRequired,
+};
+
+export const MosaicTileContext = {
+    ...MosaicContext,
     getMosaicPath: MosaicPathGetterPropType,
 };
 
 export const MosaicWindowContext = {
+    ...MosaicTileContext,
     mosaicWindowActions: MosaicWindowActionsPropType,
-    mosaicActions: MosaicActionsPropType,
-    getMosaicPath: MosaicPathGetterPropType,
 };

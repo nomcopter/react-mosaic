@@ -18,7 +18,9 @@ import * as classNames from 'classnames';
 import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { ConnectDropTarget, DropTarget } from 'react-dnd';
-import { MosaicDragType, MosaicDropData, MosaicDropTargetPosition, MosaicPath } from './types';
+import { MosaicContext } from './contextTypes';
+import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
+import { MosaicDragType, MosaicPath } from './types';
 import DropTargetMonitor = __ReactDnd.DropTargetMonitor;
 
 const { div } = React.DOM;
@@ -31,28 +33,39 @@ export interface MosaicWindowDropTargetProps {
 interface DropTargetProps {
     connectDropTarget: ConnectDropTarget;
     isOver: boolean;
+    draggedMosaicId: string | undefined;
 }
 
 type Props = MosaicWindowDropTargetProps & DropTargetProps;
 
 const dropTarget = {
-    drop: (props: Props, _monitor: DropTargetMonitor): MosaicDropData => ({
-        path: props.path,
-        position: props.position,
-    }),
+    drop: (props: Props, monitor: DropTargetMonitor, component: MosaicWindowDropTargetClass): MosaicDropData => {
+        if (component.context.mosaicId === ((monitor.getItem() || {}) as MosaicDragItem).mosaicId) {
+            return {
+                path: props.path,
+                position: props.position,
+            };
+        } else {
+            return {};
+        }
+    },
 };
 
 @(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
+    draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
 })) as ClassDecorator)
 @PureRenderDecorator
 class MosaicWindowDropTargetClass extends React.Component<Props, void> {
+    static contextTypes = MosaicContext;
+    context: MosaicContext<any>;
+
     render() {
-        const { position, isOver, connectDropTarget } = this.props;
+        const { position, isOver, connectDropTarget, draggedMosaicId } = this.props;
         return connectDropTarget(div({
             className: classNames('drop-target', position, {
-                'drop-target-hover': isOver,
+                'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
             }),
         }));
     }
