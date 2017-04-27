@@ -32,8 +32,8 @@ import {
     MosaicZeroStateFactory,
     updateTree,
 } from '../src/index';
-import '../src/index.less';
 import { MosaicDirection } from '../src/types';
+import '../styles/index.less';
 import './example.less';
 
 const { div, h1, a, button, span } = React.DOM;
