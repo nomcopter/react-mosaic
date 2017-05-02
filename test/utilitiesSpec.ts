@@ -41,6 +41,12 @@ const MEDIUM_TREE: MosaicNode<number> = {
     },
 };
 
+const FALSY_TREE: MosaicNode<number | string> = {
+    direction: 'row',
+    first: 0,
+    second: '',
+};
+
 const NINE_LEAVES = _.range(1, 10);
 const THOUSAND_AND_ONE_LEAVES = _.range(1, 1002);
 
@@ -78,6 +84,9 @@ describe('mosaicUtilities', () => {
         });
         it('should return null on null root', () => {
             expect(getNodeAtPath(null, ['second', 'first', 'second', 'first'])).to.equal(null);
+        });
+        it('should work with falsy values', () => {
+            expect(getNodeAtPath(FALSY_TREE, ['first'])).to.equal(0);
         });
     });
     describe('getAndAssertNodeAtPathExists', () => {

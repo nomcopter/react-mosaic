@@ -156,7 +156,7 @@ export function getLeaves<T>(tree: MosaicNode<T> | null): T[] {
  */
 export function getNodeAtPath<T>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> | null {
     if (path.length > 0) {
-        return _.get<MosaicNode<T>>(tree, path) || null;
+        return _.get<MosaicNode<T>>(tree, path, null!);
     } else {
         return tree;
     }
