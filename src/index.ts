@@ -14,11 +14,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from './Mosaic';
-export * from './types';
-export * from './contextTypes';
-export * from './mosaicUpdates';
-export * from './mosaicUtilities';
-export * from './window/MosaicWindow';
-export * from './window/defaultToolbarControls';
-export * from './MosaicZeroState';
+export {
+    Mosaic,
+    MosaicProps,
+    MosaicUncontrolledProps,
+    MosaicControlledProps,
+    MosaicFactory,
+    MosaicWithoutDragDropContext,
+} from './Mosaic';
+export {
+    MosaicNode,
+    MosaicDragType,
+    MosaicDirection,
+    MosaicBranch,
+    CreateNode,
+    MosaicParent,
+    MosaicPath,
+    MosaicUpdate,
+    MosaicUpdateSpec,
+    TileRenderer,
+} from './types';
+export {
+    MosaicContext,
+    MosaicActionsPropType,
+    MosaicPathGetterPropType,
+    MosaicRootActions,
+    MosaicTileContext,
+    MosaicWindowActions,
+    MosaicWindowActionsPropType,
+    MosaicWindowContext,
+} from './contextTypes';
+export {
+    buildSpecFromUpdate,
+    createDragToUpdates,
+    createExpandUpdate,
+    createHideUpdate,
+    createRemoveUpdate,
+    updateTree,
+} from './mosaicUpdates';
+export {
+    createBalancedTreeFromLeaves,
+    Corner,
+    getAndAssertNodeAtPathExists,
+    getLeaves,
+    getNodeAtPath,
+    getOtherBranch,
+    getOtherDirection,
+    getPathToCorner,
+    isParent,
+} from './mosaicUtilities';
+export { MosaicWindow, MosaicWindowFactory, MosaicWindowProps } from './window/MosaicWindow';
+export {
+    createDefaultToolbarButton,
+    DEFAULT_CONTROLS_WITH_CREATION,
+    DEFAULT_CONTROLS_WITHOUT_CREATION,
+    ExpandButton,
+    ExpandButtonFactory,
+    MosaicButtonProps,
+    RemoveButton,
+    RemoveButtonFactory,
+    ReplaceButton,
+    ReplaceButtonFactory,
+    Separator,
+    SeparatorFactory,
+    SplitButton,
+    SplitButtonFactory,
+} from './window/defaultToolbarControls';
+export { MosaicZeroState, MosaicZeroStateFactory, MosaicZeroStateProps } from './MosaicZeroState';

@@ -84,9 +84,8 @@ export interface MosaicState<T> {
     mosaicId: string;
 }
 
-@(DragDropContext(HTML5) as ClassDecorator)
 @PureRenderDecorator
-export class Mosaic<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
+export class MosaicWithoutDragDropContext<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
     static defaultProps = {
         onChange: () => void 0,
         resizeable: true,
@@ -196,6 +195,9 @@ export class Mosaic<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
             }]),
     };
 }
+
+@(DragDropContext(HTML5) as ClassDecorator)
+export class Mosaic<T> extends MosaicWithoutDragDropContext<T> { }
 
 // Factory that works with generics
 export function MosaicFactory<T>(props: MosaicProps<T> & React.Attributes, ...children: React.ReactNode[]) {
