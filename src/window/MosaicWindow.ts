@@ -42,6 +42,7 @@ export interface MosaicWindowProps<T> {
     additionalControlButtonText?: string;
     draggable?: boolean;
     createNode?: CreateNode<T>;
+    renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 
 interface DragSourceProps {
@@ -102,10 +103,19 @@ const dropTarget = { };
 })) as ClassDecorator)
 @PureRenderDecorator
 class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
-    static defaultProps = {
+    static defaultProps: Partial<Props<any>> = {
         additionalControlButtonText: 'More',
         draggable: true,
-    } as any;
+        renderPreview: ({ title }) =>
+            div({ className: 'mosaic-preview' },
+                div({ className: 'mosaic-window-toolbar' },
+                    div({ className: 'mosaic-window-title' }, title)),
+                div({ className: 'mosaic-window-body' },
+                    h4({}, title),
+                    span({ className: 'pt-icon pt-icon-application' }),
+                ),
+            ),
+    };
 
     static contextTypes = MosaicTileContext;
 
@@ -130,7 +140,7 @@ class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
     }
 
     render() {
-        const { className, isOver, title, additionalControls, connectDropTarget, connectDragPreview, draggedMosaicId } = this.props;
+        const { className, isOver, renderPreview, additionalControls, connectDropTarget, connectDragPreview, draggedMosaicId } = this.props;
 
         return connectDropTarget(div({
                 className: classNames('mosaic-window mosaic-drop-target', className, {
@@ -150,16 +160,7 @@ class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
             div({ className: 'mosaic-window-additional-actions-bar' },
                 additionalControls,
             ),
-            connectDragPreview(
-                div({ className: 'mosaic-preview' },
-                    div({ className: 'mosaic-window-toolbar' },
-                        div({ className: 'mosaic-window-title' }, title)),
-                    div({ className: 'mosaic-window-body' },
-                        h4({}, title),
-                        span({ className: 'pt-icon pt-icon-application' }),
-                    ),
-                ),
-            ),
+            connectDragPreview(renderPreview!(this.props)),
             div({ className: 'drop-target-container' },
                 _.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget),
             ),
