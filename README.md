@@ -224,6 +224,10 @@ export interface MosaicWindowProps<T> {
     * Method called when a new node is required (such as the Split or Replace buttons)
     */
     createNode?: CreateNode<T>;
+    /**
+    * Optional method to override the displayed preview when a user drags a window
+    */
+    renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 ```
 The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](./src/window/defaultToolbarControls.ts)
