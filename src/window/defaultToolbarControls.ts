@@ -40,7 +40,7 @@ export interface MosaicButtonProps {
 }
 
 @PureRenderDecorator
-class RemoveButtonComponentClass<T> extends React.Component<MosaicButtonProps, void> {
+export class RemoveButton<T> extends React.Component<MosaicButtonProps, void> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -55,11 +55,10 @@ class RemoveButtonComponentClass<T> extends React.Component<MosaicButtonProps, v
         }
     }
 }
-export const RemoveButton = RemoveButtonComponentClass as React.ComponentClass<MosaicButtonProps>;
 export const RemoveButtonFactory = React.createFactory(RemoveButton);
 
 @PureRenderDecorator
-class SplitButtonComponentClass<T> extends React.Component<MosaicButtonProps, void> {
+export class SplitButton<T> extends React.Component<MosaicButtonProps, void> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -77,11 +76,10 @@ class SplitButtonComponentClass<T> extends React.Component<MosaicButtonProps, vo
             .catch(_.noop); // Swallow rejections (i.e. on user cancel)
     }
 }
-export const SplitButton = SplitButtonComponentClass as React.ComponentClass<MosaicButtonProps>;
 export const SplitButtonFactory = React.createFactory(SplitButton);
 
 @PureRenderDecorator
-class ReplaceButtonComponentClass<T> extends React.Component<MosaicButtonProps, void> {
+export class ReplaceButton<T> extends React.Component<MosaicButtonProps, void> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -99,11 +97,10 @@ class ReplaceButtonComponentClass<T> extends React.Component<MosaicButtonProps, 
             .catch(_.noop); // Swallow rejections (i.e. on user cancel)
     }
 }
-export const ReplaceButton = ReplaceButtonComponentClass as React.ComponentClass<MosaicButtonProps>;
 export const ReplaceButtonFactory = React.createFactory(ReplaceButton);
 
 @PureRenderDecorator
-class ExpandButtonComponentClass<T> extends React.Component<MosaicButtonProps, void> {
+export class ExpandButton<T> extends React.Component<MosaicButtonProps, void> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -119,16 +116,14 @@ class ExpandButtonComponentClass<T> extends React.Component<MosaicButtonProps, v
         }
     }
 }
-export const ExpandButton = ExpandButtonComponentClass as React.ComponentClass<MosaicButtonProps>;
 export const ExpandButtonFactory = React.createFactory(ExpandButton);
 
 @PureRenderDecorator
-class SeparatorComponentClass extends React.Component<{}, void> {
+export class Separator extends React.Component<void, void> {
     render() {
         return div({ className: 'separator' });
     }
 }
-export const Separator = SeparatorComponentClass as React.ComponentClass<{}>;
 export const SeparatorFactory = React.createFactory(Separator);
 
 export const DEFAULT_CONTROLS_WITH_CREATION = [
