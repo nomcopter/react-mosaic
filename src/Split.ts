@@ -61,7 +61,8 @@ class SplitClass extends React.Component<SplitProps, void> {
         };
     }
 
-    private onMouseDown = () => {
+    private onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
         document.addEventListener('mousemove', this.onMouseMove, true);
         document.addEventListener('mouseup', this.onMouseUp, true);
     };
