@@ -20,14 +20,14 @@ import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
 import { isParent } from './mosaicUtilities';
 import { Split } from './Split';
-import { MosaicNode, MosaicPath, MosaicUpdateSpec, TileRenderer } from './types';
+import { MosaicNode, MosaicParent, MosaicPath, MosaicUpdateSpec, ResizeOptions, TileRenderer } from './types';
 
 const { div } = React.DOM;
 
 export interface MosaicTileProps<T> {
     node: MosaicNode<T>;
     renderTile: TileRenderer<T>;
-    resizeable: boolean;
+    resize?: ResizeOptions;
     getPath: () => MosaicPath;
     className?: string;
 }
@@ -51,7 +51,7 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
     }
 
     render(): JSX.Element {
-        const { node, renderTile, resizeable } = this.props;
+        const { node, renderTile, resize } = this.props;
 
         if (isParent(node)) {
             const splitPercentage = node.splitPercentage == null ? 50 : node.splitPercentage;
@@ -69,15 +69,11 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
                         },
                     },
                     MosaicTile<T>({
-                        renderTile, resizeable,
+                        renderTile, resize,
                         node: node.first,
                         getPath: this.getFirstBranchPath,
                     })),
-                resizeable && Split({
-                    splitPercentage,
-                    direction: node.direction,
-                    onChange: this.onResize,
-                }),
+                this.renderSplit(node, splitPercentage),
                 div({
                         className: 'mosaic-branch -second',
                         style: {
@@ -85,13 +81,27 @@ class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
                         },
                     },
                     MosaicTile<T>({
-                        renderTile, resizeable,
+                        renderTile, resize,
                         node: node.second,
                         getPath: this.getSecondBranchPath,
                     })),
             );
         } else {
             return renderTile(node);
+        }
+    }
+
+    private renderSplit(node: MosaicParent<T>, splitPercentage: number) {
+        const { resize } = this.props;
+        if (resize !== 'DISABLED') {
+            return Split({
+                ...resize,
+                splitPercentage,
+                direction: node.direction,
+                onChange: this.onResize,
+            });
+        } else {
+            return null;
         }
     }
 

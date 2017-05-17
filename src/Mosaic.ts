@@ -27,7 +27,7 @@ import { MosaicWindowDropTarget } from './MosaicDropTarget';
 import { MosaicTile } from './MosaicTile';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
 import { MosaicZeroStateFactory } from './MosaicZeroState';
-import { MosaicNode, MosaicPath, MosaicUpdate, TileRenderer } from './types';
+import { MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
 
 const { div } = React.DOM;
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -47,10 +47,10 @@ export interface MosaicBaseProps<T> {
      */
     className?: string;
     /**
-     * Whether the panes should be resizeable
-     * default: true
+     * Options that control resizing
+     * @see: [[ResizeOptions]]
      */
-    resizeable?: boolean;
+    resize?: ResizeOptions;
     /**
      * View to display when the current value is `null`
      * default: Simple NonIdealState view
@@ -88,7 +88,6 @@ export interface MosaicState<T> {
 export class MosaicWithoutDragDropContext<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
     static defaultProps = {
         onChange: () => void 0,
-        resizeable: true,
         zeroStateView: MosaicZeroStateFactory(),
         className: 'mosaic-blueprint-theme',
     } as any;
@@ -108,7 +107,7 @@ export class MosaicWithoutDragDropContext<T> extends React.Component<MosaicProps
     }
 
     render() {
-        const { className, renderTile, resizeable, zeroStateView } = this.props;
+        const { className, renderTile, resize, zeroStateView } = this.props;
         const node = this.getRoot();
 
         return div({
@@ -117,8 +116,7 @@ export class MosaicWithoutDragDropContext<T> extends React.Component<MosaicProps
             node == null ?
                 zeroStateView :
                 MosaicTile<T>({
-                    node, renderTile,
-                    resizeable: resizeable!,
+                    node, renderTile, resize,
                     getPath: this.getPath,
                 }),
             div({ className: 'drop-target-container' },

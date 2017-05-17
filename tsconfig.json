@@ -12,7 +12,8 @@
         "noImplicitAny": true,
         "forceConsistentCasingInFileNames": true,
         "noUnusedParameters": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "strict": true
     },
     "exclude": [
         "docs",

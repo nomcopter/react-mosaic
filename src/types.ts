@@ -73,3 +73,9 @@ export type CreateNode<T> = () => Promise<MosaicNode<T>> | MosaicNode<T>;
 export const MosaicDragType = {
     WINDOW: 'MosaicWindow',
 };
+
+export interface EnabledResizeOptions {
+    minimumPaneSizePercentage?: number; // Default: 20
+}
+
+export type ResizeOptions = 'DISABLED' | EnabledResizeOptions;

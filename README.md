@@ -170,10 +170,10 @@ export interface MosaicBaseProps<T> {
      */
     className?: string;
     /**
-     * Whether the panes should be resizeable
-     * default: true
+     * Options that control resizing
+     * @see: [[ResizeOptions]]
      */
-    resizeable?: boolean;
+    resize?: ResizeOptions;
     /**
      * View to display when the current value is `null`
      * default: Simple NonIdealState view

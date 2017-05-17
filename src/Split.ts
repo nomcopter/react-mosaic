@@ -17,19 +17,17 @@
 import * as _ from 'lodash';
 import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
-import { MosaicDirection } from './types';
+import { EnabledResizeOptions, MosaicDirection } from './types';
 
 const { div } = React.DOM;
 const RESIZE_THROTTLE_MS = 1000 / 30; // 30 fps
 
-export interface SplitProps {
+export interface SplitProps extends EnabledResizeOptions {
     direction: MosaicDirection;
     splitPercentage: number;
     onChange?: (percentOfParent: number) => void;
     onRelease?: (percentOfParent: number) => void;
 }
-
-const MINIMUM_PERCENTAGE = 20;
 
 @PureRenderDecorator
 class SplitClass extends React.Component<SplitProps, void> {
@@ -38,7 +36,8 @@ class SplitClass extends React.Component<SplitProps, void> {
     static defaultProps = {
         onChange: () => void 0,
         onRelease: () => void 0,
-    } as any;
+        minimumPaneSizePercentage: 20,
+    };
 
     render() {
         return div({
@@ -88,6 +87,7 @@ class SplitClass extends React.Component<SplitProps, void> {
     }, RESIZE_THROTTLE_MS);
 
     private calculatePercentOfParent(event: MouseEvent): number {
+        const { minimumPaneSizePercentage } = this.props;
         const parentBBox = this.rootElement.parentElement!.getBoundingClientRect();
 
         let percentage: number;
@@ -97,7 +97,7 @@ class SplitClass extends React.Component<SplitProps, void> {
             percentage = (event.clientX - parentBBox.left) / parentBBox.width * 100.0;
         }
 
-        return _.clamp(percentage, MINIMUM_PERCENTAGE, 100 - MINIMUM_PERCENTAGE);
+        return _.clamp(percentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
     }
 }
 
