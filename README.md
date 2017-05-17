@@ -354,6 +354,10 @@ export interface MosaicUpdateSpec<T> {
 }
 ```
 
+## Upgrade Considerations
+
+See [Releases](https://github.com/palantir/react-mosaic/releases)
+
 ## License
 Copyright 2016 Palantir Technologies
 
