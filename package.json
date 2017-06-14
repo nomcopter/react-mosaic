@@ -65,6 +65,7 @@
     "classnames": "^2.2.5",
     "immutability-helper": "^2.0.0",
     "lodash": "^4.17.2",
+    "prop-types": "^15.5.10",
     "pure-render-decorator": "^1.2.1",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
