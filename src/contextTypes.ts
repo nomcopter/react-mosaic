@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
-
+import PropTypes from 'prop-types';
 /**
  * Mosaic provides functionality on the context for components within
  * Mosaic to affect the view state.
@@ -103,20 +103,20 @@ export interface MosaicWindowActions {
  * PropTypes for React `contextTypes`
  */
 
-export const MosaicActionsPropType = React.PropTypes.shape({
-    expand: React.PropTypes.func.isRequired,
-    remove: React.PropTypes.func.isRequired,
-    hide: React.PropTypes.func.isRequired,
-    replaceWith: React.PropTypes.func.isRequired,
-    updateTree: React.PropTypes.func.isRequired,
-    getRoot: React.PropTypes.func.isRequired,
+export const MosaicActionsPropType = PropTypes.shape({
+    expand: PropTypes.func.isRequired,
+    remove: PropTypes.func.isRequired,
+    hide: PropTypes.func.isRequired,
+    replaceWith: PropTypes.func.isRequired,
+    updateTree: PropTypes.func.isRequired,
+    getRoot: PropTypes.func.isRequired,
 }).isRequired;
 
-export const MosaicPathGetterPropType = React.PropTypes.func.isRequired;
+export const MosaicPathGetterPropType = PropTypes.func.isRequired;
 
-export const MosaicWindowActionsPropType = React.PropTypes.shape({
-    split: React.PropTypes.func.isRequired,
-    replaceWithNew: React.PropTypes.func.isRequired,
+export const MosaicWindowActionsPropType = PropTypes.shape({
+    split: PropTypes.func.isRequired,
+    replaceWithNew: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
@@ -125,7 +125,7 @@ export const MosaicWindowActionsPropType = React.PropTypes.shape({
 
 export const MosaicContext = {
     mosaicActions: MosaicActionsPropType,
-    mosaicId: React.PropTypes.string.isRequired,
+    mosaicId: PropTypes.string.isRequired,
 };
 
 export const MosaicTileContext = {
