@@ -21,6 +21,7 @@ dependencies:
     - yarn install
 test:
   override:
+    - yarn run build
     - "yarn run test -- --reporter mocha-junit-reporter":
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
