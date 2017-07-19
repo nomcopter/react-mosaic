@@ -16,7 +16,6 @@
  */
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { MosaicWindowContext } from '../contextTypes';
 
@@ -39,8 +38,7 @@ export interface MosaicButtonProps {
     onClick?: () => void;
 }
 
-@PureRenderDecorator
-export class RemoveButton<T> extends React.Component<MosaicButtonProps, void> {
+export class RemoveButton<T> extends React.PureComponent<MosaicButtonProps> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -57,8 +55,7 @@ export class RemoveButton<T> extends React.Component<MosaicButtonProps, void> {
 }
 export const RemoveButtonFactory = React.createFactory(RemoveButton);
 
-@PureRenderDecorator
-export class SplitButton<T> extends React.Component<MosaicButtonProps, void> {
+export class SplitButton<T> extends React.PureComponent<MosaicButtonProps> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -78,8 +75,7 @@ export class SplitButton<T> extends React.Component<MosaicButtonProps, void> {
 }
 export const SplitButtonFactory = React.createFactory(SplitButton);
 
-@PureRenderDecorator
-export class ReplaceButton<T> extends React.Component<MosaicButtonProps, void> {
+export class ReplaceButton<T> extends React.PureComponent<MosaicButtonProps> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -99,8 +95,7 @@ export class ReplaceButton<T> extends React.Component<MosaicButtonProps, void> {
 }
 export const ReplaceButtonFactory = React.createFactory(ReplaceButton);
 
-@PureRenderDecorator
-export class ExpandButton<T> extends React.Component<MosaicButtonProps, void> {
+export class ExpandButton<T> extends React.PureComponent<MosaicButtonProps> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<T>;
 
@@ -118,8 +113,7 @@ export class ExpandButton<T> extends React.Component<MosaicButtonProps, void> {
 }
 export const ExpandButtonFactory = React.createFactory(ExpandButton);
 
-@PureRenderDecorator
-export class Separator extends React.Component<void, void> {
+export class Separator extends React.PureComponent {
     render() {
         return div({ className: 'separator' });
     }

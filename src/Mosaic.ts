@@ -16,7 +16,6 @@
  */
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
@@ -84,8 +83,7 @@ export interface MosaicState<T> {
     mosaicId: string;
 }
 
-@PureRenderDecorator
-export class MosaicWithoutDragDropContext<T> extends React.Component<MosaicProps<T>, MosaicState<T>> {
+export class MosaicWithoutDragDropContext<T> extends React.PureComponent<MosaicProps<T>, MosaicState<T>> {
     static defaultProps = {
         onChange: () => void 0,
         zeroStateView: MosaicZeroStateFactory(),
