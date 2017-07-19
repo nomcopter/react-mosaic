@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 import { CreateNode } from './types';
@@ -26,8 +25,7 @@ export interface MosaicZeroStateProps<T> {
     createNode?: CreateNode<T>;
 }
 
-@PureRenderDecorator
-export class MosaicZeroState<T> extends React.Component<MosaicZeroStateProps<T>, void> {
+export class MosaicZeroState<T> extends React.PureComponent<MosaicZeroStateProps<T>> {
     context: MosaicContext<T>;
 
     static contextTypes = {

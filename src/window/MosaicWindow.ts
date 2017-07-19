@@ -16,7 +16,6 @@
  */
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
 import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';
@@ -101,8 +100,7 @@ const dropTarget = { };
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
 })) as ClassDecorator)
-@PureRenderDecorator
-class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
+class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
     static defaultProps: Partial<Props<any>> = {
         additionalControlButtonText: 'More',
         draggable: true,
@@ -128,7 +126,7 @@ class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
     };
     context: MosaicTileContext<T>;
 
-    private rootElement: HTMLElement;
+    private rootElement: HTMLElement | null;
 
     getChildContext(): Partial<MosaicWindowContext<T>> {
         return {
@@ -240,7 +238,7 @@ class MosaicWindowClass<T> extends React.Component<Props<T>, State> {
         const path = getMosaicPath();
 
         const direction: MosaicDirection =
-            this.rootElement.offsetWidth > this.rootElement.offsetHeight ? 'row' : 'column';
+            this.rootElement!.offsetWidth > this.rootElement!.offsetHeight ? 'row' : 'column';
 
         return Promise.resolve(createNode!())
             .then((second) =>

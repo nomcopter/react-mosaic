@@ -34,14 +34,14 @@ FIX_9944 = null!;
 
 /**
  * Used to prepare `update` for `immutability-helper`
- * @param update
+ * @param mosaicUpdate
  * @returns {any}
  */
-export function buildSpecFromUpdate<T>(update: MosaicUpdate<T>): MosaicUpdateSpec<T> {
-    if (update.path.length > 0) {
-        return _.set({}, update.path, update.spec);
+export function buildSpecFromUpdate<T>(mosaicUpdate: MosaicUpdate<T>): MosaicUpdateSpec<T> {
+    if (mosaicUpdate.path.length > 0) {
+        return _.set({}, mosaicUpdate.path, mosaicUpdate.spec);
     } else {
-        return update.spec;
+        return mosaicUpdate.spec;
     }
 }
 
@@ -69,7 +69,7 @@ export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
 export function createRemoveUpdate<T>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
     const parentPath = _.dropRight(path);
     const nodeToRemove = _.last(path);
-    const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove));
+    const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove!));
     const sibling = getAndAssertNodeAtPathExists(root, siblingPath);
 
     return {

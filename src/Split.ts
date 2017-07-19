@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { EnabledResizeOptions, MosaicDirection } from './types';
 
@@ -29,9 +28,8 @@ export interface SplitProps extends EnabledResizeOptions {
     onRelease?: (percentOfParent: number) => void;
 }
 
-@PureRenderDecorator
-class SplitClass extends React.Component<SplitProps, void> {
-    private rootElement: HTMLElement;
+class SplitClass extends React.PureComponent<SplitProps> {
+    private rootElement: HTMLElement | null;
 
     static defaultProps = {
         onChange: () => void 0,
@@ -88,7 +86,7 @@ class SplitClass extends React.Component<SplitProps, void> {
 
     private calculatePercentOfParent(event: MouseEvent): number {
         const { minimumPaneSizePercentage } = this.props;
-        const parentBBox = this.rootElement.parentElement!.getBoundingClientRect();
+        const parentBBox = this.rootElement!.parentElement!.getBoundingClientRect();
 
         let percentage: number;
         if (this.props.direction === 'column') {

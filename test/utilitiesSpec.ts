@@ -57,8 +57,8 @@ function getTreeDepths(tree: MosaicNode<any>): { min: number, max: number } {
         const first = getTreeDepths(tree.first);
         const second = getTreeDepths(tree.second);
         return {
-            min: _.min([first.min, second.min]) + 1,
-            max: _.max([first.max, second.max]) + 1,
+            min: _.min([first.min, second.min])! + 1,
+            max: _.max([first.max, second.max])! + 1,
         };
     } else {
         return {

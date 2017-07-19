@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import * as classNames from 'classnames';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
 import { isParent } from './mosaicUtilities';
@@ -32,8 +31,7 @@ export interface MosaicTileProps<T> {
     className?: string;
 }
 
-@PureRenderDecorator
-class MosaicTileClass<T> extends React.Component<MosaicTileProps<T>, void> {
+class MosaicTileClass<T> extends React.PureComponent<MosaicTileProps<T>> {
     context: MosaicContext<T>;
 
     static contextTypes = {

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import * as classNames from 'classnames';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import { ConnectDropTarget, DropTarget } from 'react-dnd';
 import { MosaicContext } from './contextTypes';
@@ -56,8 +55,7 @@ const dropTarget = {
     isOver: monitor.isOver(),
     draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
 })) as ClassDecorator)
-@PureRenderDecorator
-class MosaicWindowDropTargetClass extends React.Component<Props, void> {
+class MosaicWindowDropTargetClass extends React.PureComponent<Props> {
     static contextTypes = MosaicContext;
     context: MosaicContext<any>;
 

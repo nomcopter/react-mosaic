@@ -16,7 +16,6 @@
  */
 import '@blueprintjs/core/dist/blueprint.css';
 import * as _ from 'lodash';
-import * as PureRenderDecorator from 'pure-render-decorator';
 import * as React from 'react';
 import {
     Corner,
@@ -40,7 +39,7 @@ const { div, h1, a, button, span } = React.DOM;
 
 let windowCount = 4;
 
-class NoOpButton extends React.Component<{}, void> {
+class NoOpButton extends React.PureComponent {
     render() {
         return div({ className: 'pt-button-group pt-minimal' },
             button({ className: 'pt-button' }, 'Proof of Concept Button!'),
@@ -55,8 +54,7 @@ interface State {
     currentNode: MosaicNode<number> | null;
 }
 
-@PureRenderDecorator
-class ExampleAppClass extends React.Component<void, State> {
+class ExampleAppClass extends React.PureComponent<void, State> {
     state: State = {
         currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1)),
     };
