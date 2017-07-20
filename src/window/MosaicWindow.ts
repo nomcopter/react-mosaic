@@ -230,7 +230,7 @@ class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
         }
     }
 
-    private split = () => {
+    private split = (...args) => {
         this.checkCreateNode();
         const { createNode } = this.props;
         const { mosaicActions, getMosaicPath } = this.context;
@@ -240,7 +240,7 @@ class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
         const direction: MosaicDirection =
             this.rootElement!.offsetWidth > this.rootElement!.offsetHeight ? 'row' : 'column';
 
-        return Promise.resolve(createNode!())
+        return Promise.resolve(createNode!(...args))
             .then((second) =>
                 mosaicActions.replaceWith(path, {
                     direction, second,
@@ -248,11 +248,11 @@ class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
                 }));
     };
 
-    private swap = () => {
+    private swap = (...args) => {
         this.checkCreateNode();
         const { mosaicActions, getMosaicPath } = this.context;
         const { createNode } = this.props;
-        return Promise.resolve(createNode!())
+        return Promise.resolve(createNode!(...args))
             .then((node) =>
                 mosaicActions.replaceWith(getMosaicPath(), node));
     };
