@@ -230,7 +230,7 @@ class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
         }
     }
 
-    private split = (...args) => {
+    private split = (...args: any[]) => {
         this.checkCreateNode();
         const { createNode } = this.props;
         const { mosaicActions, getMosaicPath } = this.context;
@@ -248,7 +248,7 @@ class MosaicWindowClass<T> extends React.PureComponent<Props<T>, State> {
                 }));
     };
 
-    private swap = (...args) => {
+    private swap = (...args: any[]) => {
         this.checkCreateNode();
         const { mosaicActions, getMosaicPath } = this.context;
         const { createNode } = this.props;
