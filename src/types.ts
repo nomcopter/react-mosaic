@@ -64,7 +64,7 @@ export type TileRenderer<T> = (t: T) => JSX.Element;
 /**
  * Function that provides a new node to put into the tree
  */
-export type CreateNode<T> = () => Promise<MosaicNode<T>> | MosaicNode<T>;
+export type CreateNode<T> = (...args: any[]) => Promise<MosaicNode<T>> | MosaicNode<T>;
 
 /**
  * Used by `react-dnd`
