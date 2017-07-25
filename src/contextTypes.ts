@@ -91,12 +91,12 @@ export interface MosaicWindowActions {
      * The current node becomes the `first` and the new node the `second` of the result.
      * `direction` is chosen by querying the DOM and splitting along the longer axis
      */
-    split: () => Promise<void>;
+    split: (...args: any[]) => Promise<void>;
     /**
      * Fails if no `createNode()` is defined
      * Convenience function to call `createNode()` and replace the current node with it.
      */
-    replaceWithNew: () => Promise<void>;
+    replaceWithNew: (...args: any[]) => Promise<void>;
 }
 
 /*************************************************************
