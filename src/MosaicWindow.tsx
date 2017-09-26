@@ -130,6 +130,7 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
       mosaicWindowActions: {
         split: this.split,
         replaceWithNew: this.swap,
+        setAdditionalControlsOpen: this.setAdditionalControlsOpen,
       },
     };
   }
@@ -151,7 +152,7 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
         </div>
         <div
           className='mosaic-window-body-overlay'
-          onClick={() => this.setState({ additionalControlsOpen: false })}
+          onClick={() => this.setAdditionalControlsOpen(false)}
         />
         <div className='mosaic-window-additional-actions-bar'>
           {additionalControls}
@@ -207,7 +208,7 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
         <div className='mosaic-window-controls pt-button-group'>
           {hasAdditionalControls && (
             <button
-              onClick={() => this.setState({ additionalControlsOpen: !additionalControlsOpen })}
+              onClick={() => this.setAdditionalControlsOpen(!additionalControlsOpen)}
               className={classNames('pt-button pt-minimal pt-icon-more', {
                 'pt-active': additionalControlsOpen,
               })}
@@ -265,6 +266,10 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
     return Promise.resolve(createNode!(...args))
       .then((node) =>
         mosaicActions.replaceWith(getMosaicPath(), node));
+  };
+
+  private setAdditionalControlsOpen = (additionalControlsOpen: boolean) => {
+    this.setState({ additionalControlsOpen });
   };
 }
 

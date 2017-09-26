@@ -97,6 +97,10 @@ export interface MosaicWindowActions {
    * Convenience function to call `createNode()` and replace the current node with it.
    */
   replaceWithNew: (...args: any[]) => Promise<void>;
+  /**
+   * Sets the open state for the tray that holds additional controls
+   */
+  setAdditionalControlsOpen: (open: boolean) => void;
 }
 
 /*************************************************************
@@ -117,6 +121,7 @@ export const MosaicPathGetterPropType = PropTypes.func.isRequired;
 export const MosaicWindowActionsPropType = PropTypes.shape({
   split: PropTypes.func.isRequired,
   replaceWithNew: PropTypes.func.isRequired,
+  setAdditionalControlsOpen: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
