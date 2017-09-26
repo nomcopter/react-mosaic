@@ -68,7 +68,7 @@ const dragSource = {
     const ownPath = context.getMosaicPath();
     const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
     const { position, path: destinationPath } = dropResult;
-    if (position != null && destinationPath != null && _.isEqual(destinationPath, ownPath)) {
+    if (position != null && destinationPath != null && !_.isEqual(destinationPath, ownPath)) {
       context.mosaicActions.updateTree(
         createDragToUpdates(context.mosaicActions.getRoot(), ownPath, destinationPath, position));
     } else {

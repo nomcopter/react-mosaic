@@ -69,7 +69,6 @@ export class ExampleApp extends React.PureComponent<{}, State> {
         <div className='pt-navbar pt-dark'>
           <div className='pt-navbar-group pt-align-left'>
             <div className='pt-logo'/>
-            ,
             <div className='pt-navbar-heading'>
               <a
                 className='pt-app-title'
@@ -80,7 +79,7 @@ export class ExampleApp extends React.PureComponent<{}, State> {
             </div>
           </div>
           <div className='pt-navbar-group pt-align-right pt-button-group'>
-            <span className='actions-label'>Example Actions:'</span>
+            <span className='actions-label'>Example Actions:</span>
             <button
               className='pt-button pt-icon-grid-view'
               onClick={this.autoArrange}

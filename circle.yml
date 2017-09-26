@@ -13,7 +13,7 @@ dependencies:
 test:
   override:
     - yarn run build
-    - yarn run test:
+    - "yarn run test:circle":
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
 deployment:
