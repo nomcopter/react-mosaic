@@ -17,6 +17,7 @@
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { div, span, button, h4 } from 'react-dom-factories';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
 import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';
 import { MosaicWindowDropTarget } from '../MosaicDropTarget';
@@ -30,8 +31,6 @@ import {
 } from './defaultToolbarControls';
 import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from '../internalTypes';
-
-const { div, span, button, h4 } = React.DOM;
 
 export interface MosaicWindowProps<T> {
     title: string;

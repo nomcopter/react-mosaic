@@ -17,6 +17,7 @@
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { div } from 'react-dom-factories'
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
@@ -28,7 +29,6 @@ import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } 
 import { MosaicZeroStateFactory } from './MosaicZeroState';
 import { MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
 
-const { div } = React.DOM;
 const DEFAULT_EXPAND_PERCENTAGE = 70;
 
 export interface MosaicBaseProps<T> {

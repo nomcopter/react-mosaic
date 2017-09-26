@@ -16,13 +16,13 @@
  */
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { div } from 'react-dom-factories'
 import { ConnectDropTarget, DropTarget } from 'react-dnd';
 import { MosaicContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicDragType, MosaicPath } from './types';
 import DropTargetMonitor = __ReactDnd.DropTargetMonitor;
 
-const { div } = React.DOM;
 
 export interface MosaicWindowDropTargetProps {
     position: MosaicDropTargetPosition;

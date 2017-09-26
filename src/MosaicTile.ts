@@ -16,12 +16,11 @@
  */
 import * as classNames from 'classnames';
 import * as React from 'react';
+import { div } from 'react-dom-factories';
 import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
 import { isParent } from './mosaicUtilities';
 import { Split } from './Split';
 import { MosaicNode, MosaicParent, MosaicPath, MosaicUpdateSpec, ResizeOptions, TileRenderer } from './types';
-
-const { div } = React.DOM;
 
 export interface MosaicTileProps<T> {
     node: MosaicNode<T>;

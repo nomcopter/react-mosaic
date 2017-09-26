@@ -16,10 +16,9 @@
  */
 import * as _ from 'lodash';
 import * as React from 'react';
+import { div, span, h4, button } from 'react-dom-factories'
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 import { CreateNode } from './types';
-
-const { div, span, h4, button } = React.DOM;
 
 export interface MosaicZeroStateProps<T> {
     createNode?: CreateNode<T>;

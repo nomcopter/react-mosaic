@@ -16,9 +16,9 @@
  */
 import * as _ from 'lodash';
 import * as React from 'react';
+import { div } from 'react-dom-factories'
 import { EnabledResizeOptions, MosaicDirection } from './types';
 
-const { div } = React.DOM;
 const RESIZE_THROTTLE_MS = 1000 / 30; // 30 fps
 
 export interface SplitProps extends EnabledResizeOptions {
