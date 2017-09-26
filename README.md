@@ -96,8 +96,13 @@ The resulting view looks and functions identically to the previous example.
 #### Drag, Drop,  and other advanced functionality with `MosaicWindow`
 `MosaicWindow` is a component that renders a toolbar and controls around its children for a tile as well as providing full featured drag and drop functionality.
 
-```typescript
+```tsx
 export type ViewId = string;
+
+// Make a simple extension class to preserve generic type checking in TSX
+class ViewIdMosaic extends Mosaic<ViewId> { }
+class ViewIdMosaicWindow extends MosaicWindow<ViewId> { }
+
 const TITLE_MAP: { [viewId: string]: string } = {
   a: 'Left Window',
   b: 'Top Right Window',
@@ -108,12 +113,12 @@ const TITLE_MAP: { [viewId: string]: string } = {
 export const app = (
   <ViewIdMosaic
     renderTile={ id => (
-      <MosaicWindow
+      <ViewIdMosaicWindow
         createNode={ () => 'new' }
         title={ TITLE_MAP[id] }
       >
         <div>title</div>
-      </MosaicWindow>
+      </ViewIdMosaicWindow>
     )}
     initialValue={{
       direction: 'row',
@@ -291,37 +296,44 @@ Children (and toolbar elements) within `MosaicWindow` are passed the following a
 
 ```typescript
 export interface MosaicWindowContext<T> extends MosaicTileContext<T> {
-    mosaicWindowActions: MosaicWindowActions;
+  mosaicWindowActions: MosaicWindowActions;
 }
 
 export interface MosaicWindowActions {
-    /**
-     * Fails if no `createNode()` is defined
-     * Creates a new node and splits the current node.
-     * The current node becomes the `first` and the new node the `second` of the result.
-     * `direction` is chosen by querying the DOM and splitting along the longer axis
-     */
-    split: () => Promise<void>;
-    /**
-     * Fails if no `createNode()` is defined
-     * Convenience function to call `createNode()` and replace the current node with it.
-     */
-    replaceWithNew: () => Promise<void>;
+  /**
+   * Fails if no `createNode()` is defined
+   * Creates a new node and splits the current node.
+   * The current node becomes the `first` and the new node the `second` of the result.
+   * `direction` is chosen by querying the DOM and splitting along the longer axis
+   */
+  split: () => Promise<void>;
+  /**
+   * Fails if no `createNode()` is defined
+   * Convenience function to call `createNode()` and replace the current node with it.
+   */
+  replaceWithNew: () => Promise<void>;
+  /**
+   * Sets the open state for the tray that holds additional controls
+   */
+  setAdditionalControlsOpen: (open: boolean) => void;
 }
 ```
 
 To access the functions on context simply specify `contextTypes` on your component.
 
-```typescript
-class RemoveButton extends React.Component<Props, void> {
+```tsx
+class RemoveButton extends React.PureComponent<Props> {
     static contextTypes = MosaicWindowContext;
     context: MosaicWindowContext<TileId>;
 
-
     render() {
-        return button({
-            onClick: this.remove
-        }, '╳');
+        return (
+          <button
+            onClick={this.remove}
+          >
+            ╳
+          </button>
+        );
     }
 
     private remove = () =>
@@ -354,7 +366,7 @@ export interface MosaicUpdateSpec<T> {
 }
 ```
 
-## Upgrade Considerations
+## Upgrade Considerations / Changelog
 
 See [Releases](https://github.com/palantir/react-mosaic/releases)
 
