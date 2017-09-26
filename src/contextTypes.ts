@@ -26,77 +26,77 @@ import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
  * Context provided to everything within Mosaic
  */
 export interface MosaicContext<T> {
-    mosaicActions: MosaicRootActions<T>;
-    mosaicId: string;
+  mosaicActions: MosaicRootActions<T>;
+  mosaicId: string;
 }
 
 /**
  * Context provided to everything within a Mosaic Tile
  */
 export interface MosaicTileContext<T> extends MosaicContext<T> {
-    /**
-     * Returns the path to this tile
-     */
-    getMosaicPath: () => MosaicPath;
+  /**
+   * Returns the path to this tile
+   */
+  getMosaicPath: () => MosaicPath;
 }
 
 /**
  * Context provided to everything within a Mosaic Window
  */
 export interface MosaicWindowContext<T> extends MosaicTileContext<T> {
-    mosaicWindowActions: MosaicWindowActions;
+  mosaicWindowActions: MosaicWindowActions;
 }
 
 /**
  * These actions are used to alter the state of the view tree
  */
 export interface MosaicRootActions<T> {
-    /**
-     * Increases the size of this node and bubbles up the tree
-     * @param path Path to node to expand
-     * @param percentage Every node in the path up to root will be expanded to this percentage
-     */
-    expand: (path: MosaicPath, percentage?: number) => void;
-    /**
-     * Remove the node at `path`
-     * @param path
-     */
-    remove: (path: MosaicPath) => void;
-    /**
-     * Hide the node at `path` but keep it in the DOM. Used in Drag and Drop
-     * @param path
-     */
-    hide: (path: MosaicPath) => void;
-    /**
-     * Replace currentNode at `path` with `node`
-     * @param path
-     * @param node
-     */
-    replaceWith: (path: MosaicPath, node: MosaicNode<T>) => void;
-    /**
-     * Atomically applies all updates to the current tree
-     * @param updates
-     */
-    updateTree: (updates: MosaicUpdate<T>[]) => void;
-    /**
-     * Returns the root of this Mosaic instance
-     */
-    getRoot: () => MosaicNode<T> | null;
+  /**
+   * Increases the size of this node and bubbles up the tree
+   * @param path Path to node to expand
+   * @param percentage Every node in the path up to root will be expanded to this percentage
+   */
+  expand: (path: MosaicPath, percentage?: number) => void;
+  /**
+   * Remove the node at `path`
+   * @param path
+   */
+  remove: (path: MosaicPath) => void;
+  /**
+   * Hide the node at `path` but keep it in the DOM. Used in Drag and Drop
+   * @param path
+   */
+  hide: (path: MosaicPath) => void;
+  /**
+   * Replace currentNode at `path` with `node`
+   * @param path
+   * @param node
+   */
+  replaceWith: (path: MosaicPath, node: MosaicNode<T>) => void;
+  /**
+   * Atomically applies all updates to the current tree
+   * @param updates
+   */
+  updateTree: (updates: MosaicUpdate<T>[]) => void;
+  /**
+   * Returns the root of this Mosaic instance
+   */
+  getRoot: () => MosaicNode<T> | null;
 }
 
 export interface MosaicWindowActions {
-    /**
-     * Fails if no `createNode()` is defined
-     * Creates a new node and splits the current node.
-     * The current node becomes the `first` and the new node the `second` of the result.
-     * `direction` is chosen by querying the DOM and splitting along the longer axis
-     */
-    split: (...args: any[]) => Promise<void>;
-    /**
-     * Fails if no `createNode()` is defined
-     * Convenience function to call `createNode()` and replace the current node with it.
-     */
-    replaceWithNew: (...args: any[]) => Promise<void>;
+  /**
+   * Fails if no `createNode()` is defined
+   * Creates a new node and splits the current node.
+   * The current node becomes the `first` and the new node the `second` of the result.
+   * `direction` is chosen by querying the DOM and splitting along the longer axis
+   */
+  split: (...args: any[]) => Promise<void>;
+  /**
+   * Fails if no `createNode()` is defined
+   * Convenience function to call `createNode()` and replace the current node with it.
+   */
+  replaceWithNew: (...args: any[]) => Promise<void>;
 }
 
 /*************************************************************
@@ -104,19 +104,19 @@ export interface MosaicWindowActions {
  */
 
 export const MosaicActionsPropType = PropTypes.shape({
-    expand: PropTypes.func.isRequired,
-    remove: PropTypes.func.isRequired,
-    hide: PropTypes.func.isRequired,
-    replaceWith: PropTypes.func.isRequired,
-    updateTree: PropTypes.func.isRequired,
-    getRoot: PropTypes.func.isRequired,
+  expand: PropTypes.func.isRequired,
+  remove: PropTypes.func.isRequired,
+  hide: PropTypes.func.isRequired,
+  replaceWith: PropTypes.func.isRequired,
+  updateTree: PropTypes.func.isRequired,
+  getRoot: PropTypes.func.isRequired,
 }).isRequired;
 
 export const MosaicPathGetterPropType = PropTypes.func.isRequired;
 
 export const MosaicWindowActionsPropType = PropTypes.shape({
-    split: PropTypes.func.isRequired,
-    replaceWithNew: PropTypes.func.isRequired,
+  split: PropTypes.func.isRequired,
+  replaceWithNew: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
@@ -124,16 +124,16 @@ export const MosaicWindowActionsPropType = PropTypes.shape({
  */
 
 export const MosaicContext = {
-    mosaicActions: MosaicActionsPropType,
-    mosaicId: PropTypes.string.isRequired,
+  mosaicActions: MosaicActionsPropType,
+  mosaicId: PropTypes.string.isRequired,
 };
 
 export const MosaicTileContext = {
-    ...MosaicContext,
-    getMosaicPath: MosaicPathGetterPropType,
+  ...MosaicContext,
+  getMosaicPath: MosaicPathGetterPropType,
 };
 
 export const MosaicWindowContext = {
-    ...MosaicTileContext,
-    mosaicWindowActions: MosaicWindowActionsPropType,
+  ...MosaicTileContext,
+  mosaicWindowActions: MosaicWindowActionsPropType,
 };

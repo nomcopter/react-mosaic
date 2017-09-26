@@ -1,24 +1,24 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "sourceMap": true,
-        "outDir": "lib",
-        "experimentalDecorators": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "strictNullChecks": true,
-        "noImplicitThis": true,
-        "noImplicitAny": true,
-        "forceConsistentCasingInFileNames": true,
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
-        "strict": true
-    },
-    "exclude": [
-        "docs",
-        "lib",
-        "node_modules",
-        "webpack.config*.js"
-    ]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "lib",
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "strict": true
+  },
+  "exclude": [
+    "docs",
+    "lib",
+    "node_modules",
+    "webpack.config*.js"
+  ]
 }

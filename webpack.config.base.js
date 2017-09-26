@@ -5,9 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const VENDOR_LIBS = _.keys(require('./package.json').dependencies);
 
-let config = {
+const config = {
   entry: {
-    app: './dev/index.ts',
+    app: './dev/index.tsx',
     vendor: VENDOR_LIBS
   },
   output: {

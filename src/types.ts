@@ -26,10 +26,10 @@ export type MosaicNode<T> = MosaicParent<T> | T;
 export type MosaicDirection = 'row' | 'column';
 
 export interface MosaicParent<T> {
-    direction: MosaicDirection;
-    first: MosaicNode<T>;
-    second: MosaicNode<T>;
-    splitPercentage?: number;
+  direction: MosaicDirection;
+  first: MosaicNode<T>;
+  second: MosaicNode<T>;
+  splitPercentage?: number;
 }
 
 export type MosaicBranch = 'first' | 'second';
@@ -40,19 +40,20 @@ export type MosaicPath = MosaicBranch[];
  * spec will be passed to https://github.com/kolodny/immutability-helper
  */
 export interface MosaicUpdateSpec<T> {
-    $set?: MosaicNode<T>;
-    splitPercentage?: {
-        $set: number | null;
-    };
-    direction?: {
-        $set: MosaicDirection;
-    };
-    first?: MosaicUpdateSpec<T>;
-    second?: MosaicUpdateSpec<T>;
+  $set?: MosaicNode<T>;
+  splitPercentage?: {
+    $set: number | null;
+  };
+  direction?: {
+    $set: MosaicDirection;
+  };
+  first?: MosaicUpdateSpec<T>;
+  second?: MosaicUpdateSpec<T>;
 }
+
 export interface MosaicUpdate<T> {
-    path: MosaicPath;
-    spec: MosaicUpdateSpec<T>;
+  path: MosaicPath;
+  spec: MosaicUpdateSpec<T>;
 }
 
 /**
@@ -71,11 +72,11 @@ export type CreateNode<T> = (...args: any[]) => Promise<MosaicNode<T>> | MosaicN
  * @type {{WINDOW: string}}
  */
 export const MosaicDragType = {
-    WINDOW: 'MosaicWindow',
+  WINDOW: 'MosaicWindow',
 };
 
 export interface EnabledResizeOptions {
-    minimumPaneSizePercentage?: number; // Default: 20
+  minimumPaneSizePercentage?: number; // Default: 20
 }
 
 export type ResizeOptions = 'DISABLED' | EnabledResizeOptions;

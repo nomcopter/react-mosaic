@@ -148,7 +148,7 @@ The exported classes are named as the base name of the component (e.g. `MosaicWi
 have 'Factory' appended (e.g. `MosaicWindowFactory`).
 
 #### Example Application
-See [ExampleApp](./dev/ExampleApp.ts) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
+See [ExampleApp](dev/ExampleApp.tsx) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
 for a more interesting example that shows the usage of Mosaic as a controlled component and modifications of the tree structure.
 
 ## API
@@ -230,7 +230,7 @@ export interface MosaicWindowProps<T> {
     renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 ```
-The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](./src/window/defaultToolbarControls.ts)
+The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](src/window/defaultToolbarControls.tsx)
 
 ### Advanced API
 The above API is good for most consumers, however Mosaic provides functionality on the [Context](https://facebook.github.io/react/docs/context.html) of its children that make it easier to alter the view state.
