@@ -59,12 +59,13 @@ class MosaicWindowDropTargetClass extends React.PureComponent<Props> {
 
   render() {
     const { position, isOver, connectDropTarget, draggedMosaicId } = this.props;
-    return connectDropTarget(
-      <div
-        className={classNames('drop-target', position, {
-          'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-        })}
-      />,
+    return connectDropTarget((
+        <div
+          className={classNames('drop-target', position, {
+            'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
+          })}
+        />
+      ),
     );
   }
 }

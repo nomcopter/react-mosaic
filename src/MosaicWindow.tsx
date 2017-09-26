@@ -138,30 +138,31 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
   render() {
     const { className, isOver, renderPreview, additionalControls, connectDropTarget, connectDragPreview, draggedMosaicId } = this.props;
 
-    return connectDropTarget(
-      <div
-        className={classNames('mosaic-window mosaic-drop-target', className, {
-          'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-          'additional-controls-open': this.state.additionalControlsOpen,
-        })}
-        ref={(element) => this.rootElement = element}
-      >
-        {this.renderToolbar()}
-        <div className='mosaic-window-body'>
-          {this.props.children!}
-        </div>
+    return connectDropTarget((
         <div
-          className='mosaic-window-body-overlay'
-          onClick={() => this.setAdditionalControlsOpen(false)}
-        />
-        <div className='mosaic-window-additional-actions-bar'>
-          {additionalControls}
+          className={classNames('mosaic-window mosaic-drop-target', className, {
+            'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
+            'additional-controls-open': this.state.additionalControlsOpen,
+          })}
+          ref={(element) => this.rootElement = element}
+        >
+          {this.renderToolbar()}
+          <div className='mosaic-window-body'>
+            {this.props.children!}
+          </div>
+          <div
+            className='mosaic-window-body-overlay'
+            onClick={() => this.setAdditionalControlsOpen(false)}
+          />
+          <div className='mosaic-window-additional-actions-bar'>
+            {additionalControls}
+          </div>
+          {connectDragPreview(renderPreview!(this.props))}
+          <div className='drop-target-container'>
+            {_.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget)}
+          </div>
         </div>
-        {connectDragPreview(renderPreview!(this.props))}
-        <div className='drop-target-container'>
-          {_.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget)}
-        </div>
-      </div>,
+      ),
     );
   }
 

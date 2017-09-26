@@ -130,7 +130,7 @@ export class MosaicWithoutDragDropContext<T> extends React.PureComponent<MosaicP
               path={[]}
               key={position}
             />
-          ))},
+          ))}
         </div>
       </div>
     );
