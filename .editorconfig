@@ -1,2 +1,3 @@
 [*.{ts,tsx}]
-indent_size = 4
+indent_size = 2
+quote_type = single

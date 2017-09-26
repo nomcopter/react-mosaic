@@ -15,69 +15,63 @@
  * limitations under the License.
  */
 export {
-    Mosaic,
-    MosaicProps,
-    MosaicUncontrolledProps,
-    MosaicControlledProps,
-    MosaicFactory,
-    MosaicWithoutDragDropContext,
+  Mosaic,
+  MosaicProps,
+  MosaicUncontrolledProps,
+  MosaicControlledProps,
+  MosaicFactory,
+  MosaicWithoutDragDropContext,
 } from './Mosaic';
 export {
-    MosaicNode,
-    MosaicDragType,
-    MosaicDirection,
-    MosaicBranch,
-    CreateNode,
-    MosaicParent,
-    MosaicPath,
-    MosaicUpdate,
-    MosaicUpdateSpec,
-    TileRenderer,
+  MosaicNode,
+  MosaicDragType,
+  MosaicDirection,
+  MosaicBranch,
+  CreateNode,
+  MosaicParent,
+  MosaicPath,
+  MosaicUpdate,
+  MosaicUpdateSpec,
+  TileRenderer,
 } from './types';
 export {
-    MosaicContext,
-    MosaicActionsPropType,
-    MosaicPathGetterPropType,
-    MosaicRootActions,
-    MosaicTileContext,
-    MosaicWindowActions,
-    MosaicWindowActionsPropType,
-    MosaicWindowContext,
+  MosaicContext,
+  MosaicActionsPropType,
+  MosaicPathGetterPropType,
+  MosaicRootActions,
+  MosaicTileContext,
+  MosaicWindowActions,
+  MosaicWindowActionsPropType,
+  MosaicWindowContext,
 } from './contextTypes';
 export {
-    buildSpecFromUpdate,
-    createDragToUpdates,
-    createExpandUpdate,
-    createHideUpdate,
-    createRemoveUpdate,
-    updateTree,
+  buildSpecFromUpdate,
+  createDragToUpdates,
+  createExpandUpdate,
+  createHideUpdate,
+  createRemoveUpdate,
+  updateTree,
 } from './mosaicUpdates';
 export {
-    createBalancedTreeFromLeaves,
-    Corner,
-    getAndAssertNodeAtPathExists,
-    getLeaves,
-    getNodeAtPath,
-    getOtherBranch,
-    getOtherDirection,
-    getPathToCorner,
-    isParent,
+  createBalancedTreeFromLeaves,
+  Corner,
+  getAndAssertNodeAtPathExists,
+  getLeaves,
+  getNodeAtPath,
+  getOtherBranch,
+  getOtherDirection,
+  getPathToCorner,
+  isParent,
 } from './mosaicUtilities';
-export { MosaicWindow, MosaicWindowFactory, MosaicWindowProps } from './window/MosaicWindow';
+export { MosaicWindow, MosaicWindowFactory, MosaicWindowProps } from './MosaicWindow';
 export {
-    createDefaultToolbarButton,
-    DEFAULT_CONTROLS_WITH_CREATION,
-    DEFAULT_CONTROLS_WITHOUT_CREATION,
-    ExpandButton,
-    ExpandButtonFactory,
-    MosaicButtonProps,
-    RemoveButton,
-    RemoveButtonFactory,
-    ReplaceButton,
-    ReplaceButtonFactory,
-    Separator,
-    SeparatorFactory,
-    SplitButton,
-    SplitButtonFactory,
-} from './window/defaultToolbarControls';
+  createDefaultToolbarButton,
+  MosaicButtonProps,
+} from './buttons/MosaicButton';
 export { MosaicZeroState, MosaicZeroStateFactory, MosaicZeroStateProps } from './MosaicZeroState';
+export { Separator, SeparatorFactory } from './buttons/Separator';
+export { ExpandButton, ExpandButtonFactory } from './buttons/ExpandButton';
+export { ReplaceButton, ReplaceButtonFactory } from './buttons/ReplaceButton';
+export { SplitButton, SplitButtonFactory } from './buttons/SplitButton';
+export { RemoveButton, RemoveButtonFactory } from './buttons/RemoveButton';
+export { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';

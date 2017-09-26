@@ -19,18 +19,17 @@ import * as _ from 'lodash';
 import { MosaicDropTargetPosition } from './internalTypes';
 import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 import {
-    MosaicBranch,
-    MosaicDirection,
-    MosaicNode,
-    MosaicParent,
-    MosaicPath,
-    MosaicUpdate,
-    MosaicUpdateSpec,
+  MosaicBranch,
+  MosaicDirection,
+  MosaicNode,
+  MosaicParent,
+  MosaicPath,
+  MosaicUpdate,
+  MosaicUpdateSpec,
 } from './types';
 
 // https://github.com/Microsoft/TypeScript/issues/9944
-let FIX_9944: MosaicParent<any>;
-FIX_9944 = null!;
+export { MosaicParent };
 
 /**
  * Used to prepare `update` for `immutability-helper`
@@ -38,11 +37,11 @@ FIX_9944 = null!;
  * @returns {any}
  */
 export function buildSpecFromUpdate<T>(mosaicUpdate: MosaicUpdate<T>): MosaicUpdateSpec<T> {
-    if (mosaicUpdate.path.length > 0) {
-        return _.set({}, mosaicUpdate.path, mosaicUpdate.spec);
-    } else {
-        return mosaicUpdate.spec;
-    }
+  if (mosaicUpdate.path.length > 0) {
+    return _.set({}, mosaicUpdate.path, mosaicUpdate.spec);
+  } else {
+    return mosaicUpdate.spec;
+  }
 }
 
 /**
@@ -52,12 +51,12 @@ export function buildSpecFromUpdate<T>(mosaicUpdate: MosaicUpdate<T>): MosaicUpd
  * @returns {MosaicNode<T>}
  */
 export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
-    let currentNode = root;
-    updates.forEach((mUpdate: MosaicUpdate<T>) => {
-        currentNode = update(currentNode, buildSpecFromUpdate(mUpdate));
-    });
+  let currentNode = root;
+  updates.forEach((mUpdate: MosaicUpdate<T>) => {
+    currentNode = update(currentNode, buildSpecFromUpdate(mUpdate));
+  });
 
-    return currentNode;
+  return currentNode;
 }
 
 /**
@@ -67,21 +66,21 @@ export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
  * @returns {{path: T[], spec: {$set: MosaicNode<T>}}}
  */
 export function createRemoveUpdate<T>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
-    const parentPath = _.dropRight(path);
-    const nodeToRemove = _.last(path);
-    const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove!));
-    const sibling = getAndAssertNodeAtPathExists(root, siblingPath);
+  const parentPath = _.dropRight(path);
+  const nodeToRemove = _.last(path);
+  const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove!));
+  const sibling = getAndAssertNodeAtPathExists(root, siblingPath);
 
-    return {
-        path: parentPath,
-        spec: {
-            $set: sibling,
-        },
-    };
+  return {
+    path: parentPath,
+    spec: {
+      $set: sibling,
+    },
+  };
 }
 
 function isPathPrefixEqual(a: MosaicPath, b: MosaicPath, length: number) {
-    return _.isEqual(_.take(a, length), _.take(b, length));
+  return _.isEqual(_.take(a, length), _.take(b, length));
 }
 
 /**
@@ -97,75 +96,76 @@ export function createDragToUpdates<T>(root: MosaicNode<T>,
                                        sourcePath: MosaicPath,
                                        destinationPath: MosaicPath,
                                        position: MosaicDropTargetPosition): MosaicUpdate<T>[] {
-    let destinationNode = getAndAssertNodeAtPathExists(root, destinationPath);
-    const updates: MosaicUpdate<T>[] = [];
+  let destinationNode = getAndAssertNodeAtPathExists(root, destinationPath);
+  const updates: MosaicUpdate<T>[] = [];
 
-    const destinationIsParentOfSource = isPathPrefixEqual(sourcePath, destinationPath, destinationPath.length);
-    if (destinationIsParentOfSource) {
-        // Must explicitly remove source from the destination node
-        destinationNode = updateTree(destinationNode, [
-            createRemoveUpdate(destinationNode, _.drop(sourcePath, destinationPath.length)),
-        ]);
-    } else {
-        // Can remove source normally
-        updates.push(createRemoveUpdate(root, sourcePath));
+  const destinationIsParentOfSource = isPathPrefixEqual(sourcePath, destinationPath, destinationPath.length);
+  if (destinationIsParentOfSource) {
+    // Must explicitly remove source from the destination node
+    destinationNode = updateTree(destinationNode, [
+      createRemoveUpdate(destinationNode, _.drop(sourcePath, destinationPath.length)),
+    ]);
+  } else {
+    // Can remove source normally
+    updates.push(createRemoveUpdate(root, sourcePath));
 
-        // Have to drop in the correct destination after the source has been removed
-        const removedNodeParentIsInPath = isPathPrefixEqual(sourcePath, destinationPath, sourcePath.length - 1);
-        if (removedNodeParentIsInPath) {
-            destinationPath.splice(sourcePath.length - 1, 1);
-        }
+    // Have to drop in the correct destination after the source has been removed
+    const removedNodeParentIsInPath = isPathPrefixEqual(sourcePath, destinationPath, sourcePath.length - 1);
+    if (removedNodeParentIsInPath) {
+      destinationPath.splice(sourcePath.length - 1, 1);
     }
+  }
 
-    const sourceNode = getAndAssertNodeAtPathExists(root, sourcePath);
-    let first: MosaicNode<T>;
-    let second: MosaicNode<T>;
-    if (position === MosaicDropTargetPosition.LEFT || position === MosaicDropTargetPosition.TOP) {
-        first = sourceNode;
-        second = destinationNode;
-    } else {
-        first = destinationNode;
-        second = sourceNode;
-    }
+  const sourceNode = getAndAssertNodeAtPathExists(root, sourcePath);
+  let first: MosaicNode<T>;
+  let second: MosaicNode<T>;
+  if (position === MosaicDropTargetPosition.LEFT || position === MosaicDropTargetPosition.TOP) {
+    first = sourceNode;
+    second = destinationNode;
+  } else {
+    first = destinationNode;
+    second = sourceNode;
+  }
 
-    let direction: MosaicDirection = 'column';
-    if (position === MosaicDropTargetPosition.LEFT || position === MosaicDropTargetPosition.RIGHT) {
-        direction = 'row';
-    }
+  let direction: MosaicDirection = 'column';
+  if (position === MosaicDropTargetPosition.LEFT || position === MosaicDropTargetPosition.RIGHT) {
+    direction = 'row';
+  }
 
-    updates.push({
-        path: destinationPath,
-        spec: {
-            $set: { first, second, direction },
-        },
-    });
+  updates.push({
+    path: destinationPath,
+    spec: {
+      $set: { first, second, direction },
+    },
+  });
 
-    return updates;
+  return updates;
 }
+
 /**
  * Sets the splitPercentage to hide the node at `path`
  * @param path
  * @returns {{path: T[], spec: {splitPercentage: {$set: number}}}}
  */
 export function createHideUpdate<T>(path: MosaicPath): MosaicUpdate<T> {
-    const targetPath = _.dropRight(path);
-    const thisBranch = _.last(path);
+  const targetPath = _.dropRight(path);
+  const thisBranch = _.last(path);
 
-    let splitPercentage: number;
-    if (thisBranch === 'first') {
-        splitPercentage = 0;
-    } else {
-        splitPercentage = 100;
-    }
+  let splitPercentage: number;
+  if (thisBranch === 'first') {
+    splitPercentage = 0;
+  } else {
+    splitPercentage = 100;
+  }
 
-    return {
-        path: targetPath,
-        spec: {
-            splitPercentage: {
-                $set: splitPercentage,
-            },
-        },
-    };
+  return {
+    path: targetPath,
+    spec: {
+      splitPercentage: {
+        $set: splitPercentage,
+      },
+    },
+  };
 }
 
 /**
@@ -175,20 +175,20 @@ export function createHideUpdate<T>(path: MosaicPath): MosaicUpdate<T> {
  * @returns {{spec: MosaicUpdateSpec<T>, path: Array}}
  */
 export function createExpandUpdate<T>(path: MosaicPath, percentage: number): MosaicUpdate<T> {
-    let spec: MosaicUpdateSpec<T> = {};
-    for (let i = path.length - 1; i >= 0; i--) {
-        const branch: MosaicBranch = path[i];
-        const splitPercentage = branch === 'first' ? percentage : 100 - percentage;
-        spec = {
-            splitPercentage: {
-                $set: splitPercentage,
-            },
-            [branch]: spec,
-        };
-    }
-
-    return {
-        spec,
-        path: [],
+  let spec: MosaicUpdateSpec<T> = {};
+  for (let i = path.length - 1; i >= 0; i--) {
+    const branch: MosaicBranch = path[i];
+    const splitPercentage = branch === 'first' ? percentage : 100 - percentage;
+    spec = {
+      splitPercentage: {
+        $set: splitPercentage,
+      },
+      [branch]: spec,
     };
+  }
+
+  return {
+    spec,
+    path: [],
+  };
 }

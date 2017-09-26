@@ -14,21 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MosaicPath } from './types';
+import * as React from 'react';
 
-export type MosaicDropTargetPosition = 'top' | 'bottom' | 'left' | 'right';
-export const MosaicDropTargetPosition = {
-  TOP: 'top' as 'top',
-  BOTTOM: 'bottom' as 'bottom',
-  LEFT: 'left' as 'left',
-  RIGHT: 'right' as 'right',
-};
-
-export interface MosaicDropData {
-  path?: MosaicPath;
-  position?: MosaicDropTargetPosition;
+export class Separator extends React.PureComponent {
+  render() {
+    return <div className='separator'/>;
+  }
 }
 
-export interface MosaicDragItem {
-  mosaicId: string;
-}
+export const SeparatorFactory = React.createFactory(Separator);

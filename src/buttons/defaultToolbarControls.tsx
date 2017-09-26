@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MosaicPath } from './types';
+import * as React from 'react';
+import { ExpandButton } from './ExpandButton';
+import { RemoveButton } from './RemoveButton';
+import { ReplaceButton } from './ReplaceButton';
+import { SplitButton } from './SplitButton';
 
-export type MosaicDropTargetPosition = 'top' | 'bottom' | 'left' | 'right';
-export const MosaicDropTargetPosition = {
-  TOP: 'top' as 'top',
-  BOTTOM: 'bottom' as 'bottom',
-  LEFT: 'left' as 'left',
-  RIGHT: 'right' as 'right',
-};
-
-export interface MosaicDropData {
-  path?: MosaicPath;
-  position?: MosaicDropTargetPosition;
-}
-
-export interface MosaicDragItem {
-  mosaicId: string;
-}
+export const DEFAULT_CONTROLS_WITH_CREATION = React.Children.toArray([
+  <ReplaceButton/>,
+  <SplitButton/>,
+  <ExpandButton/>,
+  <RemoveButton/>,
+]);
+export const DEFAULT_CONTROLS_WITHOUT_CREATION = React.Children.toArray([
+  <ExpandButton/>,
+  <RemoveButton/>,
+]);
