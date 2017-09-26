@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
-    "declaration": true
+    "rootDir": "src"
   },
   "exclude": [
     "dev",

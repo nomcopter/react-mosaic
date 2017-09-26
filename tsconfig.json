@@ -1,6 +1,8 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
     "target": "es5",
+    "declaration": true,
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "lib",

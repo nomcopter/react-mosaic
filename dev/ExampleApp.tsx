@@ -60,7 +60,7 @@ const additionalControls = React.Children.toArray([
   <CloseAdditionalControlsButton/>,
 ]);
 
-interface State {
+export interface ExampleAppState {
   currentNode: MosaicNode<number> | null;
 }
 
@@ -70,8 +70,8 @@ class NumberMosaic extends Mosaic<number> {
 class NumberMosaicWindow extends MosaicWindow<number> {
 }
 
-export class ExampleApp extends React.PureComponent<{}, State> {
-  state: State = {
+export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
+  state: ExampleAppState = {
     currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1)),
   };
 

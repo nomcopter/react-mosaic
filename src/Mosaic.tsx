@@ -25,7 +25,7 @@ import { MosaicDropTargetPosition } from './internalTypes';
 import { MosaicWindowDropTarget } from './MosaicDropTarget';
 import { MosaicTile } from './MosaicTile';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './mosaicUpdates';
-import { MosaicZeroStateFactory } from './MosaicZeroState';
+import { MosaicZeroState } from './MosaicZeroState';
 import { MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
 
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -85,7 +85,7 @@ export interface MosaicState<T> {
 export class MosaicWithoutDragDropContext<T> extends React.PureComponent<MosaicProps<T>, MosaicState<T>> {
   static defaultProps = {
     onChange: () => void 0,
-    zeroStateView: MosaicZeroStateFactory(),
+    zeroStateView: <MosaicZeroState/>,
     className: 'mosaic-blueprint-theme',
   };
 
