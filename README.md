@@ -230,7 +230,7 @@ export interface MosaicWindowProps<T> {
     renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 ```
-The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](src/window/defaultToolbarControls.tsx)
+The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](src/buttons/MosaicButton.tsx)
 
 ### Advanced API
 The above API is good for most consumers, however Mosaic provides functionality on the [Context](https://facebook.github.io/react/docs/context.html) of its children that make it easier to alter the view state.

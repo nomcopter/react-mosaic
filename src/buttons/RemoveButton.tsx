@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
-import { ExampleApp } from './ExampleApp';
+import { MosaicWindowContext } from '../contextTypes';
+import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
-const APP_ELEMENT = document.getElementById('app')!;
-const render = (Component: React.ComponentClass<any>) => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component/>
-    </AppContainer>,
-    APP_ELEMENT,
-  );
-};
+export class RemoveButton<T> extends React.PureComponent<MosaicButtonProps> {
+  static contextTypes = MosaicWindowContext;
+  context: MosaicWindowContext<T>;
 
-render(ExampleApp);
+  render() {
+    return createDefaultToolbarButton('Close Window', 'pt-icon-cross', this.remove);
+  }
 
-declare var module: any;
-if (module.hot) {
-  module.hot.accept('./ExampleApp', () => {
-    render(ExampleApp);
-  });
+  private remove = () => {
+    this.context.mosaicActions.remove(this.context.getMosaicPath());
+    if (this.props.onClick) {
+      this.props.onClick();
+    }
+  };
 }
+
+export const RemoveButtonFactory = React.createFactory(RemoveButton);

@@ -15,25 +15,18 @@
  * limitations under the License.
  */
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
-import { ExampleApp } from './ExampleApp';
+import { ExpandButton } from './ExpandButton';
+import { RemoveButton } from './RemoveButton';
+import { ReplaceButton } from './ReplaceButton';
+import { SplitButton } from './SplitButton';
 
-const APP_ELEMENT = document.getElementById('app')!;
-const render = (Component: React.ComponentClass<any>) => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component/>
-    </AppContainer>,
-    APP_ELEMENT,
-  );
-};
-
-render(ExampleApp);
-
-declare var module: any;
-if (module.hot) {
-  module.hot.accept('./ExampleApp', () => {
-    render(ExampleApp);
-  });
-}
+export const DEFAULT_CONTROLS_WITH_CREATION = React.Children.toArray([
+  <ReplaceButton/>,
+  <SplitButton/>,
+  <ExpandButton/>,
+  <RemoveButton/>,
+]);
+export const DEFAULT_CONTROLS_WITHOUT_CREATION = React.Children.toArray([
+  <ExpandButton/>,
+  <RemoveButton/>,
+]);

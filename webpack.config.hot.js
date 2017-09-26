@@ -3,9 +3,16 @@ const webpack = require('webpack');
 
 let config = require('./webpack.config.base.js');
 
+// Re-configure the app entry point for hot-reloading by injecting this pseudo-module provided by webpack.
+config.entry.app = _.flatten([
+  'react-hot-loader/patch',
+  'webpack/hot/only-dev-server',
+  config.entry.app
+]);
+
 config.module.loaders.forEach(loaderConf => {
   if (loaderConf.loader.slice(0, 2) === 'ts') {
-    loaderConf.loader = 'react-hot!' + loaderConf.loader;
+    loaderConf.loader = 'react-hot-loader/webpack!' + loaderConf.loader;
   }
 });
 
@@ -15,9 +22,6 @@ config.plugins.push(new webpack.DefinePlugin({
 
 _.merge(config, {
   devtool: '#cheap-module-source-map',
-  ts: {
-    transpileOnly: true
-  },
   devServer: {
     historyApiFallback: true,
     stats: 'minimal',

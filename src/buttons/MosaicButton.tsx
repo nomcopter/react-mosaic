@@ -14,26 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as classNames from 'classnames';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
-import { ExampleApp } from './ExampleApp';
 
-const APP_ELEMENT = document.getElementById('app')!;
-const render = (Component: React.ComponentClass<any>) => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component/>
-    </AppContainer>,
-    APP_ELEMENT,
+export function createDefaultToolbarButton(title: string,
+                                           className: string,
+                                           onClick: (event: React.MouseEvent<any>) => any,
+                                           text?: string): React.ReactElement<any> {
+  return (
+    <button
+      title={title}
+      onClick={onClick}
+      className={classNames('mosaic-default-control pt-button pt-minimal', className)}
+    >
+      {text! && <span className='control-text'>text!</span>}
+    </button>
   );
-};
+}
 
-render(ExampleApp);
-
-declare var module: any;
-if (module.hot) {
-  module.hot.accept('./ExampleApp', () => {
-    render(ExampleApp);
-  });
+export interface MosaicButtonProps {
+  onClick?: () => void;
 }

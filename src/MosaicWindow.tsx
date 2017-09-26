@@ -18,17 +18,14 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
-import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from '../contextTypes';
-import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from '../internalTypes';
-import { MosaicWindowDropTarget } from '../MosaicDropTarget';
-import { createDragToUpdates } from '../mosaicUpdates';
-import { getAndAssertNodeAtPathExists } from '../mosaicUtilities';
-import { CreateNode, MosaicDirection, MosaicDragType } from '../types';
-import {
-  DEFAULT_CONTROLS_WITH_CREATION,
-  DEFAULT_CONTROLS_WITHOUT_CREATION,
-  Separator,
-} from './defaultToolbarControls';
+import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
+import { Separator } from './buttons/Separator';
+import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from './contextTypes';
+import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
+import { MosaicWindowDropTarget } from './MosaicDropTarget';
+import { createDragToUpdates } from './mosaicUpdates';
+import { getAndAssertNodeAtPathExists } from './mosaicUtilities';
+import { CreateNode, MosaicDirection, MosaicDragType } from './types';
 import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
 
 export interface MosaicWindowProps<T> {

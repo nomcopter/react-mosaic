@@ -31,7 +31,7 @@ import {
 import { Mosaic } from '../src/Mosaic';
 import { MosaicZeroState } from '../src/MosaicZeroState';
 import { MosaicDirection } from '../src/types';
-import { MosaicWindow } from '../src/window/MosaicWindow';
+import { MosaicWindow } from '../src/MosaicWindow';
 import '../styles/index.less';
 import './example.less';
 
