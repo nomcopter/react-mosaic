@@ -17,9 +17,8 @@
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { button, div, span } from 'react-dom-factories'
 import { MosaicWindowContext } from '../contextTypes';
-
-const { button, div, span } = React.DOM;
 
 export function createDefaultToolbarButton(title: string,
                                            className: string,
