@@ -59,12 +59,17 @@ interface State {
 const dragSource = {
   beginDrag: (_props: Props<any>, _monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>): MosaicDragItem => {
     // The defer is necessary as the element must be present on start for HTML DnD to not cry
-    _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
+    const hideTimer = _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
     return {
       mosaicId: context.mosaicId,
+      hideTimer,
     };
   },
   endDrag: (_props: Props<any>, monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>) => {
+    const { hideTimer } = monitor.getItem() as MosaicDragItem;
+    // If the hide call hasn't happened yet, cancel it
+    window.clearTimeout(hideTimer);
+
     const ownPath = context.getMosaicPath();
     const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
     const { position, path: destinationPath } = dropResult;

@@ -31,4 +31,5 @@ export interface MosaicDropData {
 
 export interface MosaicDragItem {
   mosaicId: string;
+  hideTimer: number;
 }
