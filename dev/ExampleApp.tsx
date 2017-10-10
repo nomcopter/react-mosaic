@@ -56,12 +56,21 @@ class CloseAdditionalControlsButton extends React.PureComponent {
   }
 }
 
+export const THEMES = {
+  ['Blueprint']: 'mosaic-blueprint-theme',
+  ['Blueprint Dark']: 'mosaic-blueprint-theme pt-dark',
+  ['None']: '',
+};
+
+export type Theme = keyof typeof THEMES;
+
 const additionalControls = React.Children.toArray([
   <CloseAdditionalControlsButton/>,
 ]);
 
 export interface ExampleAppState {
   currentNode: MosaicNode<number> | null;
+  currentTheme: Theme;
 }
 
 class NumberMosaic extends Mosaic<number> {
@@ -73,39 +82,13 @@ class NumberMosaicWindow extends MosaicWindow<number> {
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   state: ExampleAppState = {
     currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1)),
+    currentTheme: 'Blueprint',
   };
 
   render() {
     return (
       <div className='react-mosaic-example-app'>
-        <div className='pt-navbar pt-dark'>
-          <div className='pt-navbar-group pt-align-left'>
-            <div className='pt-logo'/>
-            <div className='pt-navbar-heading'>
-              <a
-                className='pt-app-title'
-                href='https://github.com/palantir/react-mosaic'
-              >
-                react-mosaic
-              </a>
-            </div>
-          </div>
-          <div className='pt-navbar-group pt-align-right pt-button-group'>
-            <span className='actions-label'>Example Actions:</span>
-            <button
-              className='pt-button pt-icon-grid-view'
-              onClick={this.autoArrange}
-            >
-              Auto Arrange
-            </button>
-            <button
-              className='pt-button pt-icon-arrow-top-right'
-              onClick={this.addToTopRight}
-            >
-              Add Window to Top Right
-            </button>
-          </div>
-        </div>
+        {this.renderNavBar()}
         <NumberMosaic
           renderTile={(count: number) => (
             <NumberMosaicWindow
@@ -121,6 +104,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
           zeroStateView={<MosaicZeroState createNode={this.createNode}/>}
           value={this.state.currentNode}
           onChange={this.onChange}
+          className={THEMES[this.state.currentTheme]}
         />
       </div>
     );
@@ -170,4 +154,49 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
     this.setState({ currentNode });
   };
+
+  private renderNavBar() {
+    return (
+      <div className='pt-navbar pt-dark'>
+        <div className='pt-navbar-group'>
+          <div className='pt-logo'/>
+          <div className='pt-navbar-heading'>
+            <a
+              className='pt-app-title'
+              href='https://github.com/palantir/react-mosaic'
+            >
+              react-mosaic
+            </a>
+          </div>
+        </div>
+        <div className='pt-navbar-group pt-button-group'>
+          <label className='pt-label pt-inline theme-selection'>
+            Theme:
+            <div className='pt-select'>
+              <select
+                value={this.state.currentTheme}
+                onChange={(e) => this.setState({ currentTheme: e.currentTarget.value as Theme })}
+              >
+                {React.Children.toArray(Object.keys(THEMES).map((label) => <option>{label}</option>))}
+              </select>
+            </div>
+          </label>
+          <div className='navbar-separator'/>
+          <span className='actions-label'>Example Actions:</span>
+          <button
+            className='pt-button pt-icon-grid-view'
+            onClick={this.autoArrange}
+          >
+            Auto Arrange
+          </button>
+          <button
+            className='pt-button pt-icon-arrow-top-right'
+            onClick={this.addToTopRight}
+          >
+            Add Window to Top Right
+          </button>
+        </div>
+      </div>
+    );
+  }
 }

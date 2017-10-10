@@ -53,7 +53,7 @@ export interface MosaicBaseProps<T> {
    * View to display when the current value is `null`
    * default: Simple NonIdealState view
    */
-  zeroStateView?: React.ReactElement<any>;
+  zeroStateView?: JSX.Element;
 }
 
 export interface MosaicControlledProps<T> extends MosaicBaseProps<T> {

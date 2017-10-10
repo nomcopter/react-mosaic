@@ -32,7 +32,7 @@ export class MosaicZeroState<T> extends React.PureComponent<MosaicZeroStateProps
 
   render() {
     return (
-      <div className='pt-non-ideal-state'>
+      <div className='mosaic-zero-state pt-non-ideal-state'>
         <div className='pt-non-ideal-state-visual pt-non-ideal-state-icon'>
           <span className='pt-icon pt-icon-applications'/>
         </div>
