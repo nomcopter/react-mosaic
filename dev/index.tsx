@@ -34,6 +34,6 @@ render(ExampleApp);
 declare var module: any;
 if (module.hot) {
   module.hot.accept('./ExampleApp', () => {
-    render(ExampleApp);
+    render(require('./ExampleApp').ExampleApp);
   });
 }

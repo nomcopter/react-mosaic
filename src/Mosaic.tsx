@@ -91,9 +91,6 @@ export class MosaicWithoutDragDropContext<T> extends React.PureComponent<MosaicP
 
   static childContextTypes = MosaicContext;
 
-  private MosaicTileT = class extends MosaicTile<T> {
-  };
-
   state: MosaicState<T> = {
     currentNode: null,
     mosaicId: uuid(),
@@ -115,14 +112,11 @@ export class MosaicWithoutDragDropContext<T> extends React.PureComponent<MosaicP
         className={classNames(className, 'mosaic-root mosaic-drop-target')}
       >
         {node == null ?
-          zeroStateView : (
-            <this.MosaicTileT
-              node={node}
-              renderTile={renderTile}
-              resize={resize}
-              getPath={this.getPath}
-            />
-          )}
+          zeroStateView : React.createElement(MosaicTile, {
+            node, renderTile, resize,
+            getPath: this.getPath,
+          })
+        }
         <div className='drop-target-container'>
           {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
             <MosaicWindowDropTarget

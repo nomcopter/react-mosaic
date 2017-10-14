@@ -17,7 +17,6 @@
 import '@blueprintjs/core/dist/blueprint.css';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { MosaicWindowContext } from '../src/contextTypes';
 import {
   Corner,
   createBalancedTreeFromLeaves,
@@ -25,36 +24,20 @@ import {
   getNodeAtPath,
   getOtherDirection,
   getPathToCorner,
+  Mosaic,
+  MosaicDirection,
   MosaicNode,
   MosaicParent,
+  MosaicWindow,
+  MosaicZeroState,
   updateTree,
 } from '../src/index';
-import { Mosaic } from '../src/Mosaic';
-import { MosaicWindow } from '../src/MosaicWindow';
-import { MosaicZeroState } from '../src/MosaicZeroState';
-import { MosaicDirection } from '../src/types';
 import '../styles/index.less';
+
+import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
 import './example.less';
 
 let windowCount = 4;
-
-class CloseAdditionalControlsButton extends React.PureComponent {
-  static contextTypes = MosaicWindowContext;
-  context: MosaicWindowContext<number>;
-
-  render() {
-    return (
-      <div className='pt-button-group pt-minimal'>
-        <button
-          onClick={() => this.context.mosaicWindowActions.setAdditionalControlsOpen(false)}
-          className='pt-button'
-        >
-          Proof of Concept Button!
-        </button>
-      </div>
-    );
-  }
-}
 
 export const THEMES = {
   ['Blueprint']: 'mosaic-blueprint-theme',
@@ -73,10 +56,10 @@ export interface ExampleAppState {
   currentTheme: Theme;
 }
 
-class NumberMosaic extends Mosaic<number> {
+export class NumberMosaic extends Mosaic<number> {
 }
 
-class NumberMosaicWindow extends MosaicWindow<number> {
+export class NumberMosaicWindow extends MosaicWindow<number> {
 }
 
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
