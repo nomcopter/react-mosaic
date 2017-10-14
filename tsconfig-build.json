@@ -4,6 +4,13 @@
     "outDir": "lib",
     "rootDir": "src"
   },
-  "exclude": [ ],
+  "exclude": [
+    "dev",
+    "docs",
+    "lib",
+    "node_modules",
+    "test",
+    "webpack"
+  ],
   "extends": "./tsconfig.json"
 }

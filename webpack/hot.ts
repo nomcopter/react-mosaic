@@ -50,6 +50,4 @@ _.merge(config, {
   },
 });
 
-console.log(JSON.stringify(config, null, 2));
-
 export default config;
