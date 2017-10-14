@@ -40,9 +40,6 @@ export class MosaicTile<T> extends React.PureComponent<MosaicTileProps<T>> {
     getMosaicPath: MosaicPathGetterPropType,
   };
 
-  private MosaicTileT = class extends MosaicTile<T> {
-  };
-
   getChildContext(): Partial<MosaicTileContext<T>> {
     return {
       getMosaicPath: this.props.getPath,
@@ -68,12 +65,11 @@ export class MosaicTile<T> extends React.PureComponent<MosaicTileProps<T>> {
               [sizeStyle]: `${splitPercentage}%`,
             }}
           >
-            <this.MosaicTileT
-              renderTile={renderTile}
-              resize={resize}
-              node={node.first}
-              getPath={this.getFirstBranchPath}
-            />
+            {React.createElement(MosaicTile, {
+              renderTile, resize,
+              node: node.first,
+              getPath: this.getFirstBranchPath,
+            })}
           </div>
           {this.renderSplit(node, splitPercentage)}
           <div
@@ -82,12 +78,11 @@ export class MosaicTile<T> extends React.PureComponent<MosaicTileProps<T>> {
               [sizeStyle]: `${100 - splitPercentage}%`,
             }}
           >
-            <this.MosaicTileT
-              renderTile={renderTile}
-              resize={resize}
-              node={node.second}
-              getPath={this.getSecondBranchPath}
-            />
+            {React.createElement(MosaicTile, {
+              renderTile, resize,
+              node: node.second,
+              getPath: this.getSecondBranchPath,
+            })}
           </div>
         </div>
       );

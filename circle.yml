@@ -9,10 +9,9 @@ dependencies:
     - "/home/ubuntu/.cache/yarn"
     - "node_modules"
   override:
-    - yarn install
+    - yarn install --frozen-lockfile
 test:
   override:
-    - yarn run build
     - "yarn run test:circle":
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "noEmit": false,
+    "outDir": "lib",
     "rootDir": "src"
   },
   "exclude": [
@@ -8,7 +10,7 @@
     "lib",
     "node_modules",
     "test",
-    "webpack.config*.js"
+    "webpack"
   ],
   "extends": "./tsconfig.json"
 }

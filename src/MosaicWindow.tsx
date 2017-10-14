@@ -39,69 +39,25 @@ export interface MosaicWindowProps<T> {
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 
-interface DragSourceProps {
+export interface InternalDragSourceProps {
   connectDragSource: ConnectDragSource;
   connectDragPreview: ConnectDragPreview;
 }
 
-interface DropTargetProps {
+export interface InternalDropTargetProps {
   connectDropTarget: ConnectDropTarget;
   isOver: boolean;
   draggedMosaicId: string | undefined;
 }
 
-type Props<T> = MosaicWindowProps<T> & DropTargetProps & DragSourceProps;
+export type InternalMosaicWindowProps<T> = MosaicWindowProps<T> & InternalDropTargetProps & InternalDragSourceProps;
 
-interface State {
+export interface InternalMosaicWindowState {
   additionalControlsOpen: boolean;
 }
 
-const dragSource = {
-  beginDrag: (_props: Props<any>, _monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>): MosaicDragItem => {
-    // The defer is necessary as the element must be present on start for HTML DnD to not cry
-    const hideTimer = _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
-    return {
-      mosaicId: context.mosaicId,
-      hideTimer,
-    };
-  },
-  endDrag: (_props: Props<any>, monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>) => {
-    const { hideTimer } = monitor.getItem() as MosaicDragItem;
-    // If the hide call hasn't happened yet, cancel it
-    window.clearTimeout(hideTimer);
-
-    const ownPath = context.getMosaicPath();
-    const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
-    const { position, path: destinationPath } = dropResult;
-    if (position != null && destinationPath != null && !_.isEqual(destinationPath, ownPath)) {
-      context.mosaicActions.updateTree(
-        createDragToUpdates(context.mosaicActions.getRoot(), ownPath, destinationPath, position));
-    } else {
-      context.mosaicActions.updateTree([{
-        path: _.dropRight(ownPath),
-        spec: {
-          splitPercentage: {
-            $set: null,
-          },
-        },
-      }]);
-    }
-  },
-};
-
-const dropTarget = {};
-
-@(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-})) as ClassDecorator)
-@(DragSource(MosaicDragType.WINDOW, dragSource, (connect, _monitor): DragSourceProps => ({
-  connectDragSource: connect.dragSource(),
-  connectDragPreview: connect.dragPreview(),
-})) as ClassDecorator)
-class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
-  static defaultProps: Partial<Props<any>> = {
+export class InternalMosaicWindow<T> extends React.PureComponent<InternalMosaicWindowProps<T>, InternalMosaicWindowState> {
+  static defaultProps: Partial<InternalMosaicWindowProps<any>> = {
     additionalControlButtonText: 'More',
     draggable: true,
     renderPreview: ({ title }) => (
@@ -123,7 +79,7 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
     mosaicWindowActions: MosaicWindowActionsPropType,
   };
 
-  state: State = {
+  state: InternalMosaicWindowState = {
     additionalControlsOpen: false,
   };
   context: MosaicTileContext<T>;
@@ -279,9 +235,56 @@ class InternalMosaicWindow<T> extends React.PureComponent<Props<T>, State> {
   };
 }
 
+const dragSource = {
+  beginDrag: (_props: InternalMosaicWindowProps<any>, _monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>): MosaicDragItem => {
+    // The defer is necessary as the element must be present on start for HTML DnD to not cry
+    const hideTimer = _.defer(() => context.mosaicActions.hide(context.getMosaicPath()));
+    return {
+      mosaicId: context.mosaicId,
+      hideTimer,
+    };
+  },
+  endDrag: (_props: InternalMosaicWindowProps<any>, monitor: DragSourceMonitor, { context }: InternalMosaicWindow<any>) => {
+    const { hideTimer } = monitor.getItem() as MosaicDragItem;
+    // If the hide call hasn't happened yet, cancel it
+    window.clearTimeout(hideTimer);
+
+    const ownPath = context.getMosaicPath();
+    const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
+    const { position, path: destinationPath } = dropResult;
+    if (position != null && destinationPath != null && !_.isEqual(destinationPath, ownPath)) {
+      context.mosaicActions.updateTree(
+        createDragToUpdates(context.mosaicActions.getRoot(), ownPath, destinationPath, position));
+    } else {
+      context.mosaicActions.updateTree([{
+        path: _.dropRight(ownPath),
+        spec: {
+          splitPercentage: {
+            $set: null,
+          },
+        },
+      }]);
+    }
+  },
+};
+
+const dropTarget = {};
+
+// Each step exported here just to keep react-hot-loader happy
+export const SourceConnectedInternalMosaicWindow = DragSource(MosaicDragType.WINDOW, dragSource, (connect, _monitor): InternalDragSourceProps => ({
+  connectDragSource: connect.dragSource(),
+  connectDragPreview: connect.dragPreview(),
+}))(InternalMosaicWindow);
+
+export const SourceDropConnectedInternalMosaicWindow = DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): InternalDropTargetProps => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
+}))(SourceConnectedInternalMosaicWindow);
+
 export class MosaicWindow<T> extends React.PureComponent<MosaicWindowProps<T>> {
   render() {
-    return <InternalMosaicWindow {...this.props as Props<T>}/>;
+    return <SourceDropConnectedInternalMosaicWindow {...this.props as InternalMosaicWindowProps<T>}/>;
   }
 }
 
