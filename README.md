@@ -32,6 +32,9 @@ To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your
 
 See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
+#### Blueprint Dark Theme
+Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `mosaic-blueprint-theme pt-dark` class.
+
 ### Examples
 
 #### Simple tiling of `ReactElement`s
