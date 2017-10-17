@@ -14,15 +14,15 @@
     "build": "npm-run-all clean build:ts build:less",
     "build:ts": "tsc -p tsconfig-build.json",
     "build:less": "lessc --source-map styles/index.less react-mosaic-component.css",
+    "bundle": "rm -rf docs/ && webpack --config webpack/bundle.ts",
     "clean": "rm -rf lib/",
-    "docs": "rm -rf docs/ && webpack --config webpack/docs.ts",
     "start": "webpack-dev-server --config webpack/hot.ts",
     "test": "npm-run-all build test:lint test:unit",
     "test:circle": "npm-run-all build test:lint test:unit:circle",
     "test:lint": "tslint --project tsconfig-build.json",
     "test:unit": "mocha --opts test/mocha.opts 'test/*.ts'",
     "test:unit:circle": "mocha --opts test/mocha.opts --reporter mocha-junit-reporter 'test/*.ts'",
-    "version": "npm run docs && git add -A docs/"
+    "version": "npm run bundle && git add -A docs/"
   },
   "devDependencies": {
     "@blueprintjs/core": "^1.31.0",
@@ -58,7 +58,6 @@
     "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^16.0.0",
     "react-hot-loader": "3.0.0",
-    "replace": "v0.3.0",
     "source-map-loader": "^0.2.2",
     "style-loader": "^0.19.0",
     "ts-loader": "^2.3.7",

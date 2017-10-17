@@ -4,7 +4,7 @@
 .npmignore
 circle.yml
 tsconfig*.json
-dev/
+demo/
 docs/
 webpack.config*.js
 screencast.gif
