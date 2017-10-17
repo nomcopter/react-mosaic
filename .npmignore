@@ -6,6 +6,6 @@ circle.yml
 tsconfig*.json
 demo/
 docs/
-webpack.config*.js
+webpack/
 screencast.gif
 yarn.lock
