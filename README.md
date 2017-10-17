@@ -156,7 +156,7 @@ The exported classes are named as the base name of the component (e.g. `MosaicWi
 have 'Factory' appended (e.g. `MosaicWindowFactory`).
 
 #### Example Application
-See [ExampleApp](dev/ExampleApp.tsx) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
+See [ExampleApp](demo/ExampleApp.tsx) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
 for a more interesting example that shows the usage of Mosaic as a controlled component and modifications of the tree structure.
 
 ## API

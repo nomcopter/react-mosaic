@@ -1,44 +1,57 @@
-import * as _ from 'lodash';
 import * as webpack from 'webpack';
 import config from './base';
 import { CONSTANTS } from './constants';
 
-const entry = config.entry as webpack.Entry;
-entry.app = _.flatten([
-  'react-hot-loader/patch',
-  // activate HMR for React
+const baseEntry = config.entry as webpack.Entry;
+const entry = {
+  ...baseEntry,
+  app: [
+    // activate HMR for React
+    'react-hot-loader/patch',
 
-  'webpack-dev-server/client?http://localhost:' + CONSTANTS.DEV_SERVER_PORT,
-  // bundle the client for webpack-dev-server
-  // and connect to the provided endpoint
+    // bundle the client for webpack-dev-server
+    // and connect to the provided endpoint
+    'webpack-dev-server/client?http://localhost:' + CONSTANTS.DEV_SERVER_PORT,
 
-  'webpack/hot/only-dev-server',
-  // bundle the client for hot reloading
-  // only- means to only hot reload for successful updates
-  entry.app,
-]);
+    // bundle the client for hot reloading
+    // only- means to only hot reload for successful updates
+    'webpack/hot/only-dev-server',
+    baseEntry.app as string,
+  ],
+};
 
-(config.module as webpack.NewModule).rules.forEach((loaderConf: any) => {
+const rules = (config.module as webpack.NewModule).rules.map((loaderConf: any) => {
   if (loaderConf.test.test('test.ts')) {
-    loaderConf.use = _.flatten([{
+    return {
+      ...loaderConf,
+      use: [{
         loader: 'react-hot-loader/webpack',
       },
-      loaderConf.use,
-    ]);
+        ...loaderConf.use,
+      ],
+    };
+  } else {
+    return loaderConf;
   }
 });
+const module = {
+  ...config.module,
+  rules,
+};
 
-config.plugins!.push(
+const plugins = [
+  ...(config.plugins || []),
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': 'null',
   }),
-);
-
-config.plugins!.push(
   new webpack.HotModuleReplacementPlugin(),
-);
+];
 
-_.merge(config, {
+const hotConfig = {
+  ...config,
+  entry,
+  module,
+  plugins,
   devtool: '#cheap-module-source-map',
   devServer: {
     contentBase: CONSTANTS.DOCS_DIR,
@@ -48,6 +61,6 @@ _.merge(config, {
     port: CONSTANTS.DEV_SERVER_PORT,
     open: true,
   },
-});
+};
 
-export default config;
+export default hotConfig;
