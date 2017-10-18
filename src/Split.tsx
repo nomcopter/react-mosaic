@@ -17,12 +17,13 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { EnabledResizeOptions, MosaicDirection } from './types';
+import { BoundingBox } from './util/BoundingBox';
 
 const RESIZE_THROTTLE_MS = 1000 / 30; // 30 fps
 
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
-  splitPercentage: number;
+  boundingBox: BoundingBox;
   onChange?: (percentOfParent: number) => void;
   onRelease?: (percentOfParent: number) => void;
 }

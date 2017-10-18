@@ -163,7 +163,7 @@ for a more interesting example that shows the usage of Mosaic as a controlled co
 
 #### Mosaic Props
 ```typescript
-export interface MosaicBaseProps<T> {
+export interface MosaicBaseProps<T extends MosaicKey> {
     /**
      * Lookup function to convert `T` to a displayable `ReactElement`
      */
@@ -189,7 +189,7 @@ export interface MosaicBaseProps<T> {
     zeroStateView?: React.ReactElement<any>;
 }
 
-export interface MosaicControlledProps<T> extends MosaicBaseProps<T> {
+export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
     /**
      * The tree to render
      */
@@ -197,20 +197,20 @@ export interface MosaicControlledProps<T> extends MosaicBaseProps<T> {
     onChange: (newNode: MosaicNode<T> | null) => void;
 }
 
-export interface MosaicUncontrolledProps<T> extends MosaicBaseProps<T> {
+export interface MosaicUncontrolledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
     /**
      * The initial tree to render, can be modified by the user
      */
     initialValue: MosaicNode<T> | null;
 }
 
-export type MosaicProps<T> = MosaicControlledProps<T> | MosaicUncontrolledProps<T>;
+export type MosaicProps<T extends MosaicKey> = MosaicControlledProps<T> | MosaicUncontrolledProps<T>;
 ```
 
 #### `MosaicWindow`
 
 ```typescript
-export interface MosaicWindowProps<T> {
+export interface MosaicWindowProps<T extends MosaicKey> {
     title: string;
     className?: string;
     /**
@@ -249,7 +249,7 @@ These are used extensively by `MosaicWindow`.
 export type MosaicBranch = 'first' | 'second';
 export type MosaicPath = MosaicBranch[];
 
-export interface MosaicTileContext<T> {
+export interface MosaicTileContext<T extends MosaicKey> {
     /**
      * These actions are used to alter the state of the view tree
      */
@@ -260,7 +260,7 @@ export interface MosaicTileContext<T> {
     getMosaicPath: () => MosaicPath;
 }
 
-export interface MosaicRootActions<T> {
+export interface MosaicRootActions<T extends MosaicKey> {
     /**
      * Increases the size of this node and bubbles up the tree
      * @param path Path to node to expand
@@ -298,7 +298,7 @@ export interface MosaicRootActions<T> {
 Children (and toolbar elements) within `MosaicWindow` are passed the following additional functions on context.
 
 ```typescript
-export interface MosaicWindowContext<T> extends MosaicTileContext<T> {
+export interface MosaicWindowContext<T extends MosaicKey> extends MosaicTileContext<T> {
   mosaicWindowActions: MosaicWindowActions;
 }
 
@@ -345,18 +345,18 @@ class RemoveButton extends React.PureComponent<Props> {
 ```
 
 ### Mutating the Tree
-Utilities are provided for working with the MosaicNode tree in [`mosaicUtilities`](./src/mosaicUtilities.ts) and
-[`mosaicUpdates`](./src/mosaicUpdates.ts)
+Utilities are provided for working with the MosaicNode tree in [`mosaicUtilities`](src/util/mosaicUtilities.ts) and
+[`mosaicUpdates`](src/util/mosaicUpdates.ts)
 #### MosaicUpdate
 [`MosaicUpdateSpec`](./src/types.ts#L43) is an argument meant to be passed to [`immutability-helper`](https://github.com/kolodny/immutability-helper) 
-to modify the state at a path. [`mosaicUpdates`](./src/mosaicUpdates.ts) has examples.
+to modify the state at a path. [`mosaicUpdates`](src/util/mosaicUpdates.ts) has examples.
 
 ```
 /**
  * Used by many utility methods to update the tree.
  * spec will be passed to https://github.com/kolodny/immutability-helper
  */
-export interface MosaicUpdateSpec<T> {
+export interface MosaicUpdateSpec<T extends MosaicKey> {
     $set?: MosaicNode<T>;
     splitPercentage?: {
         $set: number | null;

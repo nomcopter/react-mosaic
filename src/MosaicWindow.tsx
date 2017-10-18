@@ -23,12 +23,12 @@ import { Separator } from './buttons/Separator';
 import { MosaicTileContext, MosaicWindowActionsPropType, MosaicWindowContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicWindowDropTarget } from './MosaicDropTarget';
-import { createDragToUpdates } from './mosaicUpdates';
-import { getAndAssertNodeAtPathExists } from './mosaicUtilities';
-import { CreateNode, MosaicDirection, MosaicDragType } from './types';
+import { CreateNode, MosaicDirection, MosaicDragType, MosaicKey } from './types';
+import { createDragToUpdates } from './util/mosaicUpdates';
+import { getAndAssertNodeAtPathExists } from './util/mosaicUtilities';
 import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
 
-export interface MosaicWindowProps<T> {
+export interface MosaicWindowProps<T extends MosaicKey> {
   title: string;
   className?: string;
   toolbarControls?: React.ReactNode;
@@ -50,13 +50,16 @@ export interface InternalDropTargetProps {
   draggedMosaicId: string | undefined;
 }
 
-export type InternalMosaicWindowProps<T> = MosaicWindowProps<T> & InternalDropTargetProps & InternalDragSourceProps;
+export type InternalMosaicWindowProps<T extends MosaicKey> =
+  MosaicWindowProps<T>
+  & InternalDropTargetProps
+  & InternalDragSourceProps;
 
 export interface InternalMosaicWindowState {
   additionalControlsOpen: boolean;
 }
 
-export class InternalMosaicWindow<T> extends React.PureComponent<InternalMosaicWindowProps<T>, InternalMosaicWindowState> {
+export class InternalMosaicWindow<T extends MosaicKey> extends React.PureComponent<InternalMosaicWindowProps<T>, InternalMosaicWindowState> {
   static defaultProps: Partial<InternalMosaicWindowProps<any>> = {
     additionalControlButtonText: 'More',
     draggable: true,
@@ -282,14 +285,14 @@ export const SourceDropConnectedInternalMosaicWindow = DropTarget(MosaicDragType
   draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
 }))(SourceConnectedInternalMosaicWindow);
 
-export class MosaicWindow<T> extends React.PureComponent<MosaicWindowProps<T>> {
+export class MosaicWindow<T extends MosaicKey> extends React.PureComponent<MosaicWindowProps<T>> {
   render() {
     return <SourceDropConnectedInternalMosaicWindow {...this.props as InternalMosaicWindowProps<T>}/>;
   }
 }
 
 // Factory that works with generics
-export function MosaicWindowFactory<T>(props: MosaicWindowProps<T> & React.Attributes, ...children: React.ReactNode[]) {
+export function MosaicWindowFactory<T extends MosaicKey>(props: MosaicWindowProps<T> & React.Attributes, ...children: React.ReactNode[]) {
   const element: React.ReactElement<MosaicWindowProps<T>> = React.createElement(
     InternalMosaicWindow as React.ComponentClass<MosaicWindowProps<T>>, props, ...children);
   return element;

@@ -24,7 +24,7 @@ import {
     getLeaves,
     getPathToCorner,
     isParent,
-} from '../src/mosaicUtilities';
+} from '../src/util/mosaicUtilities';
 
 const ROOT_ONLY_TREE: MosaicNode<number> = 1;
 const MEDIUM_TREE: MosaicNode<number> = {

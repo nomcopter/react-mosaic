@@ -51,7 +51,7 @@ export {
   createHideUpdate,
   createRemoveUpdate,
   updateTree,
-} from './mosaicUpdates';
+} from './util/mosaicUpdates';
 export {
   createBalancedTreeFromLeaves,
   Corner,
@@ -62,7 +62,7 @@ export {
   getOtherDirection,
   getPathToCorner,
   isParent,
-} from './mosaicUtilities';
+} from './util/mosaicUtilities';
 export { MosaicWindow, MosaicWindowFactory, MosaicWindowProps } from './MosaicWindow';
 export {
   createDefaultToolbarButton,

@@ -14,92 +14,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
-import { MosaicActionsPropType, MosaicContext, MosaicPathGetterPropType, MosaicTileContext } from './contextTypes';
-import { isParent } from './mosaicUtilities';
+import { MosaicActionsPropType, MosaicContext, } from './contextTypes';
 import { Split } from './Split';
-import { MosaicNode, MosaicParent, MosaicPath, MosaicUpdateSpec, ResizeOptions, TileRenderer } from './types';
+import { MosaicBranch, MosaicDirection, MosaicKey, MosaicNode, ResizeOptions, TileRenderer, } from './types';
+import { BoundingBox } from './util/BoundingBox';
+import { isParent } from './util/mosaicUtilities';
 
-export interface MosaicTileProps<T> {
+export interface MosaicTileProps<T extends MosaicKey> {
   node: MosaicNode<T>;
   renderTile: TileRenderer<T>;
   resize?: ResizeOptions;
-  getPath: () => MosaicPath;
   className?: string;
 }
 
-export class MosaicTile<T> extends React.PureComponent<MosaicTileProps<T>> {
+function nonNullElement(x: JSX.Element | null): x is JSX.Element {
+  return x !== null;
+}
+
+export class MosaicTile<T extends MosaicKey> extends React.Component<MosaicTileProps<T>> {
   context: MosaicContext<T>;
 
   static contextTypes = {
     mosaicActions: MosaicActionsPropType,
   };
 
-  static childContextTypes = {
-    getMosaicPath: MosaicPathGetterPropType,
-  };
-
-  getChildContext(): Partial<MosaicTileContext<T>> {
-    return {
-      getMosaicPath: this.props.getPath,
-    };
+  render() {
+    const { node } = this.props;
+    return this.renderRecursively(node, BoundingBox.empty(), []);
   }
 
-  render(): JSX.Element {
-    const { node, renderTile, resize } = this.props;
+  shouldComponentUpdate(nextProps: MosaicTileProps<T>) {
+    // Deep equal for `boundingBox`
+    return !_.isEqual(this.props, nextProps);
+  }
 
+  private renderRecursively(node: MosaicNode<T>, boundingBox: BoundingBox, path: MosaicBranch[]): JSX.Element[] {
     if (isParent(node)) {
       const splitPercentage = node.splitPercentage == null ? 50 : node.splitPercentage;
-      const sizeStyle = node.direction === 'column' ? 'height' : 'width';
-      return (
-        <div
-          className={classNames('mosaic-tile', this.props.className, {
-            '-column': node.direction === 'column',
-            '-row': node.direction === 'row',
-          })}
-        >
-          <div
-            className='mosaic-branch -first'
-            style={{
-              [sizeStyle]: `${splitPercentage}%`,
-            }}
-          >
-            {React.createElement(MosaicTile, {
-              renderTile, resize,
-              node: node.first,
-              getPath: this.getFirstBranchPath,
-            })}
-          </div>
-          {this.renderSplit(node, splitPercentage)}
-          <div
-            className='mosaic-branch -second'
-            style={{
-              [sizeStyle]: `${100 - splitPercentage}%`,
-            }}
-          >
-            {React.createElement(MosaicTile, {
-              renderTile, resize,
-              node: node.second,
-              getPath: this.getSecondBranchPath,
-            })}
-          </div>
-        </div>
-      );
+      const { first, splitter, second } = BoundingBox.split(boundingBox, splitPercentage, node.direction);
+      return _.flatten([
+        this.renderRecursively(node.first, first, path.concat('first')),
+        this.renderSplit(node.direction, splitter, path),
+        this.renderRecursively(node.second, second, path.concat('second')),
+      ].filter(nonNullElement));
     } else {
-      return renderTile(node);
+      return [<div className='mosaic-tile'>{this.props.renderTile(node, path)}</div>];
     }
   }
 
-  private renderSplit(node: MosaicParent<T>, splitPercentage: number) {
+  private renderSplit(direction: MosaicDirection, splitBoundingBox: BoundingBox, path: MosaicBranch[]) {
     const { resize } = this.props;
     if (resize !== 'DISABLED') {
       return (
         <Split
           {...resize}
-          splitPercentage={splitPercentage}
-          direction={node.direction}
-          onChange={this.onResize}
+          boundingBox={splitBoundingBox}
+          direction={direction}
+          onChange={(percentage) => this.onResize(percentage, path)}
         />
       );
     } else {
@@ -107,20 +80,13 @@ export class MosaicTile<T> extends React.PureComponent<MosaicTileProps<T>> {
     }
   }
 
-  private replaceWith = (spec: MosaicUpdateSpec<T>) =>
+  private onResize = (percentage: number, path: MosaicBranch[]) => {
     this.context.mosaicActions.updateTree([{
-      path: this.props.getPath(),
-      spec,
-    }]);
-
-  private onResize = (percentage: number) => {
-    this.replaceWith({
-      splitPercentage: {
-        $set: percentage,
+      path, spec: {
+        splitPercentage: {
+          $set: percentage,
+        },
       },
-    });
+    }]);
   };
-
-  private getFirstBranchPath = () => this.props.getPath().concat('first');
-  private getSecondBranchPath = () => this.props.getPath().concat('second');
 }

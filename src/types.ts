@@ -16,16 +16,22 @@
  */
 
 /**
+ * Valid node types
+ * @see MosaicKey
+ */
+export type MosaicKey = string | number;
+
+/**
  * Base type for the Mosaic binary tree
  */
-export type MosaicNode<T> = MosaicParent<T> | T;
+export type MosaicNode<T extends MosaicKey> = MosaicParent<T> | T;
 
 /**
  * Row means each window is side-by-side
  */
 export type MosaicDirection = 'row' | 'column';
 
-export interface MosaicParent<T> {
+export interface MosaicParent<T extends MosaicKey> {
   direction: MosaicDirection;
   first: MosaicNode<T>;
   second: MosaicNode<T>;
@@ -39,7 +45,7 @@ export type MosaicPath = MosaicBranch[];
  * Used by many utility methods to update the tree.
  * spec will be passed to https://github.com/kolodny/immutability-helper
  */
-export interface MosaicUpdateSpec<T> {
+export interface MosaicUpdateSpec<T extends MosaicKey> {
   $set?: MosaicNode<T>;
   splitPercentage?: {
     $set: number | null;
@@ -51,7 +57,7 @@ export interface MosaicUpdateSpec<T> {
   second?: MosaicUpdateSpec<T>;
 }
 
-export interface MosaicUpdate<T> {
+export interface MosaicUpdate<T extends MosaicKey> {
   path: MosaicPath;
   spec: MosaicUpdateSpec<T>;
 }
@@ -60,12 +66,12 @@ export interface MosaicUpdate<T> {
  * Mosaic needs a way to resolve `T` into react elements for display.
  * This provides a way to look them up. If `T` is a `JSX.Element`, then this can simply be `_.identity`
  */
-export type TileRenderer<T> = (t: T) => JSX.Element;
+export type TileRenderer<T extends MosaicKey> = (t: T, path: MosaicBranch[]) => JSX.Element;
 
 /**
  * Function that provides a new node to put into the tree
  */
-export type CreateNode<T> = (...args: any[]) => Promise<MosaicNode<T>> | MosaicNode<T>;
+export type CreateNode<T extends MosaicKey> = (...args: any[]) => Promise<MosaicNode<T>> | MosaicNode<T>;
 
 /**
  * Used by `react-dnd`
