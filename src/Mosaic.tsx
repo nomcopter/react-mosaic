@@ -32,7 +32,7 @@ const DEFAULT_EXPAND_PERCENTAGE = 70;
 
 export interface MosaicBaseProps<T extends MosaicKey> {
   /**
-   * Lookup function to convert `T` to a displayable `ReactElement`
+   * Lookup function to convert `T` to a displayable `JSX.Element`
    */
   renderTile: TileRenderer<T>;
   /**

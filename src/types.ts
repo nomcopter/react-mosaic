@@ -17,7 +17,7 @@
 
 /**
  * Valid node types
- * @see MosaicKey
+ * @see React.Key
  */
 export type MosaicKey = string | number;
 
@@ -63,8 +63,8 @@ export interface MosaicUpdate<T extends MosaicKey> {
 }
 
 /**
- * Mosaic needs a way to resolve `T` into react elements for display.
- * This provides a way to look them up. If `T` is a `JSX.Element`, then this can simply be `_.identity`
+ * Mosaic needs a way to resolve `MosaicKey` into react elements for display.
+ * This provides a way to render them.
  */
 export type TileRenderer<T extends MosaicKey> = (t: T, path: MosaicBranch[]) => JSX.Element;
 

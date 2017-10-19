@@ -12,8 +12,8 @@ The best way to see it is a simple [**Demo**](https://palantir.github.io/react-m
 [![screencast demo](./screencast.gif)](./screencast.gif)
 
 ## Usage
-The core of react-mosaic's operations revolve around the simple binary tree [specified by `MosaicNode<T>`](./src/types.ts#L22).
-`T` is the type of the leaves of the tree and can be anything that can be resolved to a `React.ReactElement` for display.
+The core of react-mosaic's operations revolve around the simple binary tree [specified by `MosaicNode<T>`](./src/types.ts#L27).
+[`T`](./src/types.ts#L22) is the type of the leaves of the tree and is a `string` or a `number` that can be resolved to a `JSX.Element` for display.
 
 ### Installation
 1. `yarn add react-mosaic-component`
@@ -37,48 +37,18 @@ Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `
 
 ### Examples
 
-#### Simple tiling of `ReactElement`s
+#### Simple Tiling
 ```tsx
 import { Mosaic } from 'react-mosaic-component';
 
-// Make a simple extension class to preserve generic type checking in TSX
-class ElementMosaic extends Mosaic<React.ReactElement> { }
-
-export const app = (
-  <ElementMosaic
-    renderTile={ e => e }
-    initialValue={{
-      direction: 'row',
-      first: <div>Left Window</div>,
-      second: {
-          direction: 'column',
-          first: <div>Top Right Window</div>,
-          second: <div>Bottom Right Window</div>
-      }
-    }}
-  />
-);
-```
-`renderTile` is a stateless lookup function to convert `T` into a displayable `ReactElement`.
-Here `T` is already a `ReactElement`, so `renderTile` can simply be the identity function.
-This example renders a simple tiled interface with one element on the left half, and two stacked elements on the right half. 
-The user can resize these panes but there is no other advanced functionality.
-
-#### Tiling with IDs
-```tsx
-export type ViewId = string;
-
-// Make a simple extension class to preserve generic type checking in TSX
-class ViewIdMosaic extends Mosaic<ViewId> { }
-
-const ELEMENT_MAP: { [viewId: string]: React.ReactElement<any> } = {
+const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
   a: <div>Left Window</div>,
   b: <div>Top Right Window</div>,
   c: <div>Bottom Right Window</div>
 };
 
 export const app = (
-  <ViewIdMosaic
+  <Mosaic
     renderTile={ id => ELEMENT_MAP[id] }
     initialValue={{
       direction: 'row',
@@ -92,21 +62,25 @@ export const app = (
   />
 );
 ```
-Here `T` is a `ViewId` that can be used to look elements up in `ELEMENT_MAP`. 
-This allows for easier view state specification and serialization.
-The resulting view looks and functions identically to the previous example.
+`renderTile` is a stateless lookup function to convert `T` into a displayable `JSX.Element`.
+By default `T` is `string`.
+`initialValue` is a [`MosaicNode<T>`](./src/types.ts#L27).
+
+The user can resize these panes but there is no other advanced functionality.
+This example renders a simple tiled interface with one element on the left half, and two stacked elements on the right half. 
+The user can resize these panes but there is no other advanced functionality.
 
 #### Drag, Drop,  and other advanced functionality with `MosaicWindow`
 `MosaicWindow` is a component that renders a toolbar and controls around its children for a tile as well as providing full featured drag and drop functionality.
 
 ```tsx
-export type ViewId = string;
+export type ViewId = 'a' | 'b' | 'c' | 'new';
 
 // Make a simple extension class to preserve generic type checking in TSX
 class ViewIdMosaic extends Mosaic<ViewId> { }
 class ViewIdMosaicWindow extends MosaicWindow<ViewId> { }
 
-const TITLE_MAP: { [viewId: string]: string } = {
+const TITLE_MAP: Record<ViewId, string> = {
   a: 'Left Window',
   b: 'Top Right Window',
   c: 'Bottom Right Window',
@@ -115,12 +89,13 @@ const TITLE_MAP: { [viewId: string]: string } = {
 
 export const app = (
   <ViewIdMosaic
-    renderTile={ id => (
+    renderTile={(id, path) => (
       <ViewIdMosaicWindow
-        createNode={ () => 'new' }
-        title={ TITLE_MAP[id] }
+        path={path}
+        createNode={() => 'new'}
+        title={TITLE_MAP[id]}
       >
-        <div>title</div>
+        <h1>{TITLE_MAP[id]}</h1>
       </ViewIdMosaicWindow>
     )}
     initialValue={{
@@ -135,9 +110,12 @@ export const app = (
   />
 );
 ```
+Here `T` is a `ViewId` that can be used to look elements up in `TITLE_MAP`. 
+This allows for easy view state specification and serialization.
 This will render a view that looks very similar to the previous examples, but now each of the windows will have a toolbar with buttons.
 These toolbars can be dragged around by a user to rearrange their workspace.
-`MosaicWindow` API docs [here](#MosaicWindow).
+
+`MosaicWindow` API docs [here](#mosaicwindow).
 
 #### Controlled vs. Uncontrolled
 Mosaic views have two modes, similar to `React.DOM` input elements:
@@ -151,7 +129,8 @@ All of the previous examples show use of Mosaic in an Uncontrolled fashion.
 
 #### TS/JS vs. TSX/JSX
 Components export both factories and component classes.
-If you are using TS/JS then use the factories; if you are using TSX/JSX then use the exported class but know that you will lose the generics if you aren't careful.
+If you are using TS/JS then use the factories;
+if you are using TSX/JSX then use the exported class but know that you will lose the generics if you aren't careful.
 The exported classes are named as the base name of the component (e.g. `MosaicWindow`) while the exported factories
 have 'Factory' appended (e.g. `MosaicWindowFactory`).
 
@@ -165,7 +144,7 @@ for a more interesting example that shows the usage of Mosaic as a controlled co
 ```typescript
 export interface MosaicBaseProps<T extends MosaicKey> {
     /**
-     * Lookup function to convert `T` to a displayable `ReactElement`
+     * Lookup function to convert `T` to a displayable `JSX.Element`
      */
     renderTile: TileRenderer<T>;
     /**
@@ -186,7 +165,7 @@ export interface MosaicBaseProps<T extends MosaicKey> {
      * View to display when the current value is `null`
      * default: Simple NonIdealState view
      */
-    zeroStateView?: React.ReactElement<any>;
+    zeroStateView?: JSX.Element;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
@@ -212,21 +191,28 @@ export type MosaicProps<T extends MosaicKey> = MosaicControlledProps<T> | Mosaic
 ```typescript
 export interface MosaicWindowProps<T extends MosaicKey> {
     title: string;
+    /**
+    * Current path to this window, provided by `renderTile`
+    */
+    path: MosaicBranch[];
     className?: string;
     /**
     * Controls in the top right of the toolbar
     * default: [Replace, Split, Expand, Remove] if createNode is defined and [Expand, Remove] otherwise
     */
-    toolbarControls?: React.ReactElement<any>[];
+    toolbarControls?: React.ReactNode;
     /**
     * Additional controls that will be hidden in a drawer beneath the toolbar.
     * default: []
     */
-    additionalControls?: React.ReactElement<any>[];
+    additionalControls?: React.ReactNode;
     /**
     * Label for the button that expands the drawer
     */
     additionalControlButtonText?: string;
+    /**
+    * Whether or not a user should be able to drag windows around
+    */
     draggable?: boolean;
     /**
     * Method called when a new node is required (such as the Split or Replace buttons)
@@ -238,7 +224,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
     renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
 }
 ```
-The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](src/buttons/MosaicButton.tsx)
+The default controls rendered by `MosaicWindow` can be accessed from [`defaultToolbarControls`](./src/buttons/defaultToolbarControls.tsx)
 
 ### Advanced API
 The above API is good for most consumers, however Mosaic provides functionality on the [Context](https://facebook.github.io/react/docs/context.html) of its children that make it easier to alter the view state.
@@ -246,18 +232,20 @@ All leaves rendered by Mosaic will have the following available on React context
 These are used extensively by `MosaicWindow`.
 
 ```typescript
+/**
+ * Valid node types
+ * @see React.Key
+ */
+export type MosaicKey = string | number;
 export type MosaicBranch = 'first' | 'second';
 export type MosaicPath = MosaicBranch[];
 
-export interface MosaicTileContext<T extends MosaicKey> {
-    /**
-     * These actions are used to alter the state of the view tree
-     */
-    mosaicActions: MosaicRootActions<T>;
-    /**
-     * Returns the path to this tile
-     */
-    getMosaicPath: () => MosaicPath;
+/**
+ * Context provided to everything within Mosaic
+ */
+export interface MosaicContext<T extends MosaicKey> {
+  mosaicActions: MosaicRootActions<T>;
+  mosaicId: string;
 }
 
 export interface MosaicRootActions<T extends MosaicKey> {
@@ -298,7 +286,7 @@ export interface MosaicRootActions<T extends MosaicKey> {
 Children (and toolbar elements) within `MosaicWindow` are passed the following additional functions on context.
 
 ```typescript
-export interface MosaicWindowContext<T extends MosaicKey> extends MosaicTileContext<T> {
+export interface MosaicWindowContext<T extends MosaicKey> extends MosaicContext<T> {
   mosaicWindowActions: MosaicWindowActions;
 }
 
@@ -319,6 +307,10 @@ export interface MosaicWindowActions {
    * Sets the open state for the tray that holds additional controls
    */
   setAdditionalControlsOpen: (open: boolean) => void;
+  /**
+   * Returns the path to this window
+   */
+  getPath: () => MosaicPath;
 }
 ```
 
@@ -348,8 +340,9 @@ class RemoveButton extends React.PureComponent<Props> {
 Utilities are provided for working with the MosaicNode tree in [`mosaicUtilities`](src/util/mosaicUtilities.ts) and
 [`mosaicUpdates`](src/util/mosaicUpdates.ts)
 #### MosaicUpdate
-[`MosaicUpdateSpec`](./src/types.ts#L43) is an argument meant to be passed to [`immutability-helper`](https://github.com/kolodny/immutability-helper) 
-to modify the state at a path. [`mosaicUpdates`](src/util/mosaicUpdates.ts) has examples.
+[`MosaicUpdateSpec`](./src/types.ts#L48) is an argument meant to be passed to [`immutability-helper`](https://github.com/kolodny/immutability-helper) 
+to modify the state at a path.
+[`mosaicUpdates`](src/util/mosaicUpdates.ts) has examples.
 
 ```
 /**
