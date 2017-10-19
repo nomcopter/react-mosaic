@@ -15,6 +15,7 @@
     },
     "member-access": false,
     "member-ordering": false,
+    "no-namespace": false,
     "object-literal-sort-keys": false,
     "quotemark": {
       "options": "single"

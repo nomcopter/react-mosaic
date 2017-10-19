@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import * as PropTypes from 'prop-types';
-import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
+import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate } from './types';
 
 /**
  * Mosaic provides functionality on the context for components within
@@ -25,32 +25,22 @@ import { MosaicNode, MosaicPath, MosaicUpdate } from './types';
 /**
  * Context provided to everything within Mosaic
  */
-export interface MosaicContext<T> {
+export interface MosaicContext<T extends MosaicKey> {
   mosaicActions: MosaicRootActions<T>;
   mosaicId: string;
 }
 
 /**
- * Context provided to everything within a Mosaic Tile
- */
-export interface MosaicTileContext<T> extends MosaicContext<T> {
-  /**
-   * Returns the path to this tile
-   */
-  getMosaicPath: () => MosaicPath;
-}
-
-/**
  * Context provided to everything within a Mosaic Window
  */
-export interface MosaicWindowContext<T> extends MosaicTileContext<T> {
+export interface MosaicWindowContext<T extends MosaicKey> extends MosaicContext<T> {
   mosaicWindowActions: MosaicWindowActions;
 }
 
 /**
  * These actions are used to alter the state of the view tree
  */
-export interface MosaicRootActions<T> {
+export interface MosaicRootActions<T extends MosaicKey> {
   /**
    * Increases the size of this node and bubbles up the tree
    * @param path Path to node to expand
@@ -101,6 +91,10 @@ export interface MosaicWindowActions {
    * Sets the open state for the tray that holds additional controls
    */
   setAdditionalControlsOpen: (open: boolean) => void;
+  /**
+   * Returns the path to this window
+   */
+  getPath: () => MosaicPath;
 }
 
 /*************************************************************
@@ -116,12 +110,11 @@ export const MosaicActionsPropType = PropTypes.shape({
   getRoot: PropTypes.func.isRequired,
 }).isRequired;
 
-export const MosaicPathGetterPropType = PropTypes.func.isRequired;
-
 export const MosaicWindowActionsPropType = PropTypes.shape({
   split: PropTypes.func.isRequired,
   replaceWithNew: PropTypes.func.isRequired,
   setAdditionalControlsOpen: PropTypes.func.isRequired,
+  getPath: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
@@ -133,12 +126,7 @@ export const MosaicContext = {
   mosaicId: PropTypes.string.isRequired,
 };
 
-export const MosaicTileContext = {
-  ...MosaicContext,
-  getMosaicPath: MosaicPathGetterPropType,
-};
-
 export const MosaicWindowContext = {
-  ...MosaicTileContext,
+  ...MosaicContext,
   mosaicWindowActions: MosaicWindowActionsPropType,
 };

@@ -18,122 +18,77 @@
 
 @split-size: 6px;
 
-.mosaic-root {
+.mosaic {
   height: 100%;
   width: 100%;
-  padding: @split-size;
 
   &, * {
     box-sizing: border-box;
   }
 
   .mosaic-zero-state {
-    height: 100%;
-    width: 100%;
+    width: auto;
+    height: auto;
     max-width: none;
+    z-index: 1;
 
     .pt-non-ideal-state-icon .pt-icon {
       font-size: 120px;
     }
   }
-
-  > :not(.drop-target-container) {
-    z-index: 1;
-    position: relative;
-    height: 100%;
-    width: 100%;
-  }
 }
 
-.mosaic-tile {
-  position: relative;
+.mosaic-root {
+  @size: @split-size / 2;
+  .absolute-fill(@size, @size, @size, @size);
+}
 
-  .mosaic-branch {
-    position: absolute;
+.mosaic-split {
+  position: absolute;
+  z-index: 1;
 
-    > * {
-      height: 100%;
-      width: 100%;
-    }
+  &:hover {
+    background: black;
   }
 
-  .mosaic-split {
+  .mosaic-split-line {
     position: absolute;
-    z-index: 1;
-
-    &:hover {
-      background: black;
-    }
-
-    .mosaic-split-line {
-      position: absolute;
-    }
   }
 
   &.-row {
-    > .mosaic-branch, > .mosaic-split {
+    margin-left: -@split-size / 2;
+    width: @split-size;
+    cursor: ew-resize;
+
+    .mosaic-split-line {
       top: 0;
       bottom: 0;
-    }
-    > .mosaic-branch {
-      &.-first {
-        left: 0;
-        &, > .mosaic-tile {
-          padding-right: @split-size / 2;
-        }
-      }
-      &.-second {
-        right: 0;
-        &, > .mosaic-tile {
-          padding-left: @split-size / 2;
-        }
-      }
-    }
-    > .mosaic-split {
-      margin-left: -@split-size / 2;
-      width: @split-size;
-      cursor: ew-resize;
-
-      .mosaic-split-line {
-        top: 0;
-        bottom: 0;
-        left: @split-size / 2;
-        right: @split-size / 2;
-      }
+      left: @split-size / 2;
+      right: @split-size / 2;
     }
   }
 
   &.-column {
-    > .mosaic-branch, > .mosaic-split {
+    margin-top: -@split-size / 2;
+    height: @split-size;
+    cursor: ns-resize;
+
+    .mosaic-split-line {
+      top: @split-size / 2;
+      bottom: @split-size / 2;
       left: 0;
       right: 0;
     }
-    > .mosaic-branch {
-      &.-first {
-        top: 0;
-        &, > .mosaic-tile {
-          padding-bottom: @split-size / 2;
-        }
-      }
-      &.-second {
-        bottom: 0;
-        &, > .mosaic-tile {
-          padding-top: @split-size / 2;
-        }
-      }
-    }
-    > .mosaic-split {
-      margin-top: -@split-size / 2;
-      height: @split-size;
-      cursor: ns-resize;
+  }
+}
 
-      .mosaic-split-line {
-        top: @split-size / 2;
-        bottom: @split-size / 2;
-        left: 0;
-        right: 0;
-      }
-    }
+.mosaic-tile {
+  position: absolute;
+  margin: @split-size / 2;
+
+  > * {
+    height: 100%;
+    width: 100%;
   }
 }
 

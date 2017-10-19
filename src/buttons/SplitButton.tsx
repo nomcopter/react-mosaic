@@ -17,9 +17,10 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { MosaicWindowContext } from '../contextTypes';
+import { MosaicKey } from '../types';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
-export class SplitButton<T> extends React.PureComponent<MosaicButtonProps> {
+export class SplitButton<T extends MosaicKey> extends React.PureComponent<MosaicButtonProps> {
   static contextTypes = MosaicWindowContext;
   context: MosaicWindowContext<T>;
 

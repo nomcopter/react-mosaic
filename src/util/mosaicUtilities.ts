@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 import * as _ from 'lodash';
-import { MosaicBranch, MosaicDirection, MosaicNode, MosaicParent, MosaicPath } from './types';
+import { MosaicBranch, MosaicDirection, MosaicKey, MosaicNode, MosaicParent, MosaicPath } from '../types';
 
-function alternateDirection<T>(node: MosaicNode<T>, direction: MosaicDirection = 'row'): MosaicNode<T> {
+function alternateDirection<T extends MosaicKey>(node: MosaicNode<T>, direction: MosaicDirection = 'row'): MosaicNode<T> {
   if (isParent(node)) {
     const nextDirection = getOtherDirection(direction);
     return {
@@ -42,7 +42,7 @@ export enum Corner {
  * @param node
  * @returns {boolean}
  */
-export function isParent<T>(node: MosaicNode<T>): node is MosaicParent<T> {
+export function isParent<T extends MosaicKey>(node: MosaicNode<T>): node is MosaicParent<T> {
   return (node as MosaicParent<T>).direction != null;
 }
 
@@ -52,8 +52,8 @@ export function isParent<T>(node: MosaicNode<T>): node is MosaicParent<T> {
  * @param startDirection
  * @returns {MosaicNode<T>}
  */
-export function createBalancedTreeFromLeaves<T>(leaves: MosaicNode<T>[],
-                                                startDirection: MosaicDirection = 'row'): MosaicNode<T> | null {
+export function createBalancedTreeFromLeaves<T extends MosaicKey>(leaves: MosaicNode<T>[],
+                                                                  startDirection: MosaicDirection = 'row'): MosaicNode<T> | null {
   if (leaves.length === 0) {
     return null;
   }
@@ -137,7 +137,7 @@ export function getPathToCorner(tree: MosaicNode<any>, corner: Corner): MosaicPa
  * @param tree
  * @returns {T[]}
  */
-export function getLeaves<T>(tree: MosaicNode<T> | null): T[] {
+export function getLeaves<T extends MosaicKey>(tree: MosaicNode<T> | null): T[] {
   if (tree == null) {
     return [];
   } else if (isParent(tree)) {
@@ -154,7 +154,7 @@ export function getLeaves<T>(tree: MosaicNode<T> | null): T[] {
  * @param path
  * @returns {MosaicNode<T>|null}
  */
-export function getNodeAtPath<T>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> | null {
+export function getNodeAtPath<T extends MosaicKey>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> | null {
   if (path.length > 0) {
     return _.get<MosaicNode<T>>(tree, path, null!);
   } else {
@@ -168,7 +168,7 @@ export function getNodeAtPath<T>(tree: MosaicNode<T> | null, path: MosaicPath): 
  * @param path
  * @returns {MosaicNode<T>}
  */
-export function getAndAssertNodeAtPathExists<T>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> {
+export function getAndAssertNodeAtPathExists<T extends MosaicKey>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> {
   if (tree == null) {
     throw new Error('Root is empty, cannot fetch path');
   }

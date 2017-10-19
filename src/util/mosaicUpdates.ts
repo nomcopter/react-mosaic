@@ -16,17 +16,18 @@
  */
 import * as update from 'immutability-helper';
 import * as _ from 'lodash';
-import { MosaicDropTargetPosition } from './internalTypes';
-import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
+import { MosaicDropTargetPosition } from '../internalTypes';
 import {
   MosaicBranch,
   MosaicDirection,
+  MosaicKey,
   MosaicNode,
   MosaicParent,
   MosaicPath,
   MosaicUpdate,
   MosaicUpdateSpec,
-} from './types';
+} from '../types';
+import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
 
 // https://github.com/Microsoft/TypeScript/issues/9944
 export { MosaicParent };
@@ -36,7 +37,7 @@ export { MosaicParent };
  * @param mosaicUpdate
  * @returns {any}
  */
-export function buildSpecFromUpdate<T>(mosaicUpdate: MosaicUpdate<T>): MosaicUpdateSpec<T> {
+export function buildSpecFromUpdate<T extends MosaicKey>(mosaicUpdate: MosaicUpdate<T>): MosaicUpdateSpec<T> {
   if (mosaicUpdate.path.length > 0) {
     return _.set({}, mosaicUpdate.path, mosaicUpdate.spec);
   } else {
@@ -50,7 +51,7 @@ export function buildSpecFromUpdate<T>(mosaicUpdate: MosaicUpdate<T>): MosaicUpd
  * @param updates
  * @returns {MosaicNode<T>}
  */
-export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
+export function updateTree<T extends MosaicKey>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
   let currentNode = root;
   updates.forEach((mUpdate: MosaicUpdate<T>) => {
     currentNode = update(currentNode, buildSpecFromUpdate(mUpdate));
@@ -65,7 +66,7 @@ export function updateTree<T>(root: MosaicNode<T>, updates: MosaicUpdate<T>[]) {
  * @param path
  * @returns {{path: T[], spec: {$set: MosaicNode<T>}}}
  */
-export function createRemoveUpdate<T>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
+export function createRemoveUpdate<T extends MosaicKey>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
   const parentPath = _.dropRight(path);
   const nodeToRemove = _.last(path);
   const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove!));
@@ -92,10 +93,10 @@ function isPathPrefixEqual(a: MosaicPath, b: MosaicPath, length: number) {
  * @param position
  * @returns {(MosaicUpdate<T>|{path: MosaicPath, spec: {$set: {first: MosaicNode<T>, second: MosaicNode<T>, direction: MosaicDirection}}})[]}
  */
-export function createDragToUpdates<T>(root: MosaicNode<T>,
-                                       sourcePath: MosaicPath,
-                                       destinationPath: MosaicPath,
-                                       position: MosaicDropTargetPosition): MosaicUpdate<T>[] {
+export function createDragToUpdates<T extends MosaicKey>(root: MosaicNode<T>,
+                                                         sourcePath: MosaicPath,
+                                                         destinationPath: MosaicPath,
+                                                         position: MosaicDropTargetPosition): MosaicUpdate<T>[] {
   let destinationNode = getAndAssertNodeAtPathExists(root, destinationPath);
   const updates: MosaicUpdate<T>[] = [];
 
@@ -147,7 +148,7 @@ export function createDragToUpdates<T>(root: MosaicNode<T>,
  * @param path
  * @returns {{path: T[], spec: {splitPercentage: {$set: number}}}}
  */
-export function createHideUpdate<T>(path: MosaicPath): MosaicUpdate<T> {
+export function createHideUpdate<T extends MosaicKey>(path: MosaicPath): MosaicUpdate<T> {
   const targetPath = _.dropRight(path);
   const thisBranch = _.last(path);
 
@@ -174,7 +175,7 @@ export function createHideUpdate<T>(path: MosaicPath): MosaicUpdate<T> {
  * @param percentage
  * @returns {{spec: MosaicUpdateSpec<T>, path: Array}}
  */
-export function createExpandUpdate<T>(path: MosaicPath, percentage: number): MosaicUpdate<T> {
+export function createExpandUpdate<T extends MosaicKey>(path: MosaicPath, percentage: number): MosaicUpdate<T> {
   let spec: MosaicUpdateSpec<T> = {};
   for (let i = path.length - 1; i >= 0; i--) {
     const branch: MosaicBranch = path[i];

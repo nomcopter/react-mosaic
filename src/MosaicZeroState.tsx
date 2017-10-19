@@ -17,13 +17,13 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
-import { CreateNode } from './types';
+import { CreateNode, MosaicKey } from './types';
 
-export interface MosaicZeroStateProps<T> {
+export interface MosaicZeroStateProps<T extends MosaicKey> {
   createNode?: CreateNode<T>;
 }
 
-export class MosaicZeroState<T> extends React.PureComponent<MosaicZeroStateProps<T>> {
+export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<MosaicZeroStateProps<T>> {
   context: MosaicContext<T>;
 
   static contextTypes = {
@@ -58,7 +58,7 @@ export class MosaicZeroState<T> extends React.PureComponent<MosaicZeroStateProps
 }
 
 // Factory that works with generics
-export function MosaicZeroStateFactory<T>(props?: MosaicZeroStateProps<T> & React.Attributes, ...children: React.ReactNode[]) {
+export function MosaicZeroStateFactory<T extends MosaicKey>(props?: MosaicZeroStateProps<T> & React.Attributes, ...children: React.ReactNode[]) {
   const element: React.ReactElement<MosaicZeroStateProps<T>> = React.createElement(
     MosaicZeroState as React.ComponentClass<MosaicZeroStateProps<T>>, props, ...children);
   return element;

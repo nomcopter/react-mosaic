@@ -17,7 +17,7 @@
 import { expect } from 'chai';
 import { getNodeAtPath, MosaicNode } from '../src/index';
 import { MosaicDropTargetPosition } from '../src/internalTypes';
-import { createDragToUpdates, createRemoveUpdate, updateTree } from '../src/mosaicUpdates';
+import { createDragToUpdates, createRemoveUpdate, updateTree } from '../src/util/mosaicUpdates';
 import { MosaicParent, MosaicPath } from '../src/types';
 
 const MEDIUM_TREE: MosaicNode<number> = {
