@@ -94,7 +94,7 @@ export interface MosaicWindowActions {
   /**
    * Returns the path to this window
    */
-  getMosaicPath: () => MosaicPath;
+  getPath: () => MosaicPath;
 }
 
 /*************************************************************
@@ -114,7 +114,7 @@ export const MosaicWindowActionsPropType = PropTypes.shape({
   split: PropTypes.func.isRequired,
   replaceWithNew: PropTypes.func.isRequired,
   setAdditionalControlsOpen: PropTypes.func.isRequired,
-  getMosaicPath: PropTypes.func.isRequired,
+  getPath: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************

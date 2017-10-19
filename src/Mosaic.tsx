@@ -23,10 +23,9 @@ import { v4 as uuid } from 'uuid';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDropTargetPosition } from './internalTypes';
 import { MosaicWindowDropTarget } from './MosaicDropTarget';
-import { MosaicTile } from './MosaicTile';
+import { MosaicRoot } from './MosaicRoot';
 import { MosaicZeroState } from './MosaicZeroState';
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
-import { BoundingBox } from './util/BoundingBox';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './util/mosaicUpdates';
 
 const DEFAULT_EXPAND_PERCENTAGE = 70;
@@ -83,7 +82,7 @@ export interface MosaicState<T extends MosaicKey> {
   mosaicId: string;
 }
 
-export class MosaicWithoutDragDropContext<T extends MosaicKey> extends React.PureComponent<MosaicProps<T>, MosaicState<T>> {
+export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends React.PureComponent<MosaicProps<T>, MosaicState<T>> {
   static defaultProps = {
     onChange: () => void 0,
     zeroStateView: <MosaicZeroState/>,
@@ -105,20 +104,13 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey> extends React.Pur
   }
 
   render() {
-    const { className, renderTile, resize, zeroStateView } = this.props;
-    const node = this.getRoot();
+    const { className } = this.props;
 
     return (
       <div
-        className={classNames(className, 'mosaic-root mosaic-drop-target')}
+        className={classNames(className, 'mosaic mosaic-drop-target')}
       >
-        {node == null ?
-          zeroStateView : React.createElement(MosaicTile, {
-            node, renderTile, resize,
-            getPath: this.getPath,
-            boundingBox: BoundingBox.empty(),
-          })
-        }
+        {this.renderTree()}
         <div className='drop-target-container'>
           {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
             <MosaicWindowDropTarget
@@ -149,13 +141,11 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey> extends React.Pur
   private getRoot(): MosaicNode<T> | null {
     const props: MosaicProps<T> = this.props;
     if (isUncontrolled(props)) {
-      return this.state.currentNode!;
+      return this.state.currentNode;
     } else {
       return props.value;
     }
   }
-
-  private getPath = (): MosaicPath => [];
 
   private updateRoot = (updates: MosaicUpdate<T>[]) => {
     const currentNode = this.getRoot() || {} as MosaicNode<T>;
@@ -193,14 +183,30 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey> extends React.Pur
         },
       }]),
   };
+
+  private renderTree() {
+    const root = this.getRoot();
+    if (root === null || root === undefined) {
+      return this.props.zeroStateView!;
+    } else {
+      const { renderTile, resize } = this.props;
+      return (
+        <MosaicRoot
+          root={root}
+          renderTile={renderTile}
+          resize={resize}
+        />
+      );
+    }
+  }
 }
 
 @(DragDropContext(HTML5) as ClassDecorator)
-export class Mosaic<T extends MosaicKey> extends MosaicWithoutDragDropContext<T> {
+export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {
 }
 
 // Factory that works with generics
-export function MosaicFactory<T extends MosaicKey>(props: MosaicProps<T> & React.Attributes, ...children: React.ReactNode[]) {
+export function MosaicFactory<T extends MosaicKey = string>(props: MosaicProps<T> & React.Attributes, ...children: React.ReactNode[]) {
   const element: React.ReactElement<MosaicProps<T>> =
     React.createElement(Mosaic as React.ComponentClass<MosaicProps<T>>, props, ...children);
   return element;

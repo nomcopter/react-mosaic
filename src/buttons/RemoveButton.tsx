@@ -28,7 +28,7 @@ export class RemoveButton<T extends MosaicKey> extends React.PureComponent<Mosai
   }
 
   private remove = () => {
-    this.context.mosaicActions.remove(this.context.getMosaicPath());
+    this.context.mosaicActions.remove(this.context.mosaicWindowActions.getPath());
     if (this.props.onClick) {
       this.props.onClick();
     }

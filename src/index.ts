@@ -37,9 +37,7 @@ export {
 export {
   MosaicContext,
   MosaicActionsPropType,
-  MosaicPathGetterPropType,
   MosaicRootActions,
-  MosaicTileContext,
   MosaicWindowActions,
   MosaicWindowActionsPropType,
   MosaicWindowContext,

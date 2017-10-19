@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { EnabledResizeOptions, MosaicDirection } from './types';
@@ -24,6 +25,7 @@ const RESIZE_THROTTLE_MS = 1000 / 30; // 30 fps
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
   boundingBox: BoundingBox;
+  splitPercentage: number;
   onChange?: (percentOfParent: number) => void;
   onRelease?: (percentOfParent: number) => void;
 }
@@ -38,9 +40,13 @@ export class Split extends React.PureComponent<SplitProps> {
   };
 
   render() {
+    const { direction } = this.props;
     return (
       <div
-        className='mosaic-split'
+        className={classNames('mosaic-split', {
+          '-row': direction === 'row',
+          '-column': direction === 'column',
+        })}
         ref={(el) => this.rootElement = el}
         onMouseDown={this.onMouseDown}
         style={this.computeStyle()}
@@ -56,9 +62,12 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 
   private computeStyle() {
-    const positionStyle = this.props.direction === 'column' ? 'top' : 'left';
+    const { boundingBox, direction, splitPercentage } = this.props;
+    const positionStyle = direction === 'column' ? 'top' : 'left';
+    const absolutePercentage = BoundingBox.getAbsoluteSplitPercentage(boundingBox, splitPercentage, direction);
     return {
-      [positionStyle]: `${this.props.splitPercentage}%`,
+      ...BoundingBox.asStyles(boundingBox),
+      [positionStyle]: `${absolutePercentage}%`,
     };
   }
 
@@ -72,7 +81,7 @@ export class Split extends React.PureComponent<SplitProps> {
     document.removeEventListener('mousemove', this.onMouseMove, true);
     document.removeEventListener('mouseup', this.onMouseUp, true);
 
-    const percentage = this.calculatePercentOfParent(event);
+    const percentage = this.calculateRelativePercentage(event);
     if (percentage !== this.props.splitPercentage) {
       this.props.onRelease!(percentage);
     }
@@ -82,23 +91,25 @@ export class Split extends React.PureComponent<SplitProps> {
     event.preventDefault();
     event.stopPropagation();
 
-    const percentage = this.calculatePercentOfParent(event);
+    const percentage = this.calculateRelativePercentage(event);
     if (percentage !== this.props.splitPercentage) {
       this.props.onChange!(percentage);
     }
   }, RESIZE_THROTTLE_MS);
 
-  private calculatePercentOfParent(event: MouseEvent): number {
-    const { minimumPaneSizePercentage } = this.props;
+  private calculateRelativePercentage(event: MouseEvent): number {
+    const { minimumPaneSizePercentage, direction, boundingBox } = this.props;
     const parentBBox = this.rootElement!.parentElement!.getBoundingClientRect();
 
-    let percentage: number;
-    if (this.props.direction === 'column') {
-      percentage = (event.clientY - parentBBox.top) / parentBBox.height * 100.0;
+    let absolutePercentage: number;
+    if (direction === 'column') {
+      absolutePercentage = (event.clientY - parentBBox.top) / parentBBox.height * 100.0;
     } else {
-      percentage = (event.clientX - parentBBox.left) / parentBBox.width * 100.0;
+      absolutePercentage = (event.clientX - parentBBox.left) / parentBBox.width * 100.0;
     }
 
-    return _.clamp(percentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
+    const relativePercentage = BoundingBox.getRelativeSplitPercentage(boundingBox, absolutePercentage, direction);
+
+    return _.clamp(relativePercentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
   }
 }

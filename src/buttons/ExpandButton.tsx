@@ -28,7 +28,7 @@ export class ExpandButton<T extends MosaicKey> extends React.PureComponent<Mosai
   }
 
   private expand = () => {
-    this.context.mosaicActions.expand(this.context.getMosaicPath());
+    this.context.mosaicActions.expand(this.context.mosaicWindowActions.getPath());
 
     if (this.props.onClick) {
       this.props.onClick();
