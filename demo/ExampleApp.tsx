@@ -36,6 +36,8 @@ import '../styles/index.less';
 
 import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
 import './example.less';
+// tslint:disable-next-line no-var-requires
+const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
 
 let windowCount = 4;
 
@@ -181,6 +183,9 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
           >
             Add Window to Top Right
           </button>
+          <a className='github-link' href='https://github.com/palantir/react-mosaic'>
+            <img src={gitHubLogo} />
+          </a>
         </div>
       </div>
     );
