@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 import * as classNames from 'classnames';
-import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
-import { MosaicDropTargetPosition } from './internalTypes';
-import { MosaicWindowDropTarget } from './MosaicDropTarget';
 import { MosaicRoot } from './MosaicRoot';
 import { MosaicZeroState } from './MosaicZeroState';
+import { RootDropTargets } from './RootDropTargets';
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './util/mosaicUpdates';
 
@@ -111,15 +109,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
         className={classNames(className, 'mosaic mosaic-drop-target')}
       >
         {this.renderTree()}
-        <div className='drop-target-container'>
-          {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
-            <MosaicWindowDropTarget
-              position={position}
-              path={[]}
-              key={position}
-            />
-          ))}
-        </div>
+        <RootDropTargets/>
       </div>
     );
   }
