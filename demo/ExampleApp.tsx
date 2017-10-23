@@ -38,6 +38,8 @@ import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
 import './example.less';
 // tslint:disable-next-line no-var-requires
 const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
+// tslint:disable-next-line no-var-requires
+const { version } = require('../package.json');
 
 let windowCount = 4;
 
@@ -153,7 +155,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
               className='pt-app-title'
               href='https://github.com/palantir/react-mosaic'
             >
-              react-mosaic
+              react-mosaic <span className='version'>v{version}</span>
             </a>
           </div>
         </div>
