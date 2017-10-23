@@ -16,13 +16,12 @@
  */
 import * as classNames from 'classnames';
 import * as React from 'react';
-import { ConnectDropTarget, DropTarget } from 'react-dnd';
+import { ConnectDropTarget, DropTarget, DropTargetMonitor } from 'react-dnd';
 import { MosaicContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicDragType, MosaicPath } from './types';
-import DropTargetMonitor = __ReactDnd.DropTargetMonitor;
 
-export interface MosaicWindowDropTargetProps {
+export interface MosaicDropTargetProps {
   position: MosaicDropTargetPosition;
   path: MosaicPath;
 }
@@ -33,10 +32,10 @@ interface DropTargetProps {
   draggedMosaicId: string | undefined;
 }
 
-type Props = MosaicWindowDropTargetProps & DropTargetProps;
+type Props = MosaicDropTargetProps & DropTargetProps;
 
 const dropTarget = {
-  drop: (props: Props, monitor: DropTargetMonitor, component: MosaicWindowDropTargetClass): MosaicDropData => {
+  drop: (props: Props, monitor: DropTargetMonitor, component: MosaicDropTargetClass): MosaicDropData => {
     if (component.context.mosaicId === ((monitor.getItem() || {}) as MosaicDragItem).mosaicId) {
       return {
         path: props.path,
@@ -48,12 +47,7 @@ const dropTarget = {
   },
 };
 
-@(DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-})) as ClassDecorator)
-class MosaicWindowDropTargetClass extends React.PureComponent<Props> {
+class MosaicDropTargetClass extends React.PureComponent<Props> {
   static contextTypes = MosaicContext;
   context: MosaicContext<any>;
 
@@ -70,9 +64,9 @@ class MosaicWindowDropTargetClass extends React.PureComponent<Props> {
   }
 }
 
-export const MosaicWindowDropTarget =
+export const MosaicDropTarget =
   DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
     draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-  }))(MosaicWindowDropTargetClass) as React.ComponentClass<MosaicWindowDropTargetProps>;
+  }))(MosaicDropTargetClass) as React.ComponentClass<MosaicDropTargetProps>;

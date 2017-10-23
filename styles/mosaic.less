@@ -115,16 +115,17 @@
     display: block;
   }
 
-  &.mosaic > .drop-target-container {
-    display: block;
-    .drop-target {
-      .split-percentages(10px);
-    }
+  &.mosaic > .drop-target-container .drop-target {
+    .split-percentages(10px);
   }
 
   .drop-target-container {
     .absolute-fill();
     display: none;
+
+    &.-dragging {
+      display: block;
+    }
 
     .drop-target {
       .absolute-fill();

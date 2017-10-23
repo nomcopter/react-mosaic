@@ -17,16 +17,22 @@
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DropTarget } from 'react-dnd';
+import {
+  ConnectDragPreview,
+  ConnectDragSource,
+  ConnectDropTarget,
+  DragSource,
+  DragSourceMonitor,
+  DropTarget,
+} from 'react-dnd';
 import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
 import { MosaicContext, MosaicWindowActionsPropType, MosaicWindowContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
-import { MosaicWindowDropTarget } from './MosaicDropTarget';
+import { MosaicDropTarget } from './MosaicDropTarget';
 import { CreateNode, MosaicBranch, MosaicDirection, MosaicDragType, MosaicKey } from './types';
 import { createDragToUpdates } from './util/mosaicUpdates';
 import { getAndAssertNodeAtPathExists } from './util/mosaicUtilities';
-import DragSourceMonitor = __ReactDnd.DragSourceMonitor;
 
 export interface MosaicWindowProps<T extends MosaicKey> {
   title: string;
@@ -206,7 +212,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<I
     const { path } = this.props;
 
     return (
-      <MosaicWindowDropTarget
+      <MosaicDropTarget
         position={position}
         path={path}
         key={position}
