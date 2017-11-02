@@ -334,7 +334,7 @@ class RemoveButton extends React.PureComponent<Props> {
     }
 
     private remove = () =>
-        this.context.mosaicActions.remove(this.context.getMosaicPath());
+        this.context.mosaicActions.remove(this.context.mosaicWindowActions.getPath());
 }
 ```
 
