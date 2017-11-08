@@ -70,7 +70,19 @@ export class NumberMosaicWindow extends MosaicWindow<number> {
 
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   state: ExampleAppState = {
-    currentNode: createBalancedTreeFromLeaves(_.range(1, windowCount + 1)),
+    currentNode: {
+      direction: 'row',
+      first: {
+        direction: 'column',
+        first: 1,
+        second: 2,
+      },
+      second: {
+        direction: 'column',
+        first: 3,
+        second: 4,
+      },
+    },
     currentTheme: 'Blueprint',
   };
 
@@ -186,7 +198,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
             Add Window to Top Right
           </button>
           <a className='github-link' href='https://github.com/palantir/react-mosaic'>
-            <img src={gitHubLogo} />
+            <img src={gitHubLogo}/>
           </a>
         </div>
       </div>
