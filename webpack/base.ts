@@ -23,7 +23,8 @@ const config: webpack.Configuration = {
       {
         test: /\.html$/,
         loader: 'html-loader',
-      }, {
+      },
+      {
         test: /\.tsx?$/,
         use: [
           {
@@ -36,32 +37,39 @@ const config: webpack.Configuration = {
             },
           },
         ],
-      }, {
+      },
+      {
         test: /node_modules.*\.js$/,
         loader: 'source-map-loader',
-      }, {
+      },
+      {
         test: /\.css$/,
         use: [
           {
             loader: 'style-loader',
-          }, {
+          },
+          {
             loader: 'css-loader',
           },
         ],
-      }, {
+      },
+      {
         test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.eot$/,
         loader: 'file-loader',
-      }, {
+      },
+      {
         test: /\.less/,
         use: [
           {
             loader: 'style-loader',
-          }, {
+          },
+          {
             loader: 'css-loader',
             options: {
               sourceMap: true,
             },
-          }, {
+          },
+          {
             loader: 'less-loader',
             options: {
               sourceMap: true,
@@ -84,4 +92,5 @@ const config: webpack.Configuration = {
   ],
 };
 
+// tslint:disable-next-line no-default-export
 export default config;

@@ -24,9 +24,10 @@ const rules = (config.module as webpack.NewModule).rules.map((loaderConf: any) =
   if (loaderConf.test.test('test.ts')) {
     return {
       ...loaderConf,
-      use: [{
-        loader: 'react-hot-loader/webpack',
-      },
+      use: [
+        {
+          loader: 'react-hot-loader/webpack',
+        },
         ...loaderConf.use,
       ],
     };
@@ -63,4 +64,5 @@ const hotConfig = {
   },
 };
 
+// tslint:disable-next-line no-default-export
 export default hotConfig;

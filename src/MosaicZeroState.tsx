@@ -32,17 +32,14 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
 
   render() {
     return (
-      <div className='mosaic-zero-state pt-non-ideal-state'>
-        <div className='pt-non-ideal-state-visual pt-non-ideal-state-icon'>
-          <span className='pt-icon pt-icon-applications'/>
+      <div className="mosaic-zero-state pt-non-ideal-state">
+        <div className="pt-non-ideal-state-visual pt-non-ideal-state-icon">
+          <span className="pt-icon pt-icon-applications" />
         </div>
-        <h4 className='pt-non-ideal-state-title'>No Windows Present</h4>
-        <div className='pt-non-ideal-state-description'>
+        <h4 className="pt-non-ideal-state-title">No Windows Present</h4>
+        <div className="pt-non-ideal-state-description">
           {this.props.createNode && (
-            <button
-              className='pt-button pt-icon-add'
-              onClick={this.replace}
-            >
+            <button className="pt-button pt-icon-add" onClick={this.replace}>
               Add New Window
             </button>
           )}
@@ -58,8 +55,14 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
 }
 
 // Factory that works with generics
-export function MosaicZeroStateFactory<T extends MosaicKey>(props?: MosaicZeroStateProps<T> & React.Attributes, ...children: React.ReactNode[]) {
+export function MosaicZeroStateFactory<T extends MosaicKey>(
+  props?: MosaicZeroStateProps<T> & React.Attributes,
+  ...children: React.ReactNode[]
+) {
   const element: React.ReactElement<MosaicZeroStateProps<T>> = React.createElement(
-    MosaicZeroState as React.ComponentClass<MosaicZeroStateProps<T>>, props, ...children);
+    MosaicZeroState as React.ComponentClass<MosaicZeroStateProps<T>>,
+    props,
+    ...children,
+  );
   return element;
 }

@@ -62,10 +62,7 @@ export {
   isParent,
 } from './util/mosaicUtilities';
 export { MosaicWindow, MosaicWindowFactory, MosaicWindowProps } from './MosaicWindow';
-export {
-  createDefaultToolbarButton,
-  MosaicButtonProps,
-} from './buttons/MosaicButton';
+export { createDefaultToolbarButton, MosaicButtonProps } from './buttons/MosaicButton';
 export { MosaicZeroState, MosaicZeroStateFactory, MosaicZeroStateProps } from './MosaicZeroState';
 export { Separator, SeparatorFactory } from './buttons/Separator';
 export { ExpandButton, ExpandButtonFactory } from './buttons/ExpandButton';

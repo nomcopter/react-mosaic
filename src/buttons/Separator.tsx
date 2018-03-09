@@ -18,7 +18,7 @@ import * as React from 'react';
 
 export class Separator extends React.PureComponent {
   render() {
-    return <div className='separator'/>;
+    return <div className="separator" />;
   }
 }
 

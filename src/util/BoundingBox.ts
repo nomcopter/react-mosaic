@@ -47,9 +47,7 @@ export namespace BoundingBox {
     left: string;
   }
 
-  export function split(boundingBox: BoundingBox,
-                        relativeSplitPercentage: number,
-                        direction: MosaicDirection): Split {
+  export function split(boundingBox: BoundingBox, relativeSplitPercentage: number, direction: MosaicDirection): Split {
     const absolutePercentage = getAbsoluteSplitPercentage(boundingBox, relativeSplitPercentage, direction);
     if (direction === 'column') {
       return {
@@ -78,9 +76,11 @@ export namespace BoundingBox {
     }
   }
 
-  export function getAbsoluteSplitPercentage(boundingBox: BoundingBox,
-                                             relativeSplitPercentage: number,
-                                             direction: MosaicDirection): number {
+  export function getAbsoluteSplitPercentage(
+    boundingBox: BoundingBox,
+    relativeSplitPercentage: number,
+    direction: MosaicDirection,
+  ): number {
     const { top, right, bottom, left } = boundingBox;
     if (direction === 'column') {
       const height = 100 - top - bottom;
@@ -93,9 +93,11 @@ export namespace BoundingBox {
     }
   }
 
-  export function getRelativeSplitPercentage(boundingBox: BoundingBox,
-                                             absoluteSplitPercentage: number,
-                                             direction: MosaicDirection): number {
+  export function getRelativeSplitPercentage(
+    boundingBox: BoundingBox,
+    absoluteSplitPercentage: number,
+    direction: MosaicDirection,
+  ): number {
     const { top, right, bottom, left } = boundingBox;
     if (direction === 'column') {
       const height = 100 - top - bottom;
@@ -108,7 +110,7 @@ export namespace BoundingBox {
     }
   }
 
-  export function asStyles({top, right, bottom, left}: BoundingBox): Styles {
+  export function asStyles({ top, right, bottom, left }: BoundingBox): Styles {
     return {
       top: `${top}%`,
       right: `${right}%`,
