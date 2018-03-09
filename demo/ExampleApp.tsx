@@ -60,24 +60,20 @@ export interface ExampleAppState {
   currentTheme: Theme;
 }
 
-export class NumberMosaic extends Mosaic<number> {}
-
-export class NumberMosaicWindow extends MosaicWindow<number> {}
+const NumberMosaic = Mosaic.ofType<number>();
+const NumberMosaicWindow = MosaicWindow.ofType<number>();
 
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   state: ExampleAppState = {
     currentNode: {
       direction: 'row',
-      first: {
-        direction: 'column',
-        first: 1,
-        second: 2,
-      },
+      first: 1,
       second: {
         direction: 'column',
-        first: 3,
-        second: 4,
+        first: 2,
+        second: 3,
       },
+      splitPercentage: 40,
     },
     currentTheme: 'Blueprint',
   };

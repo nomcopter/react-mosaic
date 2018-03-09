@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
@@ -25,6 +26,7 @@ import { MosaicZeroState } from './MosaicZeroState';
 import { RootDropTargets } from './RootDropTargets';
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate, ResizeOptions, TileRenderer } from './types';
 import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } from './util/mosaicUpdates';
+import { getLeaves } from './util/mosaicUtilities';
 
 const DEFAULT_EXPAND_PERCENTAGE = 70;
 
@@ -131,18 +133,16 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 
   componentWillMount() {
-    const props: MosaicProps<T> = this.props;
-    if (isUncontrolled(props)) {
-      this.setState({ currentNode: props.initialValue });
+    if (isUncontrolled(this.props)) {
+      this.setState({ currentNode: this.props.initialValue });
     }
   }
 
   private getRoot(): MosaicNode<T> | null {
-    const props: MosaicProps<T> = this.props;
-    if (isUncontrolled(props)) {
+    if (isUncontrolled(this.props)) {
       return this.state.currentNode;
     } else {
-      return props.value;
+      return this.props.value;
     }
   }
 
@@ -186,11 +186,28 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
 
   private renderTree() {
     const root = this.getRoot();
+    this.validateTree(root);
     if (root === null || root === undefined) {
       return this.props.zeroStateView!;
     } else {
       const { renderTile, resize } = this.props;
       return <MosaicRoot root={root} renderTile={renderTile} resize={resize} />;
+    }
+  }
+
+  private validateTree(node: MosaicNode<T> | null) {
+    if (process.env.NODE_ENV !== 'production') {
+      const duplicates = _.chain(getLeaves(node))
+        .countBy()
+        .pickBy((n) => n > 1)
+        .keys()
+        .value();
+
+      if (duplicates.length > 0) {
+        throw new Error(
+          `Duplicate IDs [${duplicates.join(', ')}] detected. Mosaic does not support leaves with the same ID`,
+        );
+      }
     }
   }
 }

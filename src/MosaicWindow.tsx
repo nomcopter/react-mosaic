@@ -148,8 +148,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     );
   }
 
-  shouldComponentUpdate(nextProps: InternalMosaicWindowProps<T>): boolean {
-    return !_.isEqual(_.omit(this.props, PURE_RENDER_IGNORE), _.omit(nextProps, PURE_RENDER_IGNORE));
+  shouldComponentUpdate(nextProps: InternalMosaicWindowProps<T>, nextState: InternalMosaicWindowState): boolean {
+    return (
+      !_.isEqual(_.omit(this.props, PURE_RENDER_IGNORE), _.omit(nextProps, PURE_RENDER_IGNORE)) ||
+      !_.isEqual(this.state, nextState)
+    );
   }
 
   private getToolbarControls() {
@@ -314,6 +317,10 @@ export const SourceDropConnectedInternalMosaicWindow = DropTarget(
 )(SourceConnectedInternalMosaicWindow);
 
 export class MosaicWindow<T extends MosaicKey = string> extends React.PureComponent<MosaicWindowProps<T>> {
+  static ofType<T extends MosaicKey>() {
+    return MosaicWindow as new (props: MosaicWindowProps<T>, context?: any) => MosaicWindow<T>;
+  }
+
   render() {
     return <SourceDropConnectedInternalMosaicWindow {...this.props as InternalMosaicWindowProps<T>} />;
   }

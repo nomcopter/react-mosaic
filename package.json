@@ -23,8 +23,8 @@
     "test:lint:fix": "yarn run test:lint --fix",
     "test:unit": "mocha --opts test/mocha.opts 'test/*.ts'",
     "test:unit:circle": "mocha --opts test/mocha.opts --reporter mocha-junit-reporter 'test/*.ts'",
-    "test:format": "prettier --list-different 'styles/*.less'",
-    "test:format:fix": "prettier --write 'styles/*.less'",
+    "test:format": "prettier --list-different 'styles/*.less' '*.md'",
+    "test:format:fix": "prettier --write 'styles/*.less' '*.md'",
     "fix": "npm-run-all test:lint:fix test:format:fix",
     "version": "npm run bundle && git add -A docs/"
   },
