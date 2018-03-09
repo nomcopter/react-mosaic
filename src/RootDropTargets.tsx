@@ -19,11 +19,7 @@ class RootDropTargetsClass extends React.PureComponent<RootDropTargetsProps> {
         })}
       >
         {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
-          <MosaicDropTarget
-            position={position}
-            path={[]}
-            key={position}
-          />
+          <MosaicDropTarget position={position} path={[]} key={position} />
         ))}
       </div>
     );
@@ -31,6 +27,10 @@ class RootDropTargetsClass extends React.PureComponent<RootDropTargetsProps> {
 }
 
 const dropTarget = {};
-export const RootDropTargets = DropTarget(MosaicDragType.WINDOW, dropTarget, (_connect, monitor): RootDropTargetsProps => ({
-  isDragging: monitor.getItem() !== null && monitor.getItemType() === MosaicDragType.WINDOW,
-}))(RootDropTargetsClass) as React.ComponentClass<{}>;
+export const RootDropTargets = DropTarget(
+  MosaicDragType.WINDOW,
+  dropTarget,
+  (_connect, monitor): RootDropTargetsProps => ({
+    isDragging: monitor.getItem() !== null && monitor.getItemType() === MosaicDragType.WINDOW,
+  }),
+)(RootDropTargetsClass) as React.ComponentClass<{}>;

@@ -23,7 +23,7 @@ const APP_ELEMENT = document.getElementById('app')!;
 const render = (Component: React.ComponentClass<any>) => {
   ReactDOM.render(
     <AppContainer>
-      <Component/>
+      <Component />
     </AppContainer>,
     APP_ELEMENT,
   );

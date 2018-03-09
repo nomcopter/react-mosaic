@@ -29,7 +29,8 @@ export class SplitButton<T extends MosaicKey> extends React.PureComponent<Mosaic
   }
 
   private split = () => {
-    this.context.mosaicWindowActions.split()
+    this.context.mosaicWindowActions
+      .split()
       .then(() => {
         if (this.props.onClick) {
           this.props.onClick();

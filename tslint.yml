@@ -1,0 +1,37 @@
+---
+defaultSeverity: error
+extends:
+  - tslint:recommended
+  - tslint-react
+  - tslint-plugin-prettier
+  - tslint-config-prettier
+rules:
+  interface-name:
+    options:
+      - never-prefix
+  member-access: false
+  member-ordering: false
+  object-literal-sort-keys: false
+  prettier: true
+  no-namespace: false
+  variable-name:
+    options:
+      - check-format
+      - allow-leading-underscore
+      - allow-pascal-case
+      - ban-keywords
+  array-type:
+    options:
+      - array
+  no-console:
+    options:
+      - log
+  switch-default: true
+  max-classes-per-file: false
+  await-promise: true
+  ban-comma-operator: true
+  prefer-object-spread: true
+  no-default-export: true
+  jsx-no-lambda: false
+  jsx-key: false
+

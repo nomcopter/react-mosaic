@@ -5,3 +5,4 @@ lib/
 .*.swp
 react-mosaic.tar.bz2
 npm-debug.log
+yarn-error.log

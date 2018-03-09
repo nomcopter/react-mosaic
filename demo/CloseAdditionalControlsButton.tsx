@@ -7,11 +7,8 @@ export class CloseAdditionalControlsButton extends React.PureComponent {
 
   render() {
     return (
-      <div className='pt-button-group pt-minimal'>
-        <button
-          onClick={() => this.context.mosaicWindowActions.setAdditionalControlsOpen(false)}
-          className='pt-button'
-        >
+      <div className="pt-button-group pt-minimal">
+        <button onClick={() => this.context.mosaicWindowActions.setAdditionalControlsOpen(false)} className="pt-button">
           Proof of Concept Button!
         </button>
       </div>

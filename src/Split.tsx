@@ -31,7 +31,7 @@ export interface SplitProps extends EnabledResizeOptions {
 }
 
 export class Split extends React.PureComponent<SplitProps> {
-  private rootElement: HTMLElement | null;
+  private rootElement: HTMLElement | null = null;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -47,11 +47,11 @@ export class Split extends React.PureComponent<SplitProps> {
           '-row': direction === 'row',
           '-column': direction === 'column',
         })}
-        ref={(el) => this.rootElement = el}
+        ref={(el) => (this.rootElement = el)}
         onMouseDown={this.onMouseDown}
         style={this.computeStyle()}
       >
-        <div className='mosaic-split-line'/>
+        <div className="mosaic-split-line" />
       </div>
     );
   }

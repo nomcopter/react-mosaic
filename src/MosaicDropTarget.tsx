@@ -53,20 +53,18 @@ class MosaicDropTargetClass extends React.PureComponent<Props> {
 
   render() {
     const { position, isOver, connectDropTarget, draggedMosaicId } = this.props;
-    return connectDropTarget((
-        <div
-          className={classNames('drop-target', position, {
-            'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-          })}
-        />
-      ),
+    return connectDropTarget(
+      <div
+        className={classNames('drop-target', position, {
+          'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
+        })}
+      />,
     );
   }
 }
 
-export const MosaicDropTarget =
-  DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-    draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-  }))(MosaicDropTargetClass) as React.ComponentClass<MosaicDropTargetProps>;
+export const MosaicDropTarget = DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
+}))(MosaicDropTargetClass) as React.ComponentClass<MosaicDropTargetProps>;

@@ -31,7 +31,7 @@ import {
   MosaicWindow,
   MosaicZeroState,
   updateTree,
-} from '../src/index';
+} from '../src';
 import '../styles/index.less';
 
 import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
@@ -51,9 +51,7 @@ export const THEMES = {
 
 export type Theme = keyof typeof THEMES;
 
-const additionalControls = React.Children.toArray([
-  <CloseAdditionalControlsButton/>,
-]);
+const additionalControls = React.Children.toArray([<CloseAdditionalControlsButton />]);
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -62,11 +60,9 @@ export interface ExampleAppState {
   currentTheme: Theme;
 }
 
-export class NumberMosaic extends Mosaic<number> {
-}
+export class NumberMosaic extends Mosaic<number> {}
 
-export class NumberMosaicWindow extends MosaicWindow<number> {
-}
+export class NumberMosaicWindow extends MosaicWindow<number> {}
 
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   state: ExampleAppState = {
@@ -88,7 +84,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
   render() {
     return (
-      <div className='react-mosaic-example-app'>
+      <div className="react-mosaic-example-app">
         {this.renderNavBar()}
         <NumberMosaic
           renderTile={(count, path) => (
@@ -98,12 +94,12 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
               createNode={this.createNode}
               path={path}
             >
-              <div className='example-window'>
+              <div className="example-window">
                 <h1>{`Window ${count}`}</h1>
               </div>
             </NumberMosaicWindow>
           )}
-          zeroStateView={<MosaicZeroState createNode={this.createNode}/>}
+          zeroStateView={<MosaicZeroState createNode={this.createNode} />}
           value={this.state.currentNode}
           onChange={this.onChange}
           className={THEMES[this.state.currentTheme]}
@@ -142,14 +138,18 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
         second = destination;
       }
 
-      currentNode = updateTree(currentNode, [{
-        path,
-        spec: {
-          $set: {
-            direction, first, second,
+      currentNode = updateTree(currentNode, [
+        {
+          path,
+          spec: {
+            $set: {
+              direction,
+              first,
+              second,
+            },
           },
         },
-      }]);
+      ]);
     } else {
       currentNode = ++windowCount;
     }
@@ -159,22 +159,19 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
   private renderNavBar() {
     return (
-      <div className='pt-navbar pt-dark'>
-        <div className='pt-navbar-group'>
-          <div className='pt-logo'/>
-          <div className='pt-navbar-heading'>
-            <a
-              className='pt-app-title'
-              href='https://github.com/palantir/react-mosaic'
-            >
-              react-mosaic <span className='version'>v{version}</span>
+      <div className="pt-navbar pt-dark">
+        <div className="pt-navbar-group">
+          <div className="pt-logo" />
+          <div className="pt-navbar-heading">
+            <a className="pt-app-title" href="https://github.com/palantir/react-mosaic">
+              react-mosaic <span className="version">v{version}</span>
             </a>
           </div>
         </div>
-        <div className='pt-navbar-group pt-button-group'>
-          <label className='pt-label pt-inline theme-selection'>
+        <div className="pt-navbar-group pt-button-group">
+          <label className="pt-label pt-inline theme-selection">
             Theme:
-            <div className='pt-select'>
+            <div className="pt-select">
               <select
                 value={this.state.currentTheme}
                 onChange={(e) => this.setState({ currentTheme: e.currentTarget.value as Theme })}
@@ -183,22 +180,16 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
               </select>
             </div>
           </label>
-          <div className='navbar-separator'/>
-          <span className='actions-label'>Example Actions:</span>
-          <button
-            className='pt-button pt-icon-grid-view'
-            onClick={this.autoArrange}
-          >
+          <div className="navbar-separator" />
+          <span className="actions-label">Example Actions:</span>
+          <button className="pt-button pt-icon-grid-view" onClick={this.autoArrange}>
             Auto Arrange
           </button>
-          <button
-            className='pt-button pt-icon-arrow-top-right'
-            onClick={this.addToTopRight}
-          >
+          <button className="pt-button pt-icon-arrow-top-right" onClick={this.addToTopRight}>
             Add Window to Top Right
           </button>
-          <a className='github-link' href='https://github.com/palantir/react-mosaic'>
-            <img src={gitHubLogo}/>
+          <a className="github-link" href="https://github.com/palantir/react-mosaic">
+            <img src={gitHubLogo} />
           </a>
         </div>
       </div>

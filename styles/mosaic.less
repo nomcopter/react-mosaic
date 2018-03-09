@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import (reference) "./mixins";
+@import (reference) './mixins';
 
 @split-size: 6px;
 
@@ -22,7 +22,8 @@
   height: 100%;
   width: 100%;
 
-  &, * {
+  &,
+  * {
     box-sizing: border-box;
   }
 
@@ -93,7 +94,7 @@
 }
 
 .split-percentages(@split-amount) {
-  @amount: ~"calc(100% - " @split-amount ~")";
+  @amount: ~'calc(100% - ' @split-amount ~')';
   &.left {
     right: @amount;
   }
@@ -142,4 +143,3 @@
     }
   }
 }
-

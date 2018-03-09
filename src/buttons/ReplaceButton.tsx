@@ -29,7 +29,8 @@ export class ReplaceButton<T extends MosaicKey> extends React.PureComponent<Mosa
   }
 
   private replace = () => {
-    this.context.mosaicWindowActions.replaceWithNew()
+    this.context.mosaicWindowActions
+      .replaceWithNew()
       .then(() => {
         if (this.props.onClick) {
           this.props.onClick();

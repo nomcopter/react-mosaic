@@ -93,10 +93,12 @@ function isPathPrefixEqual(a: MosaicPath, b: MosaicPath, length: number) {
  * @param position
  * @returns {(MosaicUpdate<T>|{path: MosaicPath, spec: {$set: {first: MosaicNode<T>, second: MosaicNode<T>, direction: MosaicDirection}}})[]}
  */
-export function createDragToUpdates<T extends MosaicKey>(root: MosaicNode<T>,
-                                                         sourcePath: MosaicPath,
-                                                         destinationPath: MosaicPath,
-                                                         position: MosaicDropTargetPosition): MosaicUpdate<T>[] {
+export function createDragToUpdates<T extends MosaicKey>(
+  root: MosaicNode<T>,
+  sourcePath: MosaicPath,
+  destinationPath: MosaicPath,
+  position: MosaicDropTargetPosition,
+): MosaicUpdate<T>[] {
   let destinationNode = getAndAssertNodeAtPathExists(root, destinationPath);
   const updates: MosaicUpdate<T>[] = [];
 
