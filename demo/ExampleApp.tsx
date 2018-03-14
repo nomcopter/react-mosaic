@@ -41,7 +41,7 @@ const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
 // tslint:disable-next-line no-var-requires
 const { version } = require('../package.json');
 
-let windowCount = 4;
+let windowCount = 3;
 
 export const THEMES = {
   ['Blueprint']: 'mosaic-blueprint-theme',
