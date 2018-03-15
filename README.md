@@ -74,7 +74,7 @@ export const app = (
 ```
 
 `renderTile` is a stateless lookup function to convert `T` into a displayable `JSX.Element`.
-By default `T` is `string`.
+By default `T` is `string` (so to render one element `initialValue="ID"` works).
 `T`s must be unique within an instance of `Mosaic`, they are used as keys for [React list management](https://reactjs.org/docs/lists-and-keys.html).
 `initialValue` is a [`MosaicNode<T>`](./src/types.ts#L27).
 
