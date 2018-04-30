@@ -1,6 +1,6 @@
 {
   "name": "react-mosaic-component",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
   "main": "lib/index.js",
