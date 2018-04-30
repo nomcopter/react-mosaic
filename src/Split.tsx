@@ -72,6 +72,10 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 
   private onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+    if (event.button !== 0) {
+      return;
+    }
+
     event.preventDefault();
     document.addEventListener('mousemove', this.onMouseMove, true);
     document.addEventListener('mouseup', this.onMouseUp, true);
