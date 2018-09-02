@@ -49,16 +49,24 @@ Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `
 
 #### Simple Tiling
 
+##### app.css
+
 ```css
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   width: 100%;
   margin: 0;
 }
 ```
 
+##### App.tsx
+
 ```tsx
 import { Mosaic } from 'react-mosaic-component';
+import '@blueprintjs/core/dist/blueprint.css';
+import './app.css';
 
 const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
   a: <div>Left Window</div>,
