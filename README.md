@@ -37,6 +37,8 @@ This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to
 It is recommended to at least start developing with this theme.
 To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your page.
 
+**Note:** Currently react-mosaic only supports `v1.x` of Blueprint (tracking [here](https://github.com/palantir/react-mosaic/issues/77))
+
 See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
 #### Blueprint Dark Theme
@@ -47,8 +49,24 @@ Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `
 
 #### Simple Tiling
 
+##### app.css
+
+```css
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+```
+
+##### App.tsx
+
 ```tsx
 import { Mosaic } from 'react-mosaic-component';
+import '@blueprintjs/core/dist/blueprint.css';
+import './app.css';
 
 const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
   a: <div>Left Window</div>,
@@ -57,19 +75,21 @@ const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
 };
 
 export const app = (
-  <Mosaic
-    renderTile={(id) => ELEMENT_MAP[id]}
-    initialValue={{
-      direction: 'row',
-      first: 'a',
-      second: {
-        direction: 'column',
-        first: 'b',
-        second: 'c',
-      },
-      splitPercentage: 40,
-    }}
-  />
+  <div id="app">
+    <Mosaic
+      renderTile={(id) => ELEMENT_MAP[id]}
+      initialValue={{
+        direction: 'row',
+        first: 'a',
+        second: {
+          direction: 'column',
+          first: 'b',
+          second: 'c',
+        },
+        splitPercentage: 40,
+      }}
+    />
+  </div>
 );
 ```
 
