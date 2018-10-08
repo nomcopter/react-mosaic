@@ -1,9 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import { MosaicWindowContext } from '../src/index';
 
 export class CloseAdditionalControlsButton extends React.PureComponent {
   static contextTypes = MosaicWindowContext;
-  context: MosaicWindowContext<number>;
+  context!: MosaicWindowContext<number>;
 
   render() {
     return (

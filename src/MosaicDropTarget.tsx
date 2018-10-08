@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as classNames from 'classnames';
-import * as React from 'react';
+import classNames from 'classnames';
+import React from 'react';
 import { ConnectDropTarget, DropTarget, DropTargetMonitor } from 'react-dnd';
 import { MosaicContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
@@ -49,7 +49,7 @@ const dropTarget = {
 
 class MosaicDropTargetClass extends React.PureComponent<Props> {
   static contextTypes = MosaicContext;
-  context: MosaicContext<any>;
+  context!: MosaicContext<any>;
 
   render() {
     const { position, isOver, connectDropTarget, draggedMosaicId } = this.props;
@@ -63,8 +63,12 @@ class MosaicDropTargetClass extends React.PureComponent<Props> {
   }
 }
 
-export const MosaicDropTarget = DropTarget(MosaicDragType.WINDOW, dropTarget, (connect, monitor): DropTargetProps => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-}))(MosaicDropTargetClass) as React.ComponentClass<MosaicDropTargetProps>;
+export const MosaicDropTarget = (DropTarget(
+  MosaicDragType.WINDOW,
+  dropTarget,
+  (connect, monitor): DropTargetProps => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
+  }),
+)(MosaicDropTargetClass as any) as any) as React.ComponentClass<MosaicDropTargetProps>;

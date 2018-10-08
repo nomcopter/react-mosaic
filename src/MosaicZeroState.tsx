@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as _ from 'lodash';
-import * as React from 'react';
+import _ from 'lodash';
+import React from 'react';
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 import { CreateNode, MosaicKey } from './types';
 
@@ -24,7 +24,7 @@ export interface MosaicZeroStateProps<T extends MosaicKey> {
 }
 
 export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<MosaicZeroStateProps<T>> {
-  context: MosaicContext<T>;
+  context!: MosaicContext<T>;
 
   static contextTypes = {
     mosaicActions: MosaicActionsPropType,

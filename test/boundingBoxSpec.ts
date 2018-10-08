@@ -71,11 +71,11 @@ describe('BoundingBox', () => {
       expectBoundingBoxCloseTo(first, {
         top: 100 / 6,
         right: 100 / 6,
-        bottom: 100 / 6 * 4,
+        bottom: (100 / 6) * 4,
         left: 100 / 6,
       });
       expectBoundingBoxCloseTo(second, {
-        top: 100 / 6 * 2,
+        top: (100 / 6) * 2,
         right: 100 / 6,
         bottom: 100 / 6,
         left: 100 / 6,

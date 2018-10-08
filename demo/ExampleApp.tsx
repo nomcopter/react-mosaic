@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import '@blueprintjs/core/dist/blueprint.css';
-import * as _ from 'lodash';
-import * as React from 'react';
+import _ from 'lodash';
+import React from 'react';
+
 import {
   Corner,
   createBalancedTreeFromLeaves,
@@ -32,9 +32,11 @@ import {
   MosaicZeroState,
   updateTree,
 } from '../src';
-import '../styles/index.less';
 
 import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
+
+import '@blueprintjs/core/dist/blueprint.css';
+import '../styles/index.less';
 import './example.less';
 // tslint:disable-next-line no-var-requires
 const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
@@ -104,7 +106,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     );
   }
 
-  private onChange = (currentNode: MosaicNode<number>) => this.setState({ currentNode });
+  private onChange = (currentNode: MosaicNode<number> | null) => this.setState({ currentNode });
 
   private createNode = () => ++windowCount;
 

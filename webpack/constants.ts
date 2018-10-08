@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 
 const DEMO_FOLDER = path.join(__dirname, '..', 'demo/');
 export const CONSTANTS = {

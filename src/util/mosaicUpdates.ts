@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as update from 'immutability-helper';
-import * as _ from 'lodash';
+import update from 'immutability-helper';
+import _ from 'lodash';
 import { MosaicDropTargetPosition } from '../internalTypes';
 import {
   MosaicBranch,

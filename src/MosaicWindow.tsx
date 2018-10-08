@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as classNames from 'classnames';
-import * as _ from 'lodash';
-import * as React from 'react';
+import classNames from 'classnames';
+import _ from 'lodash';
+import React from 'react';
 import {
   ConnectDragPreview,
   ConnectDragSource,
@@ -102,9 +102,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   state: InternalMosaicWindowState = {
     additionalControlsOpen: false,
   };
-  context: MosaicContext<T>;
+  context!: MosaicContext<T>;
 
-  private rootElement: HTMLElement | null;
+  private rootElement: HTMLElement | null = null;
 
   getChildContext(): Partial<MosaicWindowContext<T>> {
     return {
@@ -142,7 +142,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
         {connectDragPreview(renderPreview!(this.props))}
         <div className="drop-target-container">
-          {_.values<string>(MosaicDropTargetPosition).map(this.renderDropTarget)}
+          {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
         </div>
       </div>,
     );
@@ -314,7 +314,7 @@ export const SourceDropConnectedInternalMosaicWindow = DropTarget(
     isOver: monitor.isOver(),
     draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
   }),
-)(SourceConnectedInternalMosaicWindow);
+)(SourceConnectedInternalMosaicWindow as any);
 
 export class MosaicWindow<T extends MosaicKey = string> extends React.PureComponent<MosaicWindowProps<T>> {
   static ofType<T extends MosaicKey>() {
@@ -332,7 +332,7 @@ export function MosaicWindowFactory<T extends MosaicKey = string>(
   ...children: React.ReactNode[]
 ) {
   const element: React.ReactElement<MosaicWindowProps<T>> = React.createElement(
-    InternalMosaicWindow as React.ComponentClass<MosaicWindowProps<T>>,
+    (InternalMosaicWindow as any) as React.ComponentClass<MosaicWindowProps<T>>,
     props,
     ...children,
   );
