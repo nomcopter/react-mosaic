@@ -9,8 +9,6 @@ react-mosaic is written in TypeScript and provides typings but can be used in Ja
 
 The best way to see it is a simple [**Demo**](https://palantir.github.io/react-mosaic/).
 
-v1.0 just released! Upgrade guide [here](https://github.com/palantir/react-mosaic/releases/tag/v1.0.0).
-
 #### Screencast
 
 [![screencast demo](./screencast.gif)](./screencast.gif)
