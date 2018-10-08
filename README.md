@@ -43,7 +43,7 @@ See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of crea
 
 #### Blueprint Dark Theme
 
-Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `mosaic-blueprint-theme pt-dark` class.
+Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `mosaic-blueprint-theme bp3-dark` class.
 
 ### Examples
 
@@ -152,9 +152,9 @@ These toolbars can be dragged around by a user to rearrange their workspace.
 
 Mosaic views have two modes, similar to `React.DOM` input elements:
 
-* Controlled, where the consumer manages Mosaic's state through callbacks.
+- Controlled, where the consumer manages Mosaic's state through callbacks.
   Using this API, the consumer can perform any operation upon the tree to change the the view as desired.
-* Uncontrolled, where Mosaic manages all of its state internally.
+- Uncontrolled, where Mosaic manages all of its state internally.
 
 See [Controlled Components](https://facebook.github.io/react/docs/forms.html#controlled-components).
 

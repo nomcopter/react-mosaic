@@ -84,10 +84,10 @@ export namespace BoundingBox {
     const { top, right, bottom, left } = boundingBox;
     if (direction === 'column') {
       const height = 100 - top - bottom;
-      return height * relativeSplitPercentage / 100 + top;
+      return (height * relativeSplitPercentage) / 100 + top;
     } else if (direction === 'row') {
       const width = 100 - right - left;
-      return width * relativeSplitPercentage / 100 + left;
+      return (width * relativeSplitPercentage) / 100 + left;
     } else {
       return assertNever(direction);
     }
@@ -101,10 +101,10 @@ export namespace BoundingBox {
     const { top, right, bottom, left } = boundingBox;
     if (direction === 'column') {
       const height = 100 - top - bottom;
-      return (absoluteSplitPercentage - top) / height * 100;
+      return ((absoluteSplitPercentage - top) / height) * 100;
     } else if (direction === 'row') {
       const width = 100 - right - left;
-      return (absoluteSplitPercentage - left) / width * 100;
+      return ((absoluteSplitPercentage - left) / width) * 100;
     } else {
       return assertNever(direction);
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { MosaicBranch, MosaicDirection, MosaicKey, MosaicNode, MosaicParent, MosaicPath } from '../types';
 
 function alternateDirection<T extends MosaicKey>(

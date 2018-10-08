@@ -79,7 +79,7 @@
     display: flex;
     z-index: 3;
 
-    .pt-button {
+    .@{ns}-button {
       margin: 0;
 
       &:after {
@@ -123,25 +123,21 @@
     h4 {
       margin-bottom: 10px;
     }
-
-    .pt-icon {
-      font-size: 72px;
-    }
   }
 }
 
 .mosaic:not(.mosaic-blueprint-theme) {
   .mosaic-default-control {
-    &.pt-icon-cross:before {
+    &.@{ns}-icon-cross:before {
       content: 'Close';
     }
-    &.pt-icon-add-column-right:before {
+    &.@{ns}-icon-add-column-right:before {
       content: 'Split';
     }
-    &.pt-icon-exchange:before {
+    &.@{ns}-icon-exchange:before {
       content: 'Replace';
     }
-    &.pt-icon-maximize:before {
+    &.@{ns}-icon-maximize:before {
       content: 'Expand';
     }
   }

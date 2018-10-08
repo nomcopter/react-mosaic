@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as React from 'react';
+import { Classes } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import React from 'react';
+
 import { MosaicWindowContext } from '../contextTypes';
 import { MosaicKey } from '../types';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class ExpandButton<T extends MosaicKey> extends React.PureComponent<MosaicButtonProps> {
   static contextTypes = MosaicWindowContext;
-  context: MosaicWindowContext<T>;
+  context!: MosaicWindowContext<T>;
 
   render() {
-    return createDefaultToolbarButton('Expand', 'pt-icon-maximize', this.expand);
+    return createDefaultToolbarButton('Expand', Classes.iconClass(IconNames.MAXIMIZE), this.expand);
   }
 
   private expand = () => {

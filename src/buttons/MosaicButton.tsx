@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as classNames from 'classnames';
-import * as React from 'react';
+import { Classes } from '@blueprintjs/core';
+import classNames from 'classnames';
+import React from 'react';
 
 export function createDefaultToolbarButton(
   title: string,
@@ -27,7 +28,7 @@ export function createDefaultToolbarButton(
     <button
       title={title}
       onClick={onClick}
-      className={classNames('mosaic-default-control pt-button pt-minimal', className)}
+      className={classNames('mosaic-default-control', Classes.BUTTON, Classes.MINIMAL, className)}
     >
       {text! && <span className="control-text">text!</span>}
     </button>

@@ -28,14 +28,11 @@
   }
 
   .mosaic-zero-state {
+    @padding: @split-size;
+    .absolute-fill(@padding, @padding, @padding, @padding);
     width: auto;
     height: auto;
-    max-width: none;
     z-index: 1;
-
-    .pt-non-ideal-state-icon .pt-icon {
-      font-size: 120px;
-    }
   }
 }
 

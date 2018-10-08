@@ -1,4 +1,4 @@
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import config from './base';
 import { CONSTANTS } from './constants';
 

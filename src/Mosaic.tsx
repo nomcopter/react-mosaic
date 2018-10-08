@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as classNames from 'classnames';
-import * as _ from 'lodash';
-import * as React from 'react';
+import classNames from 'classnames';
+import _ from 'lodash';
+import React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
