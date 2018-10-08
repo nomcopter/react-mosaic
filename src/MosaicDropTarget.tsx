@@ -17,6 +17,7 @@
 import classNames from 'classnames';
 import React from 'react';
 import { ConnectDropTarget, DropTarget, DropTargetMonitor } from 'react-dnd';
+
 import { MosaicContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicDragType, MosaicPath } from './types';
@@ -71,4 +72,4 @@ export const MosaicDropTarget = (DropTarget(
     isOver: monitor.isOver(),
     draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
   }),
-)(MosaicDropTargetClass as any) as any) as React.ComponentClass<MosaicDropTargetProps>;
+)(MosaicDropTargetClass) as any) as React.ComponentType<MosaicDropTargetProps>;
