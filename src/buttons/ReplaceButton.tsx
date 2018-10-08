@@ -14,8 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Classes } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import _ from 'lodash';
 import React from 'react';
+
 import { MosaicWindowContext } from '../contextTypes';
 import { MosaicKey } from '../types';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
@@ -25,7 +28,7 @@ export class ReplaceButton<T extends MosaicKey> extends React.PureComponent<Mosa
   context!: MosaicWindowContext<T>;
 
   render() {
-    return createDefaultToolbarButton('Replace Window', 'pt-icon-exchange', this.replace);
+    return createDefaultToolbarButton('Replace Window', Classes.iconClass(IconNames.EXCHANGE), this.replace);
   }
 
   private replace = () => {

@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Classes, Icon } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
 import _ from 'lodash';
 import React from 'react';
@@ -25,6 +27,7 @@ import {
   DragSourceMonitor,
   DropTarget,
 } from 'react-dnd';
+
 import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
 import { MosaicContext, MosaicWindowActionsPropType, MosaicWindowContext } from './contextTypes';
@@ -87,7 +90,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         </div>
         <div className="mosaic-window-body">
           <h4>{title}</h4>
-          <span className="pt-icon pt-icon-application" />
+          <Icon icon="application" />
         </div>
       </div>
     ),
@@ -187,12 +190,12 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     return (
       <div className={classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot })}>
         {titleDiv}
-        <div className="mosaic-window-controls pt-button-group">
+        <div className={classNames('mosaic-window-controls', Classes.BUTTON_GROUP)}>
           {hasAdditionalControls && (
             <button
               onClick={() => this.setAdditionalControlsOpen(!additionalControlsOpen)}
-              className={classNames('pt-button pt-minimal pt-icon-more', {
-                'pt-active': additionalControlsOpen,
+              className={classNames(Classes.BUTTON, Classes.MINIMAL, Classes.iconClass(IconNames.MORE), {
+                [Classes.ACTIVE]: additionalControlsOpen,
               })}
             >
               <span className="control-text">{additionalControlButtonText!}</span>

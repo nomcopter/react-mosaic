@@ -43,7 +43,7 @@ See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of crea
 
 #### Blueprint Dark Theme
 
-Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `mosaic-blueprint-theme pt-dark` class.
+Mosaic supports the Blueprint Dark Theme out of the box when rendered with the `mosaic-blueprint-theme bp3-dark` class.
 
 ### Examples
 

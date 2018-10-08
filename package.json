@@ -29,7 +29,8 @@
     "version": "npm run bundle && git add -A docs/"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.35.5",
+    "@blueprintjs/core": "^3.7.0",
+    "@blueprintjs/icons": "^3.2.0",
     "@types/chai": "^4.1.6",
     "@types/classnames": "^2.2.6",
     "@types/dom4": "^2.0.1",

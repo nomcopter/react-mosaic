@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import (reference) '../node_modules/@blueprintjs/core/dist/variables';
+@import (reference) '../node_modules/@blueprintjs/core/lib/less/variables';
 
 .mosaic.mosaic-blueprint-theme {
   background: @gray4;
@@ -69,7 +69,7 @@
       .separator {
         border-left: 1px solid @light-gray2;
       }
-      .pt-button {
+      .@{ns}-button {
         &,
         &:before {
           color: @gray2;
@@ -88,7 +88,7 @@
       transition: height 250ms;
       box-shadow: 0 1px 1px @pt-divider-black;
 
-      .pt-button {
+      .@{ns}-button {
         &,
         &:before {
           color: @gray2;
@@ -111,7 +111,7 @@
     }
   }
 
-  &.pt-dark {
+  &.@{ns}-dark {
     background: @dark-gray2;
 
     .mosaic-zero-state {
@@ -156,7 +156,7 @@
         .separator {
           border-color: @gray1;
         }
-        .pt-button {
+        .@{ns}-button {
           &,
           &:before {
             color: @gray4;
@@ -169,7 +169,7 @@
       }
 
       .mosaic-window-additional-actions-bar {
-        .pt-button {
+        .@{ns}-button {
           &,
           &:before {
             color: @gray5;
