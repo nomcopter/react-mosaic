@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import _ from 'lodash';
+import values from 'lodash/values';
 import React from 'react';
 import { DropTarget } from 'react-dnd';
 
@@ -19,7 +19,7 @@ class RootDropTargetsClass extends React.PureComponent<RootDropTargetsProps> {
           '-dragging': this.props.isDragging,
         })}
       >
-        {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
+        {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map((position) => (
           <MosaicDropTarget position={position} path={[]} key={position} />
         ))}
       </div>

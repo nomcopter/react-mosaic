@@ -17,7 +17,7 @@
 import { Classes, HTMLSelect } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import _ from 'lodash';
+import dropRight from 'lodash/dropRight';
 import React from 'react';
 
 import {
@@ -127,7 +127,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     let { currentNode } = this.state;
     if (currentNode) {
       const path = getPathToCorner(currentNode, Corner.TOP_RIGHT);
-      const parent = getNodeAtPath(currentNode, _.dropRight(path)) as MosaicParent<number>;
+      const parent = getNodeAtPath(currentNode, dropRight(path)) as MosaicParent<number>;
       const destination = getNodeAtPath(currentNode, path) as MosaicNode<number>;
       const direction: MosaicDirection = parent ? getOtherDirection(parent.direction) : 'row';
 

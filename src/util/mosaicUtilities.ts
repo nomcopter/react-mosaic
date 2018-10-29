@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
+import clone from 'lodash/clone';
+import get from 'lodash/get';
 import { MosaicBranch, MosaicDirection, MosaicKey, MosaicNode, MosaicParent, MosaicPath } from '../types';
 
 function alternateDirection<T extends MosaicKey>(
@@ -63,7 +64,7 @@ export function createBalancedTreeFromLeaves<T extends MosaicKey>(
     return null;
   }
 
-  let current: MosaicNode<T>[] = _.clone(leaves);
+  let current: MosaicNode<T>[] = clone(leaves);
   let next: MosaicNode<T>[] = [];
 
   while (current.length > 1) {
@@ -160,7 +161,7 @@ export function getLeaves<T extends MosaicKey>(tree: MosaicNode<T> | null): T[] 
  */
 export function getNodeAtPath<T extends MosaicKey>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T> | null {
   if (path.length > 0) {
-    return _.get(tree, path, null);
+    return get(tree, path, null);
   } else {
     return tree;
   }

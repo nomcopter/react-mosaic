@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import _ from 'lodash';
+import flatten from 'lodash/flatten';
 import React from 'react';
 import { MosaicContext } from './contextTypes';
 import { Split } from './Split';
@@ -45,7 +45,7 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicR
     if (isParent(node)) {
       const splitPercentage = node.splitPercentage == null ? 50 : node.splitPercentage;
       const { first, second } = BoundingBox.split(boundingBox, splitPercentage, node.direction);
-      return _.flatten(
+      return flatten(
         [
           this.renderRecursively(node.first, first, path.concat('first')),
           this.renderSplit(node.direction, boundingBox, splitPercentage, path),
