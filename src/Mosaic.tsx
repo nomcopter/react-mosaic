@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 import classNames from 'classnames';
-import _ from 'lodash';
+import countBy from 'lodash/countBy';
+import keys from 'lodash/keys';
+import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
@@ -197,11 +199,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
 
   private validateTree(node: MosaicNode<T> | null) {
     if (process.env.NODE_ENV !== 'production') {
-      const duplicates = _.chain(getLeaves(node))
-        .countBy()
-        .pickBy((n) => n > 1)
-        .keys()
-        .value();
+      const duplicates = keys(pickBy(countBy(getLeaves(node)), (n) => n > 1));
 
       if (duplicates.length > 0) {
         throw new Error(

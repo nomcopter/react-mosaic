@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import classNames from 'classnames';
-import _ from 'lodash';
+import clamp from 'lodash/clamp';
+import throttle from 'lodash/throttle';
 import React from 'react';
 
 import { EnabledResizeOptions, MosaicDirection } from './types';
@@ -92,7 +93,7 @@ export class Split extends React.PureComponent<SplitProps> {
     }
   };
 
-  private onMouseMove = _.throttle((event: MouseEvent) => {
+  private onMouseMove = throttle((event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -115,6 +116,6 @@ export class Split extends React.PureComponent<SplitProps> {
 
     const relativePercentage = BoundingBox.getRelativeSplitPercentage(boundingBox, absolutePercentage, direction);
 
-    return _.clamp(relativePercentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
+    return clamp(relativePercentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
   }
 }

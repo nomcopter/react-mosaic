@@ -17,7 +17,7 @@
 import { Classes, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import _ from 'lodash';
+import noop from 'lodash/noop';
 import React from 'react';
 
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
@@ -55,7 +55,7 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
   private replace = () =>
     Promise.resolve(this.props.createNode!())
       .then((node) => this.context.mosaicActions.replaceWith([], node))
-      .catch(_.noop); // Swallow rejections (i.e. on user cancel)
+      .catch(noop); // Swallow rejections (i.e. on user cancel)
 }
 
 // Factory that works with generics

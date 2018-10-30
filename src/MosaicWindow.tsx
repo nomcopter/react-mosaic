@@ -17,7 +17,12 @@
 import { Classes, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import _ from 'lodash';
+import defer from 'lodash/defer';
+import dropRight from 'lodash/dropRight';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
+import omit from 'lodash/omit';
+import values from 'lodash/values';
 import React from 'react';
 import {
   ConnectDragPreview,
@@ -145,7 +150,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
         {connectDragPreview(renderPreview!(this.props))}
         <div className="drop-target-container">
-          {_.values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
+          {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
         </div>
       </div>,
     );
@@ -153,8 +158,8 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
 
   shouldComponentUpdate(nextProps: InternalMosaicWindowProps<T>, nextState: InternalMosaicWindowState): boolean {
     return (
-      !_.isEqual(_.omit(this.props, PURE_RENDER_IGNORE), _.omit(nextProps, PURE_RENDER_IGNORE)) ||
-      !_.isEqual(this.state, nextState)
+      !isEqual(omit(this.props, PURE_RENDER_IGNORE), omit(nextProps, PURE_RENDER_IGNORE)) ||
+      !isEqual(this.state, nextState)
     );
   }
 
@@ -185,7 +190,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       titleDiv = connectDragSource(titleDiv) as React.ReactElement<any>;
     }
 
-    const hasAdditionalControls = !_.isEmpty(additionalControls);
+    const hasAdditionalControls = !isEmpty(additionalControls);
 
     return (
       <div className={classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot })}>
@@ -260,7 +265,7 @@ const dragSource = {
   ): MosaicDragItem => {
     // TODO: Actually just delete instead of hiding
     // The defer is necessary as the element must be present on start for HTML DnD to not cry
-    const hideTimer = _.defer(() => component.context.mosaicActions.hide(component.props.path));
+    const hideTimer = defer(() => component.context.mosaicActions.hide(component.props.path));
     return {
       mosaicId: component.context.mosaicId,
       hideTimer,
@@ -279,13 +284,13 @@ const dragSource = {
     const dropResult: MosaicDropData = (monitor.getDropResult() || {}) as MosaicDropData;
     const { mosaicActions } = component.context;
     const { position, path: destinationPath } = dropResult;
-    if (position != null && destinationPath != null && !_.isEqual(destinationPath, ownPath)) {
+    if (position != null && destinationPath != null && !isEqual(destinationPath, ownPath)) {
       mosaicActions.updateTree(createDragToUpdates(mosaicActions.getRoot(), ownPath, destinationPath, position));
     } else {
       // TODO: restore node from captured state
       mosaicActions.updateTree([
         {
-          path: _.dropRight(ownPath),
+          path: dropRight(ownPath),
           spec: {
             splitPercentage: {
               $set: null,

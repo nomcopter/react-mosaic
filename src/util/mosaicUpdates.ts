@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 import update from 'immutability-helper';
-import _ from 'lodash';
+import drop from 'lodash/drop';
+import dropRight from 'lodash/dropRight';
+import isEqual from 'lodash/isEqual';
+import last from 'lodash/last';
+import set from 'lodash/set';
+import take from 'lodash/take';
 import { MosaicDropTargetPosition } from '../internalTypes';
 import {
   MosaicBranch,
@@ -39,7 +44,7 @@ export { MosaicParent };
  */
 export function buildSpecFromUpdate<T extends MosaicKey>(mosaicUpdate: MosaicUpdate<T>): MosaicUpdateSpec<T> {
   if (mosaicUpdate.path.length > 0) {
-    return _.set({}, mosaicUpdate.path, mosaicUpdate.spec);
+    return set({}, mosaicUpdate.path, mosaicUpdate.spec);
   } else {
     return mosaicUpdate.spec;
   }
@@ -67,8 +72,8 @@ export function updateTree<T extends MosaicKey>(root: MosaicNode<T>, updates: Mo
  * @returns {{path: T[], spec: {$set: MosaicNode<T>}}}
  */
 export function createRemoveUpdate<T extends MosaicKey>(root: MosaicNode<T> | null, path: MosaicPath): MosaicUpdate<T> {
-  const parentPath = _.dropRight(path);
-  const nodeToRemove = _.last(path);
+  const parentPath = dropRight(path);
+  const nodeToRemove = last(path);
   const siblingPath = parentPath.concat(getOtherBranch(nodeToRemove!));
   const sibling = getAndAssertNodeAtPathExists(root, siblingPath);
 
@@ -81,7 +86,7 @@ export function createRemoveUpdate<T extends MosaicKey>(root: MosaicNode<T> | nu
 }
 
 function isPathPrefixEqual(a: MosaicPath, b: MosaicPath, length: number) {
-  return _.isEqual(_.take(a, length), _.take(b, length));
+  return isEqual(take(a, length), take(b, length));
 }
 
 /**
@@ -106,7 +111,7 @@ export function createDragToUpdates<T extends MosaicKey>(
   if (destinationIsParentOfSource) {
     // Must explicitly remove source from the destination node
     destinationNode = updateTree(destinationNode, [
-      createRemoveUpdate(destinationNode, _.drop(sourcePath, destinationPath.length)),
+      createRemoveUpdate(destinationNode, drop(sourcePath, destinationPath.length)),
     ]);
   } else {
     // Can remove source normally
@@ -151,8 +156,8 @@ export function createDragToUpdates<T extends MosaicKey>(
  * @returns {{path: T[], spec: {splitPercentage: {$set: number}}}}
  */
 export function createHideUpdate<T extends MosaicKey>(path: MosaicPath): MosaicUpdate<T> {
-  const targetPath = _.dropRight(path);
-  const thisBranch = _.last(path);
+  const targetPath = dropRight(path);
+  const thisBranch = last(path);
 
   let splitPercentage: number;
   if (thisBranch === 'first') {

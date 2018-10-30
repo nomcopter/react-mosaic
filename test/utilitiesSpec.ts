@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 import { expect } from 'chai';
-import _ from 'lodash';
+import max from 'lodash/max';
+import min from 'lodash/min';
+import range from 'lodash/range';
 
 import { getNodeAtPath, MosaicNode } from '../src/index';
 import {
@@ -48,8 +50,8 @@ const FALSY_TREE: MosaicNode<number | string> = {
   second: '',
 };
 
-const NINE_LEAVES = _.range(1, 10);
-const THOUSAND_AND_ONE_LEAVES = _.range(1, 1002);
+const NINE_LEAVES = range(1, 10);
+const THOUSAND_AND_ONE_LEAVES = range(1, 1002);
 
 const NUMERICAL_SORT = (a: number, b: number) => a - b;
 
@@ -58,8 +60,8 @@ function getTreeDepths(tree: MosaicNode<any>): { min: number; max: number } {
     const first = getTreeDepths(tree.first);
     const second = getTreeDepths(tree.second);
     return {
-      min: _.min([first.min, second.min])! + 1,
-      max: _.max([first.max, second.max])! + 1,
+      min: min([first.min, second.min])! + 1,
+      max: max([first.max, second.max])! + 1,
     };
   } else {
     return {

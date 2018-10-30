@@ -16,7 +16,7 @@
  */
 import { Classes } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import _ from 'lodash';
+import noop from 'lodash/noop';
 import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
@@ -39,7 +39,7 @@ export class ReplaceButton<T extends MosaicKey> extends React.PureComponent<Mosa
           this.props.onClick();
         }
       })
-      .catch(_.noop); // Swallow rejections (i.e. on user cancel)
+      .catch(noop); // Swallow rejections (i.e. on user cancel)
   };
 }
 
