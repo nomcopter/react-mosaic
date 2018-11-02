@@ -14,10 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Classes, Icon } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
-import classNames from 'classnames';
 import noop from 'lodash/noop';
+import { BlueprintCoreMock as BlueprintCore } from './util/BlueprintCoreMock';
+import('@blueprintjs/core')
+  .then(({ default: _ }) => {
+    BlueprintCore.Classes = _.Classes;
+    BlueprintCore.Icon = _.Icon;
+  })
+  .catch((_error) => noop);
+
+import { BlueprintIconsMock as BlueprintIcons } from './util/BlueprintIconsMock';
+import('@blueprintjs/icons')
+  .then(({ default: _ }) => {
+    BlueprintCore.IconNames = _.IconNames;
+  })
+  .catch((_error) => noop);
+import classNames from 'classnames';
 import React from 'react';
 
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
@@ -36,14 +48,20 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
 
   render() {
     return (
-      <div className={classNames('mosaic-zero-state', Classes.NON_IDEAL_STATE)}>
-        <div className={Classes.NON_IDEAL_STATE_VISUAL}>
-          <Icon iconSize={120} icon="applications" />
+      <div className={classNames('mosaic-zero-state', BlueprintCore.Classes.NON_IDEAL_STATE)}>
+        <div className={BlueprintCore.Classes.NON_IDEAL_STATE_VISUAL}>
+          <BlueprintCore.Icon iconSize={120} icon="applications" />
         </div>
-        <h4 className={Classes.HEADING}>No Windows Present</h4>
+        <h4 className={BlueprintCore.Classes.HEADING}>No Windows Present</h4>
         <div>
           {this.props.createNode && (
-            <button className={classNames(Classes.BUTTON, Classes.iconClass(IconNames.ADD))} onClick={this.replace}>
+            <button
+              className={classNames(
+                BlueprintCore.Classes.BUTTON,
+                BlueprintCore.Classes.iconClass(BlueprintIcons.IconNames.ADD),
+              )}
+              onClick={this.replace}
+            >
               Add New Window
             </button>
           )}
