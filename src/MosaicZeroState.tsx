@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Classes, Icon } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
 import noop from 'lodash/noop';
 import React from 'react';
 
 import { MosaicActionsPropType, MosaicContext } from './contextTypes';
 import { CreateNode, MosaicKey } from './types';
+import { OptionalBlueprint } from './util/OptionalBlueprint';
 
 export interface MosaicZeroStateProps<T extends MosaicKey> {
   createNode?: CreateNode<T>;
@@ -36,14 +35,17 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
 
   render() {
     return (
-      <div className={classNames('mosaic-zero-state', Classes.NON_IDEAL_STATE)}>
-        <div className={Classes.NON_IDEAL_STATE_VISUAL}>
-          <Icon iconSize={120} icon="applications" />
+      <div className={classNames('mosaic-zero-state', OptionalBlueprint.getClasses('NON_IDEAL_STATE'))}>
+        <div className={OptionalBlueprint.getClasses('NON_IDEAL_STATE_VISUAL')}>
+          <OptionalBlueprint.Icon iconSize={120} icon="applications" />
         </div>
-        <h4 className={Classes.HEADING}>No Windows Present</h4>
+        <h4 className={OptionalBlueprint.getClasses('HEADING')}>No Windows Present</h4>
         <div>
           {this.props.createNode && (
-            <button className={classNames(Classes.BUTTON, Classes.iconClass(IconNames.ADD))} onClick={this.replace}>
+            <button
+              className={classNames(OptionalBlueprint.getClasses('BUTTON'), OptionalBlueprint.getIconClass('ADD'))}
+              onClick={this.replace}
+            >
               Add New Window
             </button>
           )}

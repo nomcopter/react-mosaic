@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Classes } from '@blueprintjs/core';
 import classNames from 'classnames';
 import React from 'react';
+
+import { OptionalBlueprint } from '../util/OptionalBlueprint';
 
 export function createDefaultToolbarButton(
   title: string,
@@ -28,9 +29,9 @@ export function createDefaultToolbarButton(
     <button
       title={title}
       onClick={onClick}
-      className={classNames('mosaic-default-control', Classes.BUTTON, Classes.MINIMAL, className)}
+      className={classNames('mosaic-default-control', OptionalBlueprint.getClasses('BUTTON', 'MINIMAL'), className)}
     >
-      {text! && <span className="control-text">text!</span>}
+      {text && <span className="control-text">{text}</span>}
     </button>
   );
 }
