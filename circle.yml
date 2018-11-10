@@ -1,12 +1,11 @@
 machine:
   node:
-    version: 6.12.3
+    version: 10.13.0
 dependencies:
   pre:
     - npm install -g yarn
-    - yarn config set cache-folder /home/ubuntu/.cache/yarn
   cache_directories:
-    - "/home/ubuntu/.cache/yarn"
+    - "~/.cache/yarn"
     - "node_modules"
   override:
     - yarn install --frozen-lockfile

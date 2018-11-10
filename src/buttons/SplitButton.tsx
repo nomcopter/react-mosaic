@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Classes } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import classNames from 'classnames';
 import noop from 'lodash/noop';
 import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
 import { MosaicKey } from '../types';
+import { OptionalBlueprint } from '../util/OptionalBlueprint';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class SplitButton<T extends MosaicKey> extends React.PureComponent<MosaicButtonProps> {
@@ -28,7 +28,11 @@ export class SplitButton<T extends MosaicKey> extends React.PureComponent<Mosaic
   context!: MosaicWindowContext<T>;
 
   render() {
-    return createDefaultToolbarButton('Split Window', Classes.iconClass(IconNames.ADD_COLUMN_RIGHT), this.split);
+    return createDefaultToolbarButton(
+      'Split Window',
+      classNames('split-button', OptionalBlueprint.getIconClass('ADD_COLUMN_RIGHT')),
+      this.split,
+    );
   }
 
   private split = () => {

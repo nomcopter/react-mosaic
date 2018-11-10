@@ -33,7 +33,7 @@ making it easier for the consumer to style it to match their own app.
 By default, Mosaic renders with the `mosaic-blueprint-theme` class.
 This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to provide a good starting state.
 It is recommended to at least start developing with this theme.
-To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your page.
+To use it install Blueprint `yarn add @blueprintjs/core @blueprintjs/icons` and add their CSS to your page.
 
 See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
@@ -61,7 +61,8 @@ body,
 
 ```tsx
 import { Mosaic } from 'react-mosaic-component';
-import '@blueprintjs/core/dist/blueprint.css';
+import '@blueprintjs/core/lib/css/blueprint.css';
+import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import './app.css';
 
 const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
@@ -72,7 +73,7 @@ const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
 
 export const app = (
   <div id="app">
-    <Mosaic
+    <Mosaic<string>
       renderTile={(id) => ELEMENT_MAP[id]}
       initialValue={{
         direction: 'row',
@@ -105,11 +106,6 @@ The user can resize these panes but there is no other advanced functionality.
 ```tsx
 export type ViewId = 'a' | 'b' | 'c' | 'new';
 
-// Make type alias for generic checking in TSX until https://github.com/Microsoft/TypeScript/issues/6395 is fixed
-
-const ViewIdMosaic = Mosaic.ofType<ViewId>();
-const ViewIdMosaicWindow = MosaicWindow.ofType<ViewId>();
-
 const TITLE_MAP: Record<ViewId, string> = {
   a: 'Left Window',
   b: 'Top Right Window',
@@ -118,11 +114,11 @@ const TITLE_MAP: Record<ViewId, string> = {
 };
 
 export const app = (
-  <ViewIdMosaic
+  <Mosaic<ViewId>
     renderTile={(id, path) => (
-      <ViewIdMosaicWindow path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
+      <MosaicWindow<ViewId> path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
         <h1>{TITLE_MAP[id]}</h1>
-      </ViewIdMosaicWindow>
+      </MosaicWindow>
     )}
     initialValue={{
       direction: 'row',
