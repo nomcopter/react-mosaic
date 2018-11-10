@@ -33,7 +33,7 @@ making it easier for the consumer to style it to match their own app.
 By default, Mosaic renders with the `mosaic-blueprint-theme` class.
 This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to provide a good starting state.
 It is recommended to at least start developing with this theme.
-To use it install Blueprint `yarn add @blueprintjs/core` and add its CSS to your page.
+To use it install Blueprint `yarn add @blueprintjs/core @blueprintjs/icons` and add their CSS to your page.
 
 See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
@@ -61,7 +61,8 @@ body,
 
 ```tsx
 import { Mosaic } from 'react-mosaic-component';
-import '@blueprintjs/core/dist/blueprint.css';
+import '@blueprintjs/core/lib/css/blueprint.css';
+import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import './app.css';
 
 const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
