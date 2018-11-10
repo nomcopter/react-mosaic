@@ -72,7 +72,7 @@ const ELEMENT_MAP: { [viewId: string]: JSX.Element } = {
 
 export const app = (
   <div id="app">
-    <Mosaic
+    <Mosaic<string>
       renderTile={(id) => ELEMENT_MAP[id]}
       initialValue={{
         direction: 'row',
@@ -105,11 +105,6 @@ The user can resize these panes but there is no other advanced functionality.
 ```tsx
 export type ViewId = 'a' | 'b' | 'c' | 'new';
 
-// Make type alias for generic checking in TSX until https://github.com/Microsoft/TypeScript/issues/6395 is fixed
-
-const ViewIdMosaic = Mosaic.ofType<ViewId>();
-const ViewIdMosaicWindow = MosaicWindow.ofType<ViewId>();
-
 const TITLE_MAP: Record<ViewId, string> = {
   a: 'Left Window',
   b: 'Top Right Window',
@@ -118,11 +113,11 @@ const TITLE_MAP: Record<ViewId, string> = {
 };
 
 export const app = (
-  <ViewIdMosaic
+  <Mosaic<ViewId>
     renderTile={(id, path) => (
-      <ViewIdMosaicWindow path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
+      <MosaicWindow<ViewId> path={path} createNode={() => 'new'} title={TITLE_MAP[id]}>
         <h1>{TITLE_MAP[id]}</h1>
-      </ViewIdMosaicWindow>
+      </MosaicWindow>
     )}
     initialValue={{
       direction: 'row',
