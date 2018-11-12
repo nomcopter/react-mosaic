@@ -19,7 +19,6 @@ import defer from 'lodash/defer';
 import dropRight from 'lodash/dropRight';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
-import omit from 'lodash/omit';
 import values from 'lodash/values';
 import React from 'react';
 import {
@@ -51,6 +50,8 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
+  onDragStart?: () => void;
+  onDragEnd?: (type: 'drop' | 'reset') => void;
 }
 
 export interface InternalDragSourceProps {
@@ -71,14 +72,6 @@ export type InternalMosaicWindowProps<T extends MosaicKey> = MosaicWindowProps<T
 export interface InternalMosaicWindowState {
   additionalControlsOpen: boolean;
 }
-
-const PURE_RENDER_IGNORE: (keyof InternalMosaicWindowProps<any> | 'children')[] = [
-  'path',
-  'connectDropTarget',
-  'connectDragSource',
-  'connectDragPreview',
-  'children',
-];
 
 export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   InternalMosaicWindowProps<T>,
@@ -152,13 +145,6 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
         </div>
       </div>,
-    );
-  }
-
-  shouldComponentUpdate(nextProps: InternalMosaicWindowProps<T>, nextState: InternalMosaicWindowState): boolean {
-    return (
-      !isEqual(omit(this.props, PURE_RENDER_IGNORE), omit(nextProps, PURE_RENDER_IGNORE)) ||
-      !isEqual(this.state, nextState)
     );
   }
 
@@ -262,10 +248,13 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
 
 const dragSource = {
   beginDrag: (
-    _props: InternalMosaicWindowProps<any>,
+    props: InternalMosaicWindowProps<any>,
     _monitor: DragSourceMonitor,
     component: InternalMosaicWindow<any>,
   ): MosaicDragItem => {
+    if (props.onDragStart) {
+      props.onDragStart();
+    }
     // TODO: Actually just delete instead of hiding
     // The defer is necessary as the element must be present on start for HTML DnD to not cry
     const hideTimer = defer(() => component.context.mosaicActions.hide(component.props.path));
@@ -275,7 +264,7 @@ const dragSource = {
     };
   },
   endDrag: (
-    _props: InternalMosaicWindowProps<any>,
+    props: InternalMosaicWindowProps<any>,
     monitor: DragSourceMonitor,
     component: InternalMosaicWindow<any>,
   ) => {
@@ -289,6 +278,9 @@ const dragSource = {
     const { position, path: destinationPath } = dropResult;
     if (position != null && destinationPath != null && !isEqual(destinationPath, ownPath)) {
       mosaicActions.updateTree(createDragToUpdates(mosaicActions.getRoot(), ownPath, destinationPath, position));
+      if (props.onDragEnd) {
+        props.onDragEnd('drop');
+      }
     } else {
       // TODO: restore node from captured state
       mosaicActions.updateTree([
@@ -301,6 +293,9 @@ const dragSource = {
           },
         },
       ]);
+      if (props.onDragEnd) {
+        props.onDragEnd('reset');
+      }
     }
   },
 };
