@@ -250,6 +250,10 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    * Optional method to override the displayed preview when a user drags a window
    */
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
+  /**
+   * Optional method to override the displayed toolbar
+   */
+  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
 }
 ```
 
