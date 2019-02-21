@@ -122,6 +122,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         replaceWithNew: this.swap,
         setAdditionalControlsOpen: this.setAdditionalControlsOpen,
         getPath: this.getPath,
+        connectDragSource: this.connectDragSource,
       },
     };
   }
@@ -277,6 +278,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   };
 
   private getPath = () => this.props.path;
+
+  private connectDragSource = (connectedElements: React.ReactElement<any>) => {
+    const { connectDragSource } = this.props;
+    return connectDragSource(connectedElements);
+  };
 }
 
 const dragSource = {
