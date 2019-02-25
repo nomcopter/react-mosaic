@@ -180,6 +180,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    */
   onChange?: (newNode: MosaicNode<T> | null) => void;
   /**
+   * Called when a user completes a change (fires like above except for the interpolation during resizing)
+   */
+  onRelease?: (newNode: MosaicNode<T> | null) => void;
+  /**
    * Additional classes to affix to the root element
    * Default: 'mosaic-blueprint-theme'
    */
@@ -254,6 +258,14 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    * Optional method to override the displayed toolbar
    */
   renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
+  /**
+   * Optional listener for when the user begins dragging the window
+   */
+  onDragStart?: () => void;
+  /**
+   * Optional listener for when the user finishes dragging a window.
+   */
+  onDragEnd?: (type: 'drop' | 'reset') => void;
 }
 ```
 
@@ -308,8 +320,9 @@ export interface MosaicRootActions<T extends MosaicKey> {
   /**
    * Atomically applies all updates to the current tree
    * @param updates
+   * @param suppressOnRelease (default: false)
    */
-  updateTree: (updates: MosaicUpdate<T>[]) => void;
+  updateTree: (updates: MosaicUpdate<T>[], suppressOnRelease?: boolean) => void;
   /**
    * Returns the root of this Mosaic instance
    */

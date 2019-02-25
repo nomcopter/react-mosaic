@@ -22,7 +22,7 @@ import React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
-import { MosaicContext, MosaicRootActions } from './contextTypes';
+import { ModernMosaicContext, MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicRoot } from './MosaicRoot';
 import { MosaicZeroState } from './MosaicZeroState';
 import { RootDropTargets } from './RootDropTargets';
@@ -41,6 +41,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * Called when a user initiates any change to the tree (removing, adding, moving, resizing, etc.)
    */
   onChange?: (newNode: MosaicNode<T> | null) => void;
+  /**
+   * Called when a user completes a change (fires like above except for the interpolation during resizing)
+   */
+  onRelease?: (newNode: MosaicNode<T> | null) => void;
   /**
    * Additional classes to affix to the root element
    * Default: 'mosaic-blueprint-theme'
@@ -108,20 +112,19 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   };
 
   getChildContext(): MosaicContext<T> {
-    return {
-      mosaicActions: this.actions,
-      mosaicId: this.state.mosaicId,
-    };
+    return this.childContext;
   }
 
   render() {
     const { className } = this.props;
 
     return (
-      <div className={classNames(className, 'mosaic mosaic-drop-target')}>
-        {this.renderTree()}
-        <RootDropTargets />
-      </div>
+      <ModernMosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+        <div className={classNames(className, 'mosaic mosaic-drop-target')}>
+          {this.renderTree()}
+          <RootDropTargets />
+        </div>
+      </ModernMosaicContext.Provider>
     );
   }
 
@@ -148,14 +151,17 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     }
   }
 
-  private updateRoot = (updates: MosaicUpdate<T>[]) => {
+  private updateRoot = (updates: MosaicUpdate<T>[], suppressOnRelease: boolean = false) => {
     const currentNode = this.getRoot() || ({} as MosaicNode<T>);
 
-    this.replaceRoot(updateTree(currentNode, updates));
+    this.replaceRoot(updateTree(currentNode, updates), suppressOnRelease);
   };
 
-  private replaceRoot = (currentNode: MosaicNode<T> | null) => {
+  private replaceRoot = (currentNode: MosaicNode<T> | null, suppressOnRelease: boolean = false) => {
     this.props.onChange!(currentNode);
+    if (!suppressOnRelease && this.props.onRelease) {
+      this.props.onRelease(currentNode);
+    }
 
     if (isUncontrolled(this.props)) {
       this.setState({ currentNode });
@@ -184,6 +190,11 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
           },
         },
       ]),
+  };
+
+  private readonly childContext: MosaicContext<T> = {
+    mosaicActions: this.actions,
+    mosaicId: this.state.mosaicId,
   };
 
   private renderTree() {
