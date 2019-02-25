@@ -254,6 +254,14 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    * Optional method to override the displayed toolbar
    */
   renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
+  /**
+   * Optional listener for when the user begins dragging the window
+   */
+  onDragStart?: () => void;
+  /**
+   * Optional listener for when the user finishes dragging a window.
+   */
+  onDragEnd?: (type: 'drop' | 'reset') => void;
 }
 ```
 
