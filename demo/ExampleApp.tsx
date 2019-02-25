@@ -69,9 +69,6 @@ export interface ExampleAppState {
   currentTheme: Theme;
 }
 
-const NumberMosaic = Mosaic.ofType<number>();
-const NumberMosaicWindow = MosaicWindow.ofType<number>();
-
 export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   state: ExampleAppState = {
     currentNode: {
@@ -91,19 +88,21 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     return (
       <div className="react-mosaic-example-app">
         {this.renderNavBar()}
-        <NumberMosaic
+        <Mosaic<number>
           renderTile={(count, path) => (
-            <NumberMosaicWindow
+            <MosaicWindow<number>
               additionalControls={count === 3 ? additionalControls : EMPTY_ARRAY}
               title={`Window ${count}`}
               createNode={this.createNode}
               path={path}
+              onDragStart={() => console.log('MosaicWindow.onDragStart')}
+              onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
               renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
             >
               <div className="example-window">
                 <h1>{`Window ${count}`}</h1>
               </div>
-            </NumberMosaicWindow>
+            </MosaicWindow>
           )}
           zeroStateView={<MosaicZeroState createNode={this.createNode} />}
           value={this.state.currentNode}
@@ -120,7 +119,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   };
 
   private onRelease = (currentNode: MosaicNode<number> | null) => {
-    console.log('onRelease():', currentNode);
+    console.log('Mosaic.onRelease():', currentNode);
   };
 
   private createNode = () => ++windowCount;
