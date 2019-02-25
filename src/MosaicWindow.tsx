@@ -128,25 +128,28 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       draggedMosaicId,
     } = this.props;
 
-    return <ModernMosaicWindowContext.Provider value={this.childContext}>
-      {connectDropTarget(
-        <div
-          className={classNames('mosaic-window mosaic-drop-target', className, {
-            'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-            'additional-controls-open': this.state.additionalControlsOpen,
-          })}
-          ref={(element) => (this.rootElement = element)}
-        >
-          {this.renderToolbar()}
-          <div className="mosaic-window-body">{this.props.children!}</div>
-          <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
-          <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
-          {connectDragPreview(renderPreview!(this.props))}
-          <div className="drop-target-container">
-            {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
-          </div>
-        </div>)}
+    return (
+      <ModernMosaicWindowContext.Provider value={this.childContext}>
+        {connectDropTarget(
+          <div
+            className={classNames('mosaic-window mosaic-drop-target', className, {
+              'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
+              'additional-controls-open': this.state.additionalControlsOpen,
+            })}
+            ref={(element) => (this.rootElement = element)}
+          >
+            {this.renderToolbar()}
+            <div className="mosaic-window-body">{this.props.children!}</div>
+            <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
+            <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
+            {connectDragPreview(renderPreview!(this.props))}
+            <div className="drop-target-container">
+              {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
+            </div>
+          </div>,
+        )}
       </ModernMosaicWindowContext.Provider>
+    );
   }
 
   private getToolbarControls() {
