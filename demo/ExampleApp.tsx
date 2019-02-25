@@ -117,7 +117,6 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
   private onChange = (currentNode: MosaicNode<number> | null) => {
     this.setState({ currentNode });
-    console.log('onChange():', currentNode);
   };
 
   private onRelease = (currentNode: MosaicNode<number> | null) => {

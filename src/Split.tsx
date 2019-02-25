@@ -33,7 +33,7 @@ export interface SplitProps extends EnabledResizeOptions {
 }
 
 export class Split extends React.PureComponent<SplitProps> {
-  private rootElement: HTMLElement | null = null;
+  private rootElement: HTMLDivElement | null = null;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -59,8 +59,10 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mousemove', this.onMouseMove, true);
-    document.removeEventListener('mouseup', this.onMouseUp, true);
+    if (this.rootElement) {
+      this.rootElement.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
+      this.rootElement.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
+    }
   }
 
   private computeStyle() {
@@ -79,13 +81,13 @@ export class Split extends React.PureComponent<SplitProps> {
     }
 
     event.preventDefault();
-    document.addEventListener('mousemove', this.onMouseMove, true);
-    document.addEventListener('mouseup', this.onMouseUp, true);
+    this.rootElement!.ownerDocument!.addEventListener('mousemove', this.onMouseMove, true);
+    this.rootElement!.ownerDocument!.addEventListener('mouseup', this.onMouseUp, true);
   };
 
   private onMouseUp = (event: MouseEvent) => {
-    document.removeEventListener('mousemove', this.onMouseMove, true);
-    document.removeEventListener('mouseup', this.onMouseUp, true);
+    this.rootElement!.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
+    this.rootElement!.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
 
     const percentage = this.calculateRelativePercentage(event);
     this.props.onRelease!(percentage);
