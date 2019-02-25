@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import PropTypes from 'prop-types';
+import React from 'react';
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate } from './types';
 
 /**
@@ -136,3 +137,12 @@ export const MosaicWindowContext = {
   ...MosaicContext,
   mosaicWindowActions: MosaicWindowActionsPropType,
 };
+
+/*************************************************************
+ * Modern context
+ */
+
+export const ModernMosaicContext = React.createContext<MosaicContext<MosaicKey>>(undefined!);
+
+export type ModernMosaicWindowContext = Pick<MosaicWindowContext<MosaicKey>, 'mosaicWindowActions'>;
+export const ModernMosaicWindowContext = React.createContext<ModernMosaicWindowContext>(undefined!);

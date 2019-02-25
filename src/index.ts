@@ -41,6 +41,8 @@ export {
   MosaicWindowActions,
   MosaicWindowActionsPropType,
   MosaicWindowContext,
+  ModernMosaicContext,
+  ModernMosaicWindowContext,
 } from './contextTypes';
 export {
   buildSpecFromUpdate,

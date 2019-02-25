@@ -22,7 +22,7 @@ import React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5 from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
-import { MosaicContext, MosaicRootActions } from './contextTypes';
+import { ModernMosaicContext, MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicRoot } from './MosaicRoot';
 import { MosaicZeroState } from './MosaicZeroState';
 import { RootDropTargets } from './RootDropTargets';
@@ -112,20 +112,19 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   };
 
   getChildContext(): MosaicContext<T> {
-    return {
-      mosaicActions: this.actions,
-      mosaicId: this.state.mosaicId,
-    };
+    return this.childContext;
   }
 
   render() {
     const { className } = this.props;
 
     return (
-      <div className={classNames(className, 'mosaic mosaic-drop-target')}>
-        {this.renderTree()}
-        <RootDropTargets />
-      </div>
+      <ModernMosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+        <div className={classNames(className, 'mosaic mosaic-drop-target')}>
+          {this.renderTree()}
+          <RootDropTargets />
+        </div>
+      </ModernMosaicContext.Provider>
     );
   }
 
@@ -191,6 +190,11 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
           },
         },
       ]),
+  };
+
+  private readonly childContext: MosaicContext<T> = {
+    mosaicActions: this.actions,
+    mosaicId: this.state.mosaicId,
   };
 
   private renderTree() {

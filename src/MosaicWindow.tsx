@@ -32,7 +32,12 @@ import {
 
 import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
-import { MosaicContext, MosaicWindowActionsPropType, MosaicWindowContext } from './contextTypes';
+import {
+  ModernMosaicWindowContext,
+  MosaicContext,
+  MosaicWindowActionsPropType,
+  MosaicWindowContext,
+} from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicDropTarget } from './MosaicDropTarget';
 import { CreateNode, MosaicBranch, MosaicDirection, MosaicDragType, MosaicKey } from './types';
@@ -109,15 +114,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   private rootElement: HTMLElement | null = null;
 
   getChildContext(): Partial<MosaicWindowContext<T>> {
-    return {
-      mosaicWindowActions: {
-        split: this.split,
-        replaceWithNew: this.swap,
-        setAdditionalControlsOpen: this.setAdditionalControlsOpen,
-        getPath: this.getPath,
-        connectDragSource: this.connectDragSource,
-      },
-    };
+    return this.childContext;
   }
 
   render() {
@@ -131,24 +128,25 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       draggedMosaicId,
     } = this.props;
 
-    return connectDropTarget(
-      <div
-        className={classNames('mosaic-window mosaic-drop-target', className, {
-          'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-          'additional-controls-open': this.state.additionalControlsOpen,
-        })}
-        ref={(element) => (this.rootElement = element)}
-      >
-        {this.renderToolbar()}
-        <div className="mosaic-window-body">{this.props.children!}</div>
-        <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
-        <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
-        {connectDragPreview(renderPreview!(this.props))}
-        <div className="drop-target-container">
-          {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
-        </div>
-      </div>,
-    );
+    return <ModernMosaicWindowContext.Provider value={this.childContext}>
+      {connectDropTarget(
+        <div
+          className={classNames('mosaic-window mosaic-drop-target', className, {
+            'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
+            'additional-controls-open': this.state.additionalControlsOpen,
+          })}
+          ref={(element) => (this.rootElement = element)}
+        >
+          {this.renderToolbar()}
+          <div className="mosaic-window-body">{this.props.children!}</div>
+          <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
+          <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
+          {connectDragPreview(renderPreview!(this.props))}
+          <div className="drop-target-container">
+            {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
+          </div>
+        </div>)}
+      </ModernMosaicWindowContext.Provider>
   }
 
   private getToolbarControls() {
@@ -268,6 +266,16 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   private connectDragSource = (connectedElements: React.ReactElement<any>) => {
     const { connectDragSource } = this.props;
     return connectDragSource(connectedElements);
+  };
+
+  private readonly childContext: ModernMosaicWindowContext = {
+    mosaicWindowActions: {
+      split: this.split,
+      replaceWithNew: this.swap,
+      setAdditionalControlsOpen: this.setAdditionalControlsOpen,
+      getPath: this.getPath,
+      connectDragSource: this.connectDragSource,
+    },
   };
 }
 

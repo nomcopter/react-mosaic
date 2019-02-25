@@ -5,6 +5,8 @@ extends:
   - tslint-react
   - tslint-plugin-prettier
   - tslint-config-prettier
+linterOptions:
+  format: stylish
 rules:
   interface-name:
     options:
