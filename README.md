@@ -180,6 +180,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    */
   onChange?: (newNode: MosaicNode<T> | null) => void;
   /**
+   * Called when a user completes a change (fires like above except for the interpolation during resizing)
+   */
+  onRelease?: (newNode: MosaicNode<T> | null) => void;
+  /**
    * Additional classes to affix to the root element
    * Default: 'mosaic-blueprint-theme'
    */
@@ -316,8 +320,9 @@ export interface MosaicRootActions<T extends MosaicKey> {
   /**
    * Atomically applies all updates to the current tree
    * @param updates
+   * @param suppressOnRelease (default: false)
    */
-  updateTree: (updates: MosaicUpdate<T>[]) => void;
+  updateTree: (updates: MosaicUpdate<T>[], suppressOnRelease?: boolean) => void;
   /**
    * Returns the root of this Mosaic instance
    */

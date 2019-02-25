@@ -66,8 +66,9 @@ export interface MosaicRootActions<T extends MosaicKey> {
   /**
    * Atomically applies all updates to the current tree
    * @param updates
+   * @param suppressOnRelease (default: false)
    */
-  updateTree: (updates: MosaicUpdate<T>[]) => void;
+  updateTree: (updates: MosaicUpdate<T>[], suppressOnRelease?: boolean) => void;
   /**
    * Returns the root of this Mosaic instance
    */

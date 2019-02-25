@@ -42,6 +42,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    */
   onChange?: (newNode: MosaicNode<T> | null) => void;
   /**
+   * Called when a user completes a change (fires like above except for the interpolation during resizing)
+   */
+  onRelease?: (newNode: MosaicNode<T> | null) => void;
+  /**
    * Additional classes to affix to the root element
    * Default: 'mosaic-blueprint-theme'
    */
@@ -148,14 +152,17 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     }
   }
 
-  private updateRoot = (updates: MosaicUpdate<T>[]) => {
+  private updateRoot = (updates: MosaicUpdate<T>[], suppressOnRelease: boolean = false) => {
     const currentNode = this.getRoot() || ({} as MosaicNode<T>);
 
-    this.replaceRoot(updateTree(currentNode, updates));
+    this.replaceRoot(updateTree(currentNode, updates), suppressOnRelease);
   };
 
-  private replaceRoot = (currentNode: MosaicNode<T> | null) => {
+  private replaceRoot = (currentNode: MosaicNode<T> | null, suppressOnRelease: boolean = false) => {
     this.props.onChange!(currentNode);
+    if (!suppressOnRelease && this.props.onRelease) {
+      this.props.onRelease(currentNode);
+    }
 
     if (isUncontrolled(this.props)) {
       this.setState({ currentNode });

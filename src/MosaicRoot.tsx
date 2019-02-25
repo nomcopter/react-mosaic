@@ -76,7 +76,8 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicR
           boundingBox={boundingBox}
           splitPercentage={splitPercentage}
           direction={direction}
-          onChange={(percentage) => this.onResize(percentage, path)}
+          onChange={(percentage) => this.onResize(percentage, path, true)}
+          onRelease={(percentage) => this.onResize(percentage, path, false)}
         />
       );
     } else {
@@ -84,17 +85,20 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicR
     }
   }
 
-  private onResize = (percentage: number, path: MosaicBranch[]) => {
-    this.context.mosaicActions.updateTree([
-      {
-        path,
-        spec: {
-          splitPercentage: {
-            $set: percentage,
+  private onResize = (percentage: number, path: MosaicBranch[], suppressOnRelease: boolean) => {
+    this.context.mosaicActions.updateTree(
+      [
+        {
+          path,
+          spec: {
+            splitPercentage: {
+              $set: percentage,
+            },
           },
         },
-      },
-    ]);
+      ],
+      suppressOnRelease,
+    );
   };
 }
 

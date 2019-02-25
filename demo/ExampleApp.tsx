@@ -43,6 +43,8 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '../styles/index.less';
 import './example.less';
 
+// tslint:disable no-console
+
 // tslint:disable-next-line no-var-requires
 const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
 // tslint:disable-next-line no-var-requires
@@ -96,7 +98,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
               title={`Window ${count}`}
               createNode={this.createNode}
               path={path}
-              renderToolbar={count === 2 ? () => <div>My Custom Toolbar</div> : null}
+              renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
             >
               <div className="example-window">
                 <h1>{`Window ${count}`}</h1>
@@ -106,13 +108,21 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
           zeroStateView={<MosaicZeroState createNode={this.createNode} />}
           value={this.state.currentNode}
           onChange={this.onChange}
+          onRelease={this.onRelease}
           className={THEMES[this.state.currentTheme]}
         />
       </div>
     );
   }
 
-  private onChange = (currentNode: MosaicNode<number> | null) => this.setState({ currentNode });
+  private onChange = (currentNode: MosaicNode<number> | null) => {
+    this.setState({ currentNode });
+    console.log('onChange():', currentNode);
+  };
+
+  private onRelease = (currentNode: MosaicNode<number> | null) => {
+    console.log('onRelease():', currentNode);
+  };
 
   private createNode = () => ++windowCount;
 

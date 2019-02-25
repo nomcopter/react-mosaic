@@ -88,9 +88,7 @@ export class Split extends React.PureComponent<SplitProps> {
     document.removeEventListener('mouseup', this.onMouseUp, true);
 
     const percentage = this.calculateRelativePercentage(event);
-    if (percentage !== this.props.splitPercentage) {
-      this.props.onRelease!(percentage);
-    }
+    this.props.onRelease!(percentage);
   };
 
   private onMouseMove = throttle((event: MouseEvent) => {
