@@ -96,6 +96,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
               title={`Window ${count}`}
               createNode={this.createNode}
               path={path}
+              renderToolbar={count === 2 ? () => <div>My Custom Toolbar</div> : null}
             >
               <div className="example-window">
                 <h1>{`Window ${count}`}</h1>

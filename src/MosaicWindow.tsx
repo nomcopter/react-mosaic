@@ -50,6 +50,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
+  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
   onDragStart?: () => void;
   onDragEnd?: (type: 'drop' | 'reset') => void;
 }
@@ -91,6 +92,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         </div>
       </div>
     ),
+    renderToolbar: null,
   };
 
   static contextTypes = MosaicContext;
@@ -113,6 +115,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         replaceWithNew: this.swap,
         setAdditionalControlsOpen: this.setAdditionalControlsOpen,
         getPath: this.getPath,
+        connectDragSource: this.connectDragSource,
       },
     };
   }
@@ -160,9 +163,27 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   }
 
   private renderToolbar() {
-    const { title, draggable, additionalControls, additionalControlButtonText, connectDragSource, path } = this.props;
+    const {
+      title,
+      draggable,
+      additionalControls,
+      additionalControlButtonText,
+      connectDragSource,
+      path,
+      renderToolbar,
+    } = this.props;
     const { additionalControlsOpen } = this.state;
     const toolbarControls = this.getToolbarControls();
+    const draggableAndNotRoot = draggable && path.length > 0;
+
+    if (renderToolbar) {
+      const connectedToolbar = connectDragSource(renderToolbar(this.props, draggable)) as React.ReactElement<any>;
+      return (
+        <div className={classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot })}>
+          {connectedToolbar}
+        </div>
+      );
+    }
 
     let titleDiv: React.ReactElement<any> = (
       <div title={title} className="mosaic-window-title">
@@ -170,7 +191,6 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       </div>
     );
 
-    const draggableAndNotRoot = draggable && path.length > 0;
     if (draggableAndNotRoot) {
       titleDiv = connectDragSource(titleDiv) as React.ReactElement<any>;
     }
@@ -244,6 +264,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   };
 
   private getPath = () => this.props.path;
+
+  private connectDragSource = (connectedElements: React.ReactElement<any>) => {
+    const { connectDragSource } = this.props;
+    return connectDragSource(connectedElements);
+  };
 }
 
 const dragSource = {

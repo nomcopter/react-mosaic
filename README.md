@@ -250,6 +250,10 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    * Optional method to override the displayed preview when a user drags a window
    */
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
+  /**
+   * Optional method to override the displayed toolbar
+   */
+  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
 }
 ```
 
@@ -341,6 +345,10 @@ export interface MosaicWindowActions {
    * Returns the path to this window
    */
   getPath: () => MosaicPath;
+  /**
+   * Enables connecting a different drag source besides the react-mosaic toolbar
+   */
+  connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement<any>;
 }
 ```
 

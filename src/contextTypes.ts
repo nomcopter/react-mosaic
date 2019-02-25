@@ -95,6 +95,10 @@ export interface MosaicWindowActions {
    * Returns the path to this window
    */
   getPath: () => MosaicPath;
+  /**
+   * Enables connecting a different drag source besides the react-mosaic toolbar
+   */
+  connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement<any>;
 }
 
 /*************************************************************
@@ -115,6 +119,7 @@ export const MosaicWindowActionsPropType = PropTypes.shape({
   replaceWithNew: PropTypes.func.isRequired,
   setAdditionalControlsOpen: PropTypes.func.isRequired,
   getPath: PropTypes.func.isRequired,
+  connectDragSource: PropTypes.func.isRequired,
 }).isRequired;
 
 /*************************************************************
