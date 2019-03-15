@@ -1,13 +1,13 @@
 # react-mosaic
 
-[![CircleCI](https://img.shields.io/circleci/project/github/palantir/react-mosaic/master.svg)](https://circleci.com/gh/palantir/react-mosaic)
+[![CircleCI](https://img.shields.io/circleci/project/github/nomcopter/react-mosaic/master.svg)](https://circleci.com/gh/nomcopter/react-mosaic)
 [![npm](https://img.shields.io/npm/v/react-mosaic-component.svg)](https://www.npmjs.com/package/react-mosaic-component)
 
 react-mosaic is a full-featured React Tiling Window Manager meant to give a user complete control over their workspace.
 It provides a simple and flexible API to tile arbitrarily complex react components across a user's view.
 react-mosaic is written in TypeScript and provides typings but can be used in JavaScript as well.
 
-The best way to see it is a simple [**Demo**](https://palantir.github.io/react-mosaic/).
+The best way to see it is a simple [**Demo**](https://nomcopter.github.io/react-mosaic/).
 
 #### Screencast
 
@@ -162,7 +162,7 @@ have 'Factory' appended (e.g. `MosaicWindowFactory`).
 
 #### Example Application
 
-See [ExampleApp](demo/ExampleApp.tsx) (the application used in the [Demo](https://palantir.github.io/react-mosaic/))
+See [ExampleApp](demo/ExampleApp.tsx) (the application used in the [Demo](https://nomcopter.github.io/react-mosaic/))
 for a more interesting example that shows the usage of Mosaic as a controlled component and modifications of the tree structure.
 
 ## API
@@ -411,11 +411,11 @@ export interface MosaicUpdateSpec<T extends MosaicKey> {
 
 ## Upgrade Considerations / Changelog
 
-See [Releases](https://github.com/palantir/react-mosaic/releases)
+See [Releases](https://github.com/nomcopter/react-mosaic/releases)
 
 ## License
 
-Copyright 2016 Palantir Technologies
+Copyright 2019 Kevin Verdieck, originally developed at Palantir Technologies, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
