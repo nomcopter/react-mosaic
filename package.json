@@ -8,7 +8,7 @@
   "typings": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/palantir/react-mosaic.git"
+    "url": "https://github.com/nomcopter/react-mosaic.git"
   },
   "scripts": {
     "build": "npm-run-all clean build:ts build:less",
@@ -87,7 +87,6 @@
   },
   "keywords": [
     "ui",
-    "palantir",
     "react",
     "component",
     "typescript",
