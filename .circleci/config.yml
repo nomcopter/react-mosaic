@@ -1,4 +1,12 @@
 version: 2
+references:
+  js_deps_cache_key: &js_deps_cache_key
+    v1-dependencies-{{ checksum "yarn.lock" }}
+  workspace_root: &workspace_root
+    .
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
 jobs:
   build:
     docker:
@@ -13,13 +21,26 @@ jobs:
             export PATH="$HOME/.yarn/bin:$PATH"
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - *js_deps_cache_key
       - run: yarn install --frozen-lockfile
       - save_cache:
           paths:
             - node_modules
             - ~/.cache/yarn
-          key: v1-dependencies-{{ checksum "yarn.lock" }}
+          key: *js_deps_cache_key
+      - run:
+          name: Build
+          command: yarn build
+     - persist_to_workspace:
+       root: *workspace_root
+       paths:
+         - .
+  test:
+    docker:
+      - image: circleci/node:dubnium
+    working_directory: ~/react-mosaic
+    steps:
+      - *attach_workspace
       - run: mkdir reports
       - run:
           name: Run unit tests
@@ -33,3 +54,37 @@ jobs:
           path: ./reports/mocha/test-results.xml
       - store_artifacts:
           path: ./reports/tslint/tslint.xml
+  deploy:
+    docker:
+      - image: circleci/node:dubnium
+    working_directory: ~/react-mosaic
+    steps:
+      - *attach_workspace
+      - run:
+          name: Publish
+          command: |
+            touch .npmrc
+            printf "\n$NPM_REGISTRY_CREDS\n" >> .npmrc
+            npm publish
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+      - test:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+      - deploy:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
