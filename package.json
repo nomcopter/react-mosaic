@@ -38,6 +38,7 @@
     "@types/mocha": "^5.2.7",
     "@types/prop-types": "^15.7.1",
     "@types/react": "^16.8.20",
+    "@types/react-dnd-multi-backend": "^3.0.5",
     "@types/react-dom": "^16.8.4",
     "@types/react-hot-loader": "^3.0.6",
     "@types/uuid": "^3.4.4",
@@ -75,8 +76,10 @@
     "immutability-helper": "^3.0.1",
     "lodash": "^4.17.11",
     "prop-types": "^15.7.2",
-    "react-dnd": "^5.0.0",
-    "react-dnd-html5-backend": "^5.0.1",
+    "react-dnd": "^7.6.1",
+    "react-dnd-html5-backend": "^7.6.2",
+    "react-dnd-multi-backend": "^3.2.1",
+    "react-dnd-touch-backend": "^0.8.3",
     "uuid": "^3.3.2"
   },
   "peerDependencies": {
