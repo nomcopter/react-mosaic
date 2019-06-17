@@ -84,7 +84,7 @@ export interface MosaicWindowActions {
   /**
    * Enables connecting a different drag source besides the react-mosaic toolbar
    */
-  connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement<any>;
+  connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement | null;
 }
 
 /*************************************************************
