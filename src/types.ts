@@ -1,3 +1,5 @@
+import { Spec } from 'immutability-helper';
+
 /**
  * Valid node types
  * @see React.Key
@@ -28,17 +30,7 @@ export type MosaicPath = MosaicBranch[];
  * Used by many utility methods to update the tree.
  * spec will be passed to https://github.com/kolodny/immutability-helper
  */
-export interface MosaicUpdateSpec<T extends MosaicKey> {
-  $set?: MosaicNode<T>;
-  splitPercentage?: {
-    $set: number | null;
-  };
-  direction?: {
-    $set: MosaicDirection;
-  };
-  first?: MosaicUpdateSpec<T>;
-  second?: MosaicUpdateSpec<T>;
-}
+export type MosaicUpdateSpec<T extends MosaicKey> = Spec<MosaicNode<T>>;
 
 export interface MosaicUpdate<T extends MosaicKey> {
   path: MosaicPath;
