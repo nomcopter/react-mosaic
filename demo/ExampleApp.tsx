@@ -157,7 +157,6 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     return (
       <div className={classNames(Classes.NAVBAR, Classes.DARK)}>
         <div className={Classes.NAVBAR_GROUP}>
-          <div className="pt-logo" />
           <div className={Classes.NAVBAR_HEADING}>
             <a href="https://github.com/nomcopter/react-mosaic">
               react-mosaic <span className="version">v{version}</span>
