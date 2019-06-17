@@ -4,7 +4,8 @@ import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { DragDropContext } from 'react-dnd';
-import HTML5 from 'react-dnd-html5-backend';
+import MultiBackend from 'react-dnd-multi-backend';
+import HTML5toTouch from 'react-dnd-multi-backend/lib/HTML5toTouch';
 import { v4 as uuid } from 'uuid';
 import { ModernMosaicContext, MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicRoot } from './MosaicRoot';
@@ -205,7 +206,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 }
 
-@(DragDropContext(HTML5) as ClassDecorator)
+@(DragDropContext(MultiBackend(HTML5toTouch)) as ClassDecorator)
 export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {
   static ofType<T extends MosaicKey>() {
     return Mosaic as new (props: MosaicProps<T>, context?: any) => Mosaic<T>;
