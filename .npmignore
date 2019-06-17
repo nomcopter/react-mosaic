@@ -2,7 +2,7 @@
 .editorconfig
 .gitignore
 .npmignore
-circle.yml
+.circleci/
 tsconfig*.json
 demo/
 docs/
