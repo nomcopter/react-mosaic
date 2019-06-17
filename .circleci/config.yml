@@ -1,9 +1,8 @@
 version: 2
+
 references:
-  js_deps_cache_key: &js_deps_cache_key
-    v1-dependencies-{{ checksum "yarn.lock" }}
-  workspace_root: &workspace_root
-    .
+  js_deps_cache_key: &js_deps_cache_key v1-dependencies-{{ checksum "yarn.lock" }}
+  workspace_root: &workspace_root .
   attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
@@ -31,10 +30,10 @@ jobs:
       - run:
           name: Build
           command: yarn build
-     - persist_to_workspace:
-       root: *workspace_root
-       paths:
-         - .
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .
   test:
     docker:
       - image: circleci/node:dubnium
