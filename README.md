@@ -152,14 +152,6 @@ See [Controlled Components](https://facebook.github.io/react/docs/forms.html#con
 
 All of the previous examples show use of Mosaic in an Uncontrolled fashion.
 
-#### TS/JS vs. TSX/JSX
-
-Components export both factories and component classes.
-If you are using TS/JS then use the factories;
-if you are using TSX/JSX then use the exported class but know that you will lose the generics if you aren't careful.
-The exported classes are named as the base name of the component (e.g. `MosaicWindow`) while the exported factories
-have 'Factory' appended (e.g. `MosaicWindowFactory`).
-
 #### Example Application
 
 See [ExampleApp](demo/ExampleApp.tsx) (the application used in the [Demo](https://nomcopter.github.io/react-mosaic/))

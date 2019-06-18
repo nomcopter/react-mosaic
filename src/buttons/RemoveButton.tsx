@@ -1,29 +1,35 @@
 import classNames from 'classnames';
 import React from 'react';
 
-import { MosaicWindowContext } from '../contextTypes';
-import { MosaicKey } from '../types';
+import { MosaicContext, MosaicRootActions, MosaicWindowContext } from '../contextTypes';
 import { OptionalBlueprint } from '../util/OptionalBlueprint';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
-export class RemoveButton<T extends MosaicKey> extends React.PureComponent<MosaicButtonProps> {
-  static contextTypes = MosaicWindowContext;
-  context!: MosaicWindowContext<T>;
+export class RemoveButton extends React.PureComponent<MosaicButtonProps> {
+  static contextType = MosaicWindowContext;
+  context!: MosaicWindowContext;
 
   render() {
-    return createDefaultToolbarButton(
-      'Close Window',
-      classNames('close-button', OptionalBlueprint.getIconClass('CROSS')),
-      this.remove,
+    return (
+      <MosaicContext.Consumer>
+        {({ mosaicActions }) =>
+          createDefaultToolbarButton(
+            'Close Window',
+            classNames('close-button', OptionalBlueprint.getIconClass('CROSS')),
+            this.createRemove(mosaicActions),
+          )
+        }
+      </MosaicContext.Consumer>
     );
   }
 
-  private remove = () => {
-    this.context.mosaicActions.remove(this.context.mosaicWindowActions.getPath());
-    if (this.props.onClick) {
-      this.props.onClick();
-    }
-  };
-}
+  private createRemove(mosaicActions: MosaicRootActions<any>) {
+    return () => {
+      mosaicActions.remove(this.context.mosaicWindowActions.getPath());
 
-export const RemoveButtonFactory = React.createFactory(RemoveButton);
+      if (this.props.onClick) {
+        this.props.onClick();
+      }
+    };
+  }
+}

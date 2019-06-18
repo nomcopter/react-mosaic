@@ -16,12 +16,7 @@ import {
 
 import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
-import {
-  ModernMosaicWindowContext,
-  MosaicContext,
-  MosaicWindowActionsPropType,
-  MosaicWindowContext,
-} from './contextTypes';
+import { MosaicContext, MosaicWindowContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
 import { MosaicDropTarget } from './MosaicDropTarget';
 import { CreateNode, MosaicBranch, MosaicDirection, MosaicDragType, MosaicKey } from './types';
@@ -83,23 +78,14 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     ),
     renderToolbar: null,
   };
-
-  static contextTypes = MosaicContext;
-
-  static childContextTypes = {
-    mosaicWindowActions: MosaicWindowActionsPropType,
-  };
+  static contextType = MosaicContext;
+  context!: MosaicContext<T>;
 
   state: InternalMosaicWindowState = {
     additionalControlsOpen: false,
   };
-  context!: MosaicContext<T>;
 
   private rootElement: HTMLElement | null = null;
-
-  getChildContext(): Partial<MosaicWindowContext<T>> {
-    return this.childContext;
-  }
 
   render() {
     const {
@@ -113,7 +99,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     } = this.props;
 
     return (
-      <ModernMosaicWindowContext.Provider value={this.childContext}>
+      <MosaicWindowContext.Provider value={this.childContext}>
         {connectDropTarget(
           <div
             className={classNames('mosaic-window mosaic-drop-target', className, {
@@ -132,7 +118,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
             </div>
           </div>,
         )}
-      </ModernMosaicWindowContext.Provider>
+      </MosaicWindowContext.Provider>
     );
   }
 
@@ -244,7 +230,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     return connectDragSource(connectedElements);
   };
 
-  private readonly childContext: ModernMosaicWindowContext = {
+  private readonly childContext: MosaicWindowContext = {
     mosaicWindowActions: {
       split: this.split,
       replaceWithNew: this.swap,
@@ -332,24 +318,7 @@ export const SourceDropConnectedInternalMosaicWindow = DropTarget(
 )(SourceConnectedInternalMosaicWindow as any);
 
 export class MosaicWindow<T extends MosaicKey = string> extends React.PureComponent<MosaicWindowProps<T>> {
-  static ofType<T extends MosaicKey>() {
-    return MosaicWindow as new (props: MosaicWindowProps<T>, context?: any) => MosaicWindow<T>;
-  }
-
   render() {
     return <SourceDropConnectedInternalMosaicWindow {...(this.props as InternalMosaicWindowProps<T>)} />;
   }
-}
-
-// Factory that works with generics
-export function MosaicWindowFactory<T extends MosaicKey = string>(
-  props: MosaicWindowProps<T> & React.Attributes,
-  ...children: React.ReactNode[]
-) {
-  const element: React.ReactElement<MosaicWindowProps<T>> = React.createElement(
-    (InternalMosaicWindow as any) as React.ComponentClass<MosaicWindowProps<T>>,
-    props,
-    ...children,
-  );
-  return element;
 }

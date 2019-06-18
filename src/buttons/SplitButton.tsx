@@ -3,13 +3,12 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
-import { MosaicKey } from '../types';
 import { OptionalBlueprint } from '../util/OptionalBlueprint';
 import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
-export class SplitButton<T extends MosaicKey> extends React.PureComponent<MosaicButtonProps> {
-  static contextTypes = MosaicWindowContext;
-  context!: MosaicWindowContext<T>;
+export class SplitButton extends React.PureComponent<MosaicButtonProps> {
+  static contextType = MosaicWindowContext;
+  context!: MosaicWindowContext;
 
   render() {
     return createDefaultToolbarButton(
@@ -30,5 +29,3 @@ export class SplitButton<T extends MosaicKey> extends React.PureComponent<Mosaic
       .catch(noop); // Swallow rejections (i.e. on user cancel)
   };
 }
-
-export const SplitButtonFactory = React.createFactory(SplitButton);

@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate } from './types';
 
 /**
@@ -18,7 +18,7 @@ export interface MosaicContext<T extends MosaicKey> {
 /**
  * Context provided to everything within a Mosaic Window
  */
-export interface MosaicWindowContext<T extends MosaicKey> extends MosaicContext<T> {
+export interface MosaicWindowContext {
   mosaicWindowActions: MosaicWindowActions;
 }
 
@@ -88,45 +88,8 @@ export interface MosaicWindowActions {
 }
 
 /*************************************************************
- * PropTypes for React `contextTypes`
- */
-
-export const MosaicActionsPropType = PropTypes.shape({
-  expand: PropTypes.func.isRequired,
-  remove: PropTypes.func.isRequired,
-  hide: PropTypes.func.isRequired,
-  replaceWith: PropTypes.func.isRequired,
-  updateTree: PropTypes.func.isRequired,
-  getRoot: PropTypes.func.isRequired,
-}).isRequired;
-
-export const MosaicWindowActionsPropType = PropTypes.shape({
-  split: PropTypes.func.isRequired,
-  replaceWithNew: PropTypes.func.isRequired,
-  setAdditionalControlsOpen: PropTypes.func.isRequired,
-  getPath: PropTypes.func.isRequired,
-  connectDragSource: PropTypes.func.isRequired,
-}).isRequired;
-
-/*************************************************************
- * Bundled PropTypes for convenience
- */
-
-export const MosaicContext = {
-  mosaicActions: MosaicActionsPropType,
-  mosaicId: PropTypes.string.isRequired,
-};
-
-export const MosaicWindowContext = {
-  ...MosaicContext,
-  mosaicWindowActions: MosaicWindowActionsPropType,
-};
-
-/*************************************************************
  * Modern context
  */
 
-export const ModernMosaicContext = React.createContext<MosaicContext<MosaicKey>>(undefined!);
-
-export type ModernMosaicWindowContext = Pick<MosaicWindowContext<MosaicKey>, 'mosaicWindowActions'>;
-export const ModernMosaicWindowContext = React.createContext<ModernMosaicWindowContext>(undefined!);
+export const MosaicContext = React.createContext<MosaicContext<MosaicKey>>(undefined!);
+export const MosaicWindowContext = React.createContext<MosaicWindowContext>(undefined!);

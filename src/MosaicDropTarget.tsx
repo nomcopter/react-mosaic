@@ -33,7 +33,7 @@ const dropTarget = {
 };
 
 class MosaicDropTargetClass extends React.PureComponent<Props> {
-  static contextTypes = MosaicContext;
+  static contextType = MosaicContext;
   context!: MosaicContext<any>;
 
   render() {
