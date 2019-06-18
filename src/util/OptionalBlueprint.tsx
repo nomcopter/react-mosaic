@@ -9,6 +9,10 @@ export namespace OptionalBlueprint {
   type IconNames = typeof IconNamesTypeImport;
   let IconNames: IconNames | undefined;
   try {
+    // Webpack is quieter about these errors
+    // https://github.com/nomcopter/react-mosaic/issues/109
+    require.resolve('@blueprintjs/core');
+    require.resolve('@blueprintjs/icons');
     ({ Classes, Icon } = require('@blueprintjs/core'));
     ({ IconNames } = require('@blueprintjs/icons'));
   } catch {
