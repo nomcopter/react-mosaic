@@ -62,8 +62,7 @@ jobs:
       - run:
           name: Publish
           command: |
-            touch .npmrc
-            printf "\n$NPM_REGISTRY_CREDS\n" >> .npmrc
+            npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
             npm publish
 workflows:
   version: 2
