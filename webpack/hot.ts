@@ -59,6 +59,7 @@ const hotConfig = {
     historyApiFallback: true,
     hot: true,
     stats: 'minimal',
+    host: '0.0.0.0',
     port: CONSTANTS.DEV_SERVER_PORT,
     open: true,
   },
