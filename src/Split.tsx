@@ -18,6 +18,7 @@ export interface SplitProps extends EnabledResizeOptions {
 
 export class Split extends React.PureComponent<SplitProps> {
   private rootElement: HTMLDivElement | null = null;
+  private listenersBound = false;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -35,6 +36,7 @@ export class Split extends React.PureComponent<SplitProps> {
         })}
         ref={(el) => (this.rootElement = el)}
         onMouseDown={this.onMouseDown}
+        onTouchStart={this.onMouseDown}
         style={this.computeStyle()}
       >
         <div className="mosaic-split-line" />
@@ -43,9 +45,26 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 
   componentWillUnmount() {
+    this.unbindListeners();
+  }
+
+  private bindListeners() {
+    if (!this.listenersBound) {
+      this.rootElement!.ownerDocument!.addEventListener('mousemove', this.onMouseMove, true);
+      this.rootElement!.ownerDocument!.addEventListener('touchmove', this.onMouseMove, true);
+      this.rootElement!.ownerDocument!.addEventListener('mouseup', this.onMouseUp, true);
+      this.rootElement!.ownerDocument!.addEventListener('touchend', this.onMouseUp, true);
+      this.listenersBound = true;
+    }
+  }
+
+  private unbindListeners() {
     if (this.rootElement) {
       this.rootElement.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
+      this.rootElement.ownerDocument!.removeEventListener('touchmove', this.onMouseMove, true);
       this.rootElement.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
+      this.rootElement.ownerDocument!.removeEventListener('touchend', this.onMouseUp, true);
+      this.listenersBound = false;
     }
   }
 
@@ -59,26 +78,27 @@ export class Split extends React.PureComponent<SplitProps> {
     };
   }
 
-  private onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
-    if (event.button !== 0) {
-      return;
+  private onMouseDown = (event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!isTouchEvent(event)) {
+      if (event.button !== 0) {
+        return;
+      }
     }
 
-    event.preventDefault();
-    this.rootElement!.ownerDocument!.addEventListener('mousemove', this.onMouseMove, true);
-    this.rootElement!.ownerDocument!.addEventListener('mouseup', this.onMouseUp, true);
+    preventDefaultIfMouseEvent(event);
+
+    this.bindListeners();
   };
 
-  private onMouseUp = (event: MouseEvent) => {
-    this.rootElement!.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
-    this.rootElement!.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
+  private onMouseUp = (event: MouseEvent | TouchEvent) => {
+    this.unbindListeners();
 
     const percentage = this.calculateRelativePercentage(event);
     this.props.onRelease!(percentage);
   };
 
-  private onMouseMove = throttle((event: MouseEvent) => {
-    event.preventDefault();
+  private onMouseMove = throttle((event: MouseEvent | TouchEvent) => {
+    preventDefaultIfMouseEvent(event);
     event.stopPropagation();
 
     const percentage = this.calculateRelativePercentage(event);
@@ -87,19 +107,35 @@ export class Split extends React.PureComponent<SplitProps> {
     }
   }, RESIZE_THROTTLE_MS);
 
-  private calculateRelativePercentage(event: MouseEvent): number {
+  private calculateRelativePercentage(event: MouseEvent | TouchEvent): number {
     const { minimumPaneSizePercentage, direction, boundingBox } = this.props;
     const parentBBox = this.rootElement!.parentElement!.getBoundingClientRect();
+    const location = isTouchEvent(event) ? event.changedTouches[0] : event;
 
     let absolutePercentage: number;
     if (direction === 'column') {
-      absolutePercentage = ((event.clientY - parentBBox.top) / parentBBox.height) * 100.0;
+      absolutePercentage = ((location.clientY - parentBBox.top) / parentBBox.height) * 100.0;
     } else {
-      absolutePercentage = ((event.clientX - parentBBox.left) / parentBBox.width) * 100.0;
+      absolutePercentage = ((location.clientX - parentBBox.left) / parentBBox.width) * 100.0;
     }
 
     const relativePercentage = BoundingBox.getRelativeSplitPercentage(boundingBox, absolutePercentage, direction);
 
     return clamp(relativePercentage, minimumPaneSizePercentage!, 100 - minimumPaneSizePercentage!);
+  }
+}
+
+function isTouchEvent<T>(event: MouseEvent | TouchEvent): event is TouchEvent;
+function isTouchEvent<T>(event: React.MouseEvent<T> | React.TouchEvent<T>): event is React.TouchEvent<T>;
+function isTouchEvent(
+  event: MouseEvent | TouchEvent | React.MouseEvent<any> | React.TouchEvent<any>,
+): event is TouchEvent {
+  return (event as TouchEvent).changedTouches != null;
+}
+
+function preventDefaultIfMouseEvent(event: MouseEvent | TouchEvent | React.MouseEvent<any> | React.TouchEvent<any>) {
+  // any cast https://github.com/Microsoft/TypeScript/issues/14107
+  if (!isTouchEvent(event as any)) {
+    event.preventDefault();
   }
 }
