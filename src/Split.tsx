@@ -8,6 +8,11 @@ import { BoundingBox } from './util/BoundingBox';
 
 const RESIZE_THROTTLE_MS = 1000 / 30; // 30 fps
 
+const TOUCH_EVENT_OPTIONS = {
+  capture: true,
+  passive: false,
+};
+
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
   boundingBox: BoundingBox;
@@ -17,7 +22,7 @@ export interface SplitProps extends EnabledResizeOptions {
 }
 
 export class Split extends React.PureComponent<SplitProps> {
-  private rootElement: HTMLDivElement | null = null;
+  private rootElement = React.createRef<HTMLDivElement>();
   private listenersBound = false;
 
   static defaultProps = {
@@ -34,9 +39,8 @@ export class Split extends React.PureComponent<SplitProps> {
           '-row': direction === 'row',
           '-column': direction === 'column',
         })}
-        ref={(el) => (this.rootElement = el)}
+        ref={this.rootElement}
         onMouseDown={this.onMouseDown}
-        onTouchStart={this.onMouseDown}
         style={this.computeStyle()}
       >
         <div className="mosaic-split-line" />
@@ -44,26 +48,33 @@ export class Split extends React.PureComponent<SplitProps> {
     );
   }
 
+  componentDidMount() {
+    this.rootElement.current!.addEventListener('touchstart', this.onMouseDown, TOUCH_EVENT_OPTIONS);
+  }
+
   componentWillUnmount() {
     this.unbindListeners();
+    if (this.rootElement.current) {
+      this.rootElement.current.ownerDocument!.removeEventListener('touchstart', this.onMouseDown, TOUCH_EVENT_OPTIONS);
+    }
   }
 
   private bindListeners() {
     if (!this.listenersBound) {
-      this.rootElement!.ownerDocument!.addEventListener('mousemove', this.onMouseMove, true);
-      this.rootElement!.ownerDocument!.addEventListener('touchmove', this.onMouseMove, true);
-      this.rootElement!.ownerDocument!.addEventListener('mouseup', this.onMouseUp, true);
-      this.rootElement!.ownerDocument!.addEventListener('touchend', this.onMouseUp, true);
+      this.rootElement.current!.ownerDocument!.addEventListener('mousemove', this.onMouseMove, true);
+      this.rootElement.current!.ownerDocument!.addEventListener('touchmove', this.onMouseMove, TOUCH_EVENT_OPTIONS);
+      this.rootElement.current!.ownerDocument!.addEventListener('mouseup', this.onMouseUp, true);
+      this.rootElement.current!.ownerDocument!.addEventListener('touchend', this.onMouseUp, true);
       this.listenersBound = true;
     }
   }
 
   private unbindListeners() {
-    if (this.rootElement) {
-      this.rootElement.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
-      this.rootElement.ownerDocument!.removeEventListener('touchmove', this.onMouseMove, true);
-      this.rootElement.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
-      this.rootElement.ownerDocument!.removeEventListener('touchend', this.onMouseUp, true);
+    if (this.rootElement.current) {
+      this.rootElement.current.ownerDocument!.removeEventListener('mousemove', this.onMouseMove, true);
+      this.rootElement.current.ownerDocument!.removeEventListener('touchmove', this.onMouseMove, TOUCH_EVENT_OPTIONS);
+      this.rootElement.current.ownerDocument!.removeEventListener('mouseup', this.onMouseUp, true);
+      this.rootElement.current.ownerDocument!.removeEventListener('touchend', this.onMouseUp, true);
       this.listenersBound = false;
     }
   }
@@ -78,15 +89,14 @@ export class Split extends React.PureComponent<SplitProps> {
     };
   }
 
-  private onMouseDown = (event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  private onMouseDown = (event: React.MouseEvent<HTMLDivElement> | TouchEvent) => {
     if (!isTouchEvent(event)) {
       if (event.button !== 0) {
         return;
       }
     }
 
-    preventDefaultIfMouseEvent(event);
-
+    event.preventDefault();
     this.bindListeners();
   };
 
@@ -98,7 +108,7 @@ export class Split extends React.PureComponent<SplitProps> {
   };
 
   private onMouseMove = throttle((event: MouseEvent | TouchEvent) => {
-    preventDefaultIfMouseEvent(event);
+    event.preventDefault();
     event.stopPropagation();
 
     const percentage = this.calculateRelativePercentage(event);
@@ -109,7 +119,7 @@ export class Split extends React.PureComponent<SplitProps> {
 
   private calculateRelativePercentage(event: MouseEvent | TouchEvent): number {
     const { minimumPaneSizePercentage, direction, boundingBox } = this.props;
-    const parentBBox = this.rootElement!.parentElement!.getBoundingClientRect();
+    const parentBBox = this.rootElement.current!.parentElement!.getBoundingClientRect();
     const location = isTouchEvent(event) ? event.changedTouches[0] : event;
 
     let absolutePercentage: number;
@@ -125,17 +135,6 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 }
 
-function isTouchEvent<T>(event: MouseEvent | TouchEvent): event is TouchEvent;
-function isTouchEvent<T>(event: React.MouseEvent<T> | React.TouchEvent<T>): event is React.TouchEvent<T>;
-function isTouchEvent(
-  event: MouseEvent | TouchEvent | React.MouseEvent<any> | React.TouchEvent<any>,
-): event is TouchEvent {
+function isTouchEvent(event: MouseEvent | TouchEvent | React.MouseEvent<any>): event is TouchEvent {
   return (event as TouchEvent).changedTouches != null;
-}
-
-function preventDefaultIfMouseEvent(event: MouseEvent | TouchEvent | React.MouseEvent<any> | React.TouchEvent<any>) {
-  // any cast https://github.com/Microsoft/TypeScript/issues/14107
-  if (!isTouchEvent(event as any)) {
-    event.preventDefault();
-  }
 }
