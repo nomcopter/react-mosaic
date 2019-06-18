@@ -13,7 +13,7 @@ export interface MosaicRootProps<T extends MosaicKey> {
 }
 
 export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicRootProps<T>> {
-  static contextTypes = MosaicContext;
+  static contextType = MosaicContext;
   context!: MosaicContext<T>;
 
   render() {

@@ -70,31 +70,33 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
   render() {
     return (
-      <div className="react-mosaic-example-app">
-        {this.renderNavBar()}
-        <Mosaic<number>
-          renderTile={(count, path) => (
-            <MosaicWindow<number>
-              additionalControls={count === 3 ? additionalControls : EMPTY_ARRAY}
-              title={`Window ${count}`}
-              createNode={this.createNode}
-              path={path}
-              onDragStart={() => console.log('MosaicWindow.onDragStart')}
-              onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
-              renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
-            >
-              <div className="example-window">
-                <h1>{`Window ${count}`}</h1>
-              </div>
-            </MosaicWindow>
-          )}
-          zeroStateView={<MosaicZeroState createNode={this.createNode} />}
-          value={this.state.currentNode}
-          onChange={this.onChange}
-          onRelease={this.onRelease}
-          className={THEMES[this.state.currentTheme]}
-        />
-      </div>
+      <React.StrictMode>
+        <div className="react-mosaic-example-app">
+          {this.renderNavBar()}
+          <Mosaic<number>
+            renderTile={(count, path) => (
+              <MosaicWindow<number>
+                additionalControls={count === 3 ? additionalControls : EMPTY_ARRAY}
+                title={`Window ${count}`}
+                createNode={this.createNode}
+                path={path}
+                onDragStart={() => console.log('MosaicWindow.onDragStart')}
+                onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
+                renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
+              >
+                <div className="example-window">
+                  <h1>{`Window ${count}`}</h1>
+                </div>
+              </MosaicWindow>
+            )}
+            zeroStateView={<MosaicZeroState createNode={this.createNode} />}
+            value={this.state.currentNode}
+            onChange={this.onChange}
+            onRelease={this.onRelease}
+            className={THEMES[this.state.currentTheme]}
+          />
+        </div>
+      </React.StrictMode>
     );
   }
 
