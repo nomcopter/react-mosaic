@@ -87,9 +87,5 @@ export interface MosaicWindowActions {
   connectDragSource: (connectedElements: React.ReactElement<any>) => React.ReactElement | null;
 }
 
-/*************************************************************
- * Modern context
- */
-
 export const MosaicContext = React.createContext<MosaicContext<MosaicKey>>(undefined!);
 export const MosaicWindowContext = React.createContext<MosaicWindowContext>(undefined!);

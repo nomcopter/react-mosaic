@@ -15,8 +15,8 @@ The best way to see it is a simple [**Demo**](https://nomcopter.github.io/react-
 
 ## Usage
 
-The core of react-mosaic's operations revolve around the simple binary tree [specified by `MosaicNode<T>`](./src/types.ts#L27).
-[`T`](./src/types.ts#L22) is the type of the leaves of the tree and is a `string` or a `number` that can be resolved to a `JSX.Element` for display.
+The core of react-mosaic's operations revolve around the simple binary tree [specified by `MosaicNode<T>`](./src/types.ts#L12).
+[`T`](./src/types.ts#L7) is the type of the leaves of the tree and is a `string` or a `number` that can be resolved to a `JSX.Element` for display.
 
 ### Installation
 
@@ -93,7 +93,7 @@ export const app = (
 `renderTile` is a stateless lookup function to convert `T` into a displayable `JSX.Element`.
 By default `T` is `string` (so to render one element `initialValue="ID"` works).
 `T`s must be unique within an instance of `Mosaic`, they are used as keys for [React list management](https://reactjs.org/docs/lists-and-keys.html).
-`initialValue` is a [`MosaicNode<T>`](./src/types.ts#L27).
+`initialValue` is a [`MosaicNode<T>`](./src/types.ts#L12).
 
 The user can resize these panes but there is no other advanced functionality.
 This example renders a simple tiled interface with one element on the left half, and two stacked elements on the right half.
@@ -357,20 +357,7 @@ export interface MosaicWindowActions {
 }
 ```
 
-To access the functions on context simply specify `contextTypes` on your component.
-
-```tsx
-class RemoveButton extends React.PureComponent<Props> {
-  static contextTypes = MosaicWindowContext;
-  context: MosaicWindowContext<TileId>;
-
-  render() {
-    return <button onClick={this.remove}>╳</button>;
-  }
-
-  private remove = () => this.context.mosaicActions.remove(this.context.mosaicWindowActions.getPath());
-}
-```
+To access the functions on context simply use a [`Context.Consumer`](https://reactjs.org/docs/context.html#contextconsumer).
 
 ### Mutating the Tree
 
@@ -379,27 +366,9 @@ Utilities are provided for working with the MosaicNode tree in [`mosaicUtilities
 
 #### MosaicUpdate
 
-[`MosaicUpdateSpec`](./src/types.ts#L48) is an argument meant to be passed to [`immutability-helper`](https://github.com/kolodny/immutability-helper)
+[`MosaicUpdateSpec`](./src/types.ts#L33) is an argument meant to be passed to [`immutability-helper`](https://github.com/kolodny/immutability-helper)
 to modify the state at a path.
 [`mosaicUpdates`](src/util/mosaicUpdates.ts) has examples.
-
-```
-/**
- * Used by many utility methods to update the tree.
- * spec will be passed to https://github.com/kolodny/immutability-helper
- */
-export interface MosaicUpdateSpec<T extends MosaicKey> {
-    $set?: MosaicNode<T>;
-    splitPercentage?: {
-        $set: number | null;
-    };
-    direction?: {
-        $set: MosaicDirection;
-    }
-    first?: MosaicUpdateSpec<T>;
-    second?: MosaicUpdateSpec<T>;
-}
-```
 
 ## Upgrade Considerations / Changelog
 
