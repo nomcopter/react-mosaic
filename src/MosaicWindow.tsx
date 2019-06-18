@@ -148,21 +148,14 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   }
 
   private renderToolbar() {
-    const {
-      title,
-      draggable,
-      additionalControls,
-      additionalControlButtonText,
-      connectDragSource,
-      path,
-      renderToolbar,
-    } = this.props;
+    const { title, draggable, additionalControls, additionalControlButtonText, path, renderToolbar } = this.props;
     const { additionalControlsOpen } = this.state;
     const toolbarControls = this.getToolbarControls();
     const draggableAndNotRoot = draggable && path.length > 0;
+    const connectIfDraggable = draggableAndNotRoot ? this.props.connectDragSource : (el: React.ReactElement) => el;
 
     if (renderToolbar) {
-      const connectedToolbar = connectDragSource(renderToolbar(this.props, draggable)) as React.ReactElement<any>;
+      const connectedToolbar = connectIfDraggable(renderToolbar(this.props, draggable)) as React.ReactElement<any>;
       return (
         <div className={classNames('mosaic-window-toolbar', { draggable: draggableAndNotRoot })}>
           {connectedToolbar}
@@ -170,15 +163,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       );
     }
 
-    let titleDiv: React.ReactElement<any> = (
+    const titleDiv = connectIfDraggable(
       <div title={title} className="mosaic-window-title">
         {title}
-      </div>
-    );
-
-    if (draggableAndNotRoot) {
-      titleDiv = connectDragSource(titleDiv) as React.ReactElement<any>;
-    }
+      </div>,
+    )!;
 
     const hasAdditionalControls = !isEmpty(additionalControls);
 
