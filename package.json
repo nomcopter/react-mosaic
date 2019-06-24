@@ -13,7 +13,7 @@
   "scripts": {
     "build": "npm-run-all clean -lp build:**",
     "build:ts": "tsc -p tsconfig-build.json",
-    "build:less": "lessc --source-map styles/index.less react-mosaic-component.css",
+    "build:less": "lessc --autoprefix=defaults --source-map styles/index.less react-mosaic-component.css",
     "bundle": "rm -rf docs/ && webpack --config webpack/bundle.ts",
     "clean": "rm -rf lib/",
     "start": "webpack-dev-server --config webpack/hot.ts",
@@ -52,6 +52,7 @@
     "jsdom-global": "^3.0.2",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
+    "less-plugin-autoprefix": "^2.0.0",
     "mocha": "^6.1.4",
     "mocha-junit-reporter": "^1.23.0",
     "npm-run-all": "^4.1.5",
