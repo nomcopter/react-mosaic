@@ -357,7 +357,8 @@ export interface MosaicWindowActions {
 }
 ```
 
-To access the functions on context simply use a [`Context.Consumer`](https://reactjs.org/docs/context.html#contextconsumer).
+To access the functions simply use the [`MosaicContext`](./src/contextTypes.ts#L90)
+or [`MosaicWindowContext`](./src/contextTypes.ts#L91) [context consumers](https://reactjs.org/docs/context.html#contextconsumer).
 
 ### Mutating the Tree
 
