@@ -71,7 +71,7 @@
     "tslint-react": "^3.6.0",
     "typescript": "~3.5.2",
     "webpack": "^3.12.0",
-    "webpack-dev-server": "^2.11.5"
+    "webpack-dev-server": "^3.1.11"
   },
   "dependencies": {
     "classnames": "^2.2.6",
