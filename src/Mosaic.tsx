@@ -1,12 +1,12 @@
 import classNames from 'classnames';
-import { BackendFactory } from 'dnd-core';
+// import { BackendFactory } from 'dnd-core';
 import countBy from 'lodash/countBy';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
-import { DragDropContext } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import MultiBackend from 'react-dnd-multi-backend';
-import HTML5toTouch from 'react-dnd-multi-backend/lib/HTML5toTouch';
+import HTML5toTouch from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
 
 import { MosaicContext, MosaicRootActions } from './contextTypes';
@@ -110,12 +110,14 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     const { className } = this.props;
 
     return (
-      <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
-        <div className={classNames(className, 'mosaic mosaic-drop-target')}>
-          {this.renderTree()}
-          <RootDropTargets />
-        </div>
-      </MosaicContext.Provider>
+      <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+        <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+          <div className={classNames(className, 'mosaic mosaic-drop-target')}>
+            {this.renderTree()}
+            <RootDropTargets />
+          </div>
+        </MosaicContext.Provider>
+      </DndProvider>
     );
   }
 
@@ -197,5 +199,5 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 }
 
-@(DragDropContext(MultiBackend(HTML5toTouch) as BackendFactory) as ClassDecorator)
+// @(DragDropContext(MultiBackend(HTML5toTouch) as BackendFactory) as ClassDecorator)
 export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {}
