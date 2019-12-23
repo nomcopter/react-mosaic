@@ -6,7 +6,7 @@ import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import MultiBackend from 'react-dnd-multi-backend';
-import HTML5toTouch from 'react-dnd-html5-backend';
+import HTML5Backend from 'react-dnd-html5-backend';
 import { v4 as uuid } from 'uuid';
 
 import { MosaicContext, MosaicRootActions } from './contextTypes';
@@ -108,9 +108,16 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
 
   render() {
     const { className } = this.props;
+    const HTML5WithTouch = {
+      backends: [
+        {
+          backend: HTML5Backend
+        }
+      ]
+    }
 
     return (
-      <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+      <DndProvider backend={MultiBackend} options={HTML5WithTouch}>
         <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
           <div className={classNames(className, 'mosaic mosaic-drop-target')}>
             {this.renderTree()}
