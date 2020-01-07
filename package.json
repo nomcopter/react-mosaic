@@ -1,6 +1,6 @@
 {
   "name": "react-mosaic-component-tcn-fork",
-  "version": "3.2.3",
+  "version": "3.2.1",
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
   "main": "lib/index.js",

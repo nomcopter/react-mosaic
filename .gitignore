@@ -1,6 +1,5 @@
 .idea/
 node_modules/
-/react-mosaic-component.css*
 .*.swp
 react-mosaic.tar.bz2
 npm-debug.log
