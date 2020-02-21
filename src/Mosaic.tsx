@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-// import { BackendFactory } from 'dnd-core';
 import countBy from 'lodash/countBy';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
@@ -18,6 +17,14 @@ import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } 
 import { getLeaves } from './util/mosaicUtilities';
 
 const DEFAULT_EXPAND_PERCENTAGE = 70;
+
+const DND_BACKENDS = {
+  backends: [
+    {
+      backend: HTML5Backend,
+    },
+  ],
+};
 
 export interface MosaicBaseProps<T extends MosaicKey> {
   /**
@@ -108,23 +115,14 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
 
   render() {
     const { className } = this.props;
-    const HTML5WithTouch = {
-      backends: [
-        {
-          backend: HTML5Backend,
-        },
-      ],
-    };
 
     return (
-      <DndProvider backend={MultiBackend} options={HTML5WithTouch}>
-        <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
-          <div className={classNames(className, 'mosaic mosaic-drop-target')}>
-            {this.renderTree()}
-            <RootDropTargets />
-          </div>
-        </MosaicContext.Provider>
-      </DndProvider>
+      <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+        <div className={classNames(className, 'mosaic mosaic-drop-target')}>
+          {this.renderTree()}
+          <RootDropTargets />
+        </div>
+      </MosaicContext.Provider>
     );
   }
 
@@ -206,5 +204,12 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 }
 
-// @(DragDropContext(MultiBackend(HTML5toTouch) as BackendFactory) as ClassDecorator)
-export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {}
+export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {
+  render() {
+    return (
+      <DndProvider backend={MultiBackend} options={DND_BACKENDS}>
+        {super.render()}
+      </DndProvider>
+    );
+  }
+}
