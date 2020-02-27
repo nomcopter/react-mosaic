@@ -204,11 +204,11 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 }
 
-export class Mosaic<T extends MosaicKey = string> extends MosaicWithoutDragDropContext<T> {
+export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<MosaicProps<T>> {
   render() {
     return (
       <DndProvider backend={MultiBackend} options={DND_BACKENDS}>
-        {super.render()}
+        <MosaicWithoutDragDropContext<T> {...this.props} />
       </DndProvider>
     );
   }
