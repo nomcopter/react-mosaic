@@ -4,8 +4,8 @@ import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import MultiBackend from 'react-dnd-multi-backend';
+import HTML5ToTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch';
 import { v4 as uuid } from 'uuid';
 
 import { MosaicContext, MosaicRootActions } from './contextTypes';
@@ -17,14 +17,6 @@ import { createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree } 
 import { getLeaves } from './util/mosaicUtilities';
 
 const DEFAULT_EXPAND_PERCENTAGE = 70;
-
-const DND_BACKENDS = {
-  backends: [
-    {
-      backend: HTML5Backend,
-    },
-  ],
-};
 
 export interface MosaicBaseProps<T extends MosaicKey> {
   /**
@@ -207,7 +199,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
 export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<MosaicProps<T>> {
   render() {
     return (
-      <DndProvider backend={MultiBackend} options={DND_BACKENDS}>
+      <DndProvider backend={MultiBackend} options={HTML5ToTouch}>
         <MosaicWithoutDragDropContext<T> {...this.props} />
       </DndProvider>
     );
