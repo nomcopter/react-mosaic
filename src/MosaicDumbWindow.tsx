@@ -3,28 +3,19 @@ import defer from 'lodash/defer';
 import dropRight from 'lodash/dropRight';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
-import values from 'lodash/values';
 import React from 'react';
-import {
-  ConnectDragPreview,
-  ConnectDragSource,
-  ConnectDropTarget,
-  DragSource,
-  DragSourceMonitor,
-  DropTarget,
-} from 'react-dnd';
+import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceMonitor } from 'react-dnd';
 
 import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
 import { MosaicContext, MosaicWindowContext } from './contextTypes';
-import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
-import { MosaicDropTarget } from './MosaicDropTarget';
+import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { CreateNode, MosaicBranch, MosaicDirection, MosaicDragType, MosaicKey } from './types';
 import { createDragToUpdates } from './util/mosaicUpdates';
 import { getAndAssertNodeAtPathExists } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
 
-export interface MosaicWindowProps<T extends MosaicKey> {
+export interface MosaicDumbWindowProps<T extends MosaicKey> {
   title: string;
   path: MosaicBranch[];
   className?: string;
@@ -33,37 +24,29 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   additionalControlButtonText?: string;
   draggable?: boolean;
   createNode?: CreateNode<T>;
-  renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
-  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
+  renderPreview?: (props: MosaicDumbWindowProps<T>) => JSX.Element;
+  renderToolbar?: ((props: MosaicDumbWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
   onDragStart?: () => void;
   onDragEnd?: (type: 'drop' | 'reset') => void;
-  tabId?: string;
 }
 
-export interface InternalDragSourceProps {
+export interface InternalNestedDragSourceProps {
   connectDragSource: ConnectDragSource;
   connectDragPreview: ConnectDragPreview;
 }
 
-export interface InternalDropTargetProps {
-  connectDropTarget: ConnectDropTarget;
-  isOver: boolean;
-  draggedMosaicId: string | undefined;
-}
+export type InternalMosaicDumbWindowProps<T extends MosaicKey> = MosaicDumbWindowProps<T> &
+  InternalNestedDragSourceProps;
 
-export type InternalMosaicWindowProps<T extends MosaicKey> = MosaicWindowProps<T> &
-  InternalDropTargetProps &
-  InternalDragSourceProps;
-
-export interface InternalMosaicWindowState {
+export interface InternalMosaicDumbWindowState {
   additionalControlsOpen: boolean;
 }
 
-export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
-  InternalMosaicWindowProps<T>,
-  InternalMosaicWindowState
+export class InternalMosaicDumbWindow<T extends MosaicKey> extends React.Component<
+  InternalMosaicDumbWindowProps<T>,
+  InternalMosaicDumbWindowState
 > {
-  static defaultProps: Partial<InternalMosaicWindowProps<any>> = {
+  static defaultProps: Partial<InternalMosaicDumbWindowProps<any>> = {
     additionalControlButtonText: 'More',
     draggable: true,
     renderPreview: ({ title }) => (
@@ -82,43 +65,29 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   static contextType = MosaicContext;
   context!: MosaicContext<T>;
 
-  state: InternalMosaicWindowState = {
+  state: InternalMosaicDumbWindowState = {
     additionalControlsOpen: false,
   };
 
   private rootElement: HTMLElement | null = null;
 
   render() {
-    const {
-      className,
-      isOver,
-      renderPreview,
-      additionalControls,
-      connectDropTarget,
-      connectDragPreview,
-      draggedMosaicId,
-    } = this.props;
+    const { className, renderPreview, additionalControls, connectDragPreview } = this.props;
 
     return (
       <MosaicWindowContext.Provider value={this.childContext}>
-        {connectDropTarget(
-          <div
-            className={classNames('mosaic-window mosaic-drop-target', className, {
-              'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
-              'additional-controls-open': this.state.additionalControlsOpen,
-            })}
-            ref={(element) => (this.rootElement = element)}
-          >
-            {this.renderToolbar()}
-            <div className="mosaic-window-body">{this.props.children!}</div>
-            <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
-            <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
-            {connectDragPreview(renderPreview!(this.props))}
-            <div className="drop-target-container">
-              {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(this.renderDropTarget)}
-            </div>
-          </div>,
-        )}
+        <div
+          className={classNames('mosaic-window', className, {
+            'additional-controls-open': this.state.additionalControlsOpen,
+          })}
+          ref={(element) => (this.rootElement = element)}
+        >
+          {this.renderToolbar()}
+          <div className="mosaic-window-body">{this.props.children!}</div>
+          <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
+          <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
+          {connectDragPreview(renderPreview!(this.props))}
+        </div>
       </MosaicWindowContext.Provider>
     );
   }
@@ -183,12 +152,6 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     );
   }
 
-  private renderDropTarget = (position: MosaicDropTargetPosition) => {
-    const { path, tabId } = this.props;
-
-    return <MosaicDropTarget position={position} path={path} key={position} tabId={tabId} />;
-  };
-
   private checkCreateNode() {
     if (this.props.createNode == null) {
       throw new Error('Operation invalid unless `createNode` is defined');
@@ -244,9 +207,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
 
 const dragSource = {
   beginDrag: (
-    props: InternalMosaicWindowProps<any>,
+    props: InternalMosaicDumbWindowProps<any>,
     _monitor: DragSourceMonitor,
-    component: InternalMosaicWindow<any>,
+    component: InternalMosaicDumbWindow<any>,
   ): MosaicDragItem => {
     if (props.onDragStart) {
       props.onDragStart();
@@ -260,9 +223,9 @@ const dragSource = {
     };
   },
   endDrag: (
-    props: InternalMosaicWindowProps<any>,
+    props: InternalMosaicDumbWindowProps<any>,
     monitor: DragSourceMonitor,
-    component: InternalMosaicWindow<any>,
+    component: InternalMosaicDumbWindow<any>,
   ) => {
     const { hideTimer } = monitor.getItem() as MosaicDragItem;
     // If the hide call hasn't happened yet, cancel it
@@ -296,30 +259,18 @@ const dragSource = {
   },
 };
 
-const dropTarget = {};
-
 // Each step exported here just to keep react-hot-loader happy
-export const SourceConnectedInternalMosaicWindow = DragSource(
+export const SourceConnectedInternalMosaicDumbWindow = DragSource(
   MosaicDragType.WINDOW,
   dragSource,
-  (connect, _monitor): InternalDragSourceProps => ({
+  (connect, _monitor): InternalNestedDragSourceProps => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
   }),
-)(InternalMosaicWindow);
+)(InternalMosaicDumbWindow);
 
-export const SourceDropConnectedInternalMosaicWindow = DropTarget(
-  MosaicDragType.WINDOW,
-  dropTarget,
-  (connect, monitor): InternalDropTargetProps => ({
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-    draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
-  }),
-)(SourceConnectedInternalMosaicWindow as any);
-
-export class MosaicWindow<T extends MosaicKey = string> extends React.PureComponent<MosaicWindowProps<T>> {
+export class MosaicDumbWindow<T extends MosaicKey = string> extends React.PureComponent<MosaicDumbWindowProps<T>> {
   render() {
-    return <SourceDropConnectedInternalMosaicWindow {...(this.props as InternalMosaicWindowProps<T>)} />;
+    return <SourceConnectedInternalMosaicDumbWindow {...(this.props as InternalMosaicDumbWindowProps<T>)} />;
   }
 }

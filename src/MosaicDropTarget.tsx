@@ -9,6 +9,7 @@ import { MosaicDragType, MosaicPath } from './types';
 export interface MosaicDropTargetProps {
   position: MosaicDropTargetPosition;
   path: MosaicPath;
+  tabId?: string;
 }
 
 interface DropTargetProps {
@@ -25,6 +26,7 @@ const dropTarget = {
       return {
         path: props.path,
         position: props.position,
+        tabId: props.tabId,
       };
     } else {
       return {};

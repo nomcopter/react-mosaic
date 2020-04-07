@@ -11,6 +11,7 @@ export const MosaicDropTargetPosition = {
 export interface MosaicDropData {
   path?: MosaicPath;
   position?: MosaicDropTargetPosition;
+  tabId?: string;
 }
 
 export interface MosaicDragItem {
