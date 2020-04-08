@@ -28,6 +28,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
      * default: Simple NonIdealState view
      */
     zeroStateView?: JSX.Element;
+    /**
+     * For reducing the drop target area.
+     */
+    removeRootDropTarget?: boolean;
 }
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
     /**
