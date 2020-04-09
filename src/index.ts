@@ -52,6 +52,7 @@ export {
   getOtherDirection,
   getPathToCorner,
   isParent,
+  getPathFromNode,
 } from './util/mosaicUtilities';
 export { MosaicWindow, MosaicWindowProps } from './MosaicWindow';
 export { MosaicDumbWindow, MosaicDumbWindowProps } from './MosaicDumbWindow';

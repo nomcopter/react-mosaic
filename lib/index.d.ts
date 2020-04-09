@@ -18,7 +18,7 @@ export { Mosaic, MosaicProps, MosaicUncontrolledProps, MosaicControlledProps, Mo
 export { MosaicNode, MosaicDragType, MosaicDirection, MosaicBranch, CreateNode, MosaicParent, MosaicPath, MosaicUpdate, MosaicUpdateSpec, TileRenderer, } from './types';
 export { MosaicContext, MosaicRootActions, MosaicWindowActions, MosaicWindowContext } from './contextTypes';
 export { buildSpecFromUpdate, createDragToUpdates, createExpandUpdate, createHideUpdate, createRemoveUpdate, updateTree, } from './util/mosaicUpdates';
-export { createBalancedTreeFromLeaves, Corner, getAndAssertNodeAtPathExists, getLeaves, getNodeAtPath, getOtherBranch, getOtherDirection, getPathToCorner, isParent, } from './util/mosaicUtilities';
+export { createBalancedTreeFromLeaves, Corner, getAndAssertNodeAtPathExists, getLeaves, getNodeAtPath, getOtherBranch, getOtherDirection, getPathToCorner, isParent, getPathFromNode, } from './util/mosaicUtilities';
 export { MosaicWindow, MosaicWindowProps } from './MosaicWindow';
 export { MosaicDumbWindow, MosaicDumbWindowProps } from './MosaicDumbWindow';
 export { createDefaultToolbarButton, MosaicButtonProps } from './buttons/MosaicButton';
