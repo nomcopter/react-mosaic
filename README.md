@@ -198,6 +198,7 @@ export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBasePr
    */
   value: MosaicNode<T> | null;
   onChange: (newNode: MosaicNode<T> | null) => void;
+  mosaicId?: string
 }
 
 export interface MosaicUncontrolledProps<T extends MosaicKey> extends MosaicBaseProps<T> {

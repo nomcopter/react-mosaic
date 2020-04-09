@@ -37,6 +37,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
   onDragStart?: () => void;
   onDragEnd?: (type: 'drop' | 'reset') => void;
+  tabId?: string;
 }
 
 export interface InternalDragSourceProps {
@@ -183,9 +184,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   }
 
   private renderDropTarget = (position: MosaicDropTargetPosition) => {
-    const { path } = this.props;
+    const { path, tabId } = this.props;
 
-    return <MosaicDropTarget position={position} path={path} key={position} />;
+    return <MosaicDropTarget position={position} path={path} key={position} tabId={tabId} />;
   };
 
   private checkCreateNode() {

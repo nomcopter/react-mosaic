@@ -46,6 +46,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Simple NonIdealState view
    */
   zeroStateView?: JSX.Element;
+  /**
+   * For reducing the drop target area.
+   */
+  removeRootDropTarget?: boolean;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
@@ -54,6 +58,7 @@ export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBasePr
    */
   value: MosaicNode<T> | null;
   onChange: (newNode: MosaicNode<T> | null) => void;
+  mosaicId?: string;
 }
 
 export interface MosaicUncontrolledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
@@ -96,6 +101,12 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
       };
     }
 
+    if (!isUncontrolled(nextProps) && nextProps.mosaicId !== prevState.mosaicId && nextProps.mosaicId) {
+      return {
+        mosaicId: nextProps.mosaicId,
+      };
+    }
+
     return null;
   }
 
@@ -106,13 +117,14 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   };
 
   render() {
-    const { className } = this.props;
-
+    const { className, removeRootDropTarget } = this.props;
     return (
-      <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+      <MosaicContext.Provider
+        value={{ mosaicId: this.state.mosaicId, mosaicActions: this.actions } as MosaicContext<any>}
+      >
         <div className={classNames(className, 'mosaic mosaic-drop-target')}>
           {this.renderTree()}
-          <RootDropTargets />
+          {removeRootDropTarget ? null : <RootDropTargets />}
         </div>
       </MosaicContext.Provider>
     );
@@ -165,11 +177,6 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
           },
         },
       ]),
-  };
-
-  private readonly childContext: MosaicContext<T> = {
-    mosaicActions: this.actions,
-    mosaicId: this.state.mosaicId,
   };
 
   private renderTree() {
