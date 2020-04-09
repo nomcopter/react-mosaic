@@ -57,3 +57,10 @@ export declare function getNodeAtPath<T extends MosaicKey>(tree: MosaicNode<T> |
  * @returns {MosaicNode<T>}
  */
 export declare function getAndAssertNodeAtPathExists<T extends MosaicKey>(tree: MosaicNode<T> | null, path: MosaicPath): MosaicNode<T>;
+/**
+ * Traverses `tree` to find the path to the specified `node`
+ * @param node
+ * @param tree
+ * @returns {MosaicPath}
+ */
+export declare function getPathFromNode<T extends MosaicKey>(node: T, tree: MosaicNode<T> | null, path?: MosaicPath): MosaicPath;

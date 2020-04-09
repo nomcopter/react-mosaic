@@ -170,3 +170,33 @@ export function getAndAssertNodeAtPathExists<T extends MosaicKey>(
   }
   return node;
 }
+
+/**
+ * Traverses `tree` to find the path to the specified `node`
+ * @param node
+ * @param tree
+ * @returns {MosaicPath}
+ */
+export function getPathFromNode<T extends MosaicKey>(
+  node: T,
+  tree: MosaicNode<T> | null,
+  path: MosaicPath = [],
+): MosaicPath {
+  let currentNode: MosaicNode<any> = tree;
+  if (isParent(currentNode)) {
+    const first = getPathFromNode(node, currentNode.first, [...path, 'first']);
+    if (first.length) {
+      return first;
+    }
+    const second = getPathFromNode(node, currentNode.second, [...path, 'second']);
+    if (second.length) {
+      return second;
+    }
+  }
+
+  if (currentNode === node) {
+    return path;
+  }
+
+  return [];
+}

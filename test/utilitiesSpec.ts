@@ -11,6 +11,7 @@ import {
   getLeaves,
   getPathToCorner,
   isParent,
+  getPathFromNode,
 } from '../src/util/mosaicUtilities';
 
 const ROOT_ONLY_TREE: MosaicNode<number> = 1;
@@ -141,6 +142,14 @@ describe('mosaicUtilities', () => {
     it('should get bottom right', () => {
       const path = getPathToCorner(MEDIUM_TREE, Corner.BOTTOM_RIGHT);
       expect(getNodeAtPath(MEDIUM_TREE, path)).to.equal(4);
+    });
+  });
+  describe('getPathFromNode', () => {
+    it('should get a node based on id', () => {
+      expect(getNodeAtPath(MEDIUM_TREE, getPathFromNode(1, MEDIUM_TREE))).to.equal(1);
+      expect(getNodeAtPath(MEDIUM_TREE, getPathFromNode(2, MEDIUM_TREE))).to.equal(2);
+      expect(getNodeAtPath(MEDIUM_TREE, getPathFromNode(3, MEDIUM_TREE))).to.equal(3);
+      expect(getNodeAtPath(MEDIUM_TREE, getPathFromNode(4, MEDIUM_TREE))).to.equal(4);
     });
   });
 });
