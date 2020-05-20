@@ -1,12 +1,14 @@
 {
   "name": "react-mosaic-component",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "style": "lib/react-mosaic.css",
   "typings": "lib/index.d.ts",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/nomcopter/react-mosaic.git"
