@@ -6,7 +6,7 @@
   "main": "lib/index.js",
   "style": "lib/react-mosaic.css",
   "typings": "lib/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": ["*.css"],
   "repository": {
     "type": "git",
     "url": "https://github.com/nomcopter/react-mosaic.git"
