@@ -14,7 +14,7 @@ import {
   DropTarget,
 } from 'react-dnd';
 
-import { DEFAULT_CONTROLS_WITH_CREATION, DEFAULT_CONTROLS_WITHOUT_CREATION } from './buttons/defaultToolbarControls';
+import { DEFAULT_CONTROLS_WITHOUT_CREATION, DEFAULT_CONTROLS_WITH_CREATION } from './buttons/defaultToolbarControls';
 import { Separator } from './buttons/Separator';
 import { MosaicContext, MosaicWindowContext } from './contextTypes';
 import { MosaicDragItem, MosaicDropData, MosaicDropTargetPosition } from './internalTypes';
