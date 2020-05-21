@@ -46,6 +46,12 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Simple NonIdealState view
    */
   zeroStateView?: JSX.Element;
+  /**
+   * Override the mosaicId passed to `react-dnd` to control how drag and drop works with other components
+   * Note: does not support updating after instantiation
+   * default: Random UUID
+   */
+  mosaicId?: string;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
@@ -89,6 +95,10 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     nextProps: Readonly<MosaicProps<MosaicKey>>,
     prevState: MosaicState<MosaicKey>,
   ): Partial<MosaicState<MosaicKey>> | null {
+    if (nextProps.mosaicId && prevState.mosaicId !== nextProps.mosaicId && process.env.NODE_ENV !== 'production') {
+      throw new Error('Mosaic does not support updating the mosaicId after instantiation');
+    }
+
     if (isUncontrolled(nextProps) && nextProps.initialValue !== prevState.lastInitialValue) {
       return {
         lastInitialValue: nextProps.initialValue,
@@ -102,7 +112,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   state: MosaicState<T> = {
     currentNode: null,
     lastInitialValue: null,
-    mosaicId: uuid(),
+    mosaicId: this.props.mosaicId ?? uuid(),
   };
 
   render() {

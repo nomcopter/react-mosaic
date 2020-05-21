@@ -8,12 +8,18 @@ extends:
 linterOptions:
   format: stylish
 rules:
+  curly: true
   interface-name:
     options:
       - never-prefix
   member-access: false
   member-ordering: false
   object-literal-sort-keys: false
+  ordered-imports:
+    options:
+      import-sources-order: case-insensitive
+      module-source-path: full
+      named-imports-order: case-insensitive
   prettier: true
   no-namespace: false
   variable-name:

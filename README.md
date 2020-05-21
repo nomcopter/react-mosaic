@@ -193,6 +193,12 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Simple NonIdealState view
    */
   zeroStateView?: JSX.Element;
+  /**
+   * Override the mosaicId passed to `react-dnd` to control how drag and drop works with other components
+   * Note: does not support updating after instantiation
+   * default: Random UUID
+   */
+  mosaicId?: string;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
