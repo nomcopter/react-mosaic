@@ -199,6 +199,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Random UUID
    */
   mosaicId?: string;
+  /**
+   * Override the react-dnd provider to allow applications to inject an existing drag and drop context
+   */
+  dragAndDropManager?: DragDropManager | undefined;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
