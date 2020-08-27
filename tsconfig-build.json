@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "lib",
+    "outDir": "dist/cjs",
     "rootDir": "src"
   },
   "exclude": [
