@@ -4,7 +4,7 @@
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
   "main": "dist/cjs/index.js",
-  "style": "dist/styles/react-mosaic.css",
+  "style": "dist/styles/theme.css",
   "typings": "dist/esm/index.d.ts",
   "module": "dist/esm/index.js",
   "sideEffects": [
@@ -18,8 +18,7 @@
     "build": "npm-run-all clean -lp build:**",
     "build:ts": "tsc -p tsconfig-build.json",
     "build:ts-esm": "tsc -p tsconfig-esm-build.json",
-    "build:less": "lessc --autoprefix=defaults --source-map styles/index.less dist/styles/minimal-theme.css",
-    "build:less-themed": "lessc --autoprefix=defaults --source-map styles/blueprint-theme.less dist/styles/blueprint-theme.css",
+    "build:less": "lessc --autoprefix=defaults --source-map styles/index.less dist/styles/theme.css",
     "bundle": "rm -rf docs/ && webpack --config webpack/bundle.ts",
     "clean": "rm -rf dist/",
     "start": "webpack-dev-server --config webpack/hot.ts",
