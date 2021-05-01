@@ -1,38 +1,29 @@
-import { Classes as ClassesImport, IIconProps } from '@blueprintjs/core';
-import { IconNames as IconNamesTypeImport } from '@blueprintjs/icons';
+import type { Classes } from '@blueprintjs/core';
+import type { IconNames } from '@blueprintjs/icons';
+import classNames from 'classnames';
+import _ from 'lodash';
 import * as React from 'react';
 
 export namespace OptionalBlueprint {
-  type Classes = typeof ClassesImport;
-  let Classes: Classes | undefined;
-  export let Icon: React.ReactType<IIconProps>;
-  type IconNames = typeof IconNamesTypeImport;
-  let IconNames: IconNames | undefined;
-  try {
-    // Webpack is quieter about these errors
-    // https://github.com/nomcopter/react-mosaic/issues/109
-    require.resolve('@blueprintjs/core');
-    require.resolve('@blueprintjs/icons');
-    ({ Classes, Icon } = require('@blueprintjs/core'));
-    ({ IconNames } = require('@blueprintjs/icons'));
-  } catch {
-    Icon = ({ icon }: IIconProps) => <span>{icon}</span>;
-  }
+  const BP_NAMESPACE = 'bp3';
+  export const Icon = ({
+    icon,
+    className,
+    size = 'standard',
+  }: {
+    icon: keyof typeof IconNames;
+    className?: string;
+    size?: 'standard' | 'large';
+  }) => <span className={classNames(className, getIconClass(icon), `${BP_NAMESPACE}-icon-${size}`)} />;
 
-  type BlueprintClass = { [K in keyof Classes]: Classes[K] extends string ? K : never }[keyof Classes];
+  type BlueprintClass = {
+    [K in keyof typeof Classes]: typeof Classes[K] extends string ? K : never;
+  }[keyof typeof Classes];
   export function getClasses(...names: BlueprintClass[]): string {
-    if (Classes) {
-      return names.map((name) => Classes![name]).join(' ');
-    }
-
-    return '';
+    return names.map((name) => `${BP_NAMESPACE}-${_.kebabCase(name)}`).join(' ');
   }
 
-  export function getIconClass(iconName: keyof IconNames): string {
-    if (Classes && IconNames) {
-      return Classes.iconClass(IconNames[iconName]);
-    }
-
-    return '';
+  export function getIconClass(iconName: keyof typeof IconNames): string {
+    return `${BP_NAMESPACE}-icon-${_.kebabCase(iconName)}`;
   }
 }

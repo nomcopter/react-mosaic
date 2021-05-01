@@ -18,7 +18,7 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
     return (
       <div className={classNames('mosaic-zero-state', OptionalBlueprint.getClasses('NON_IDEAL_STATE'))}>
         <div className={OptionalBlueprint.getClasses('NON_IDEAL_STATE_VISUAL')}>
-          <OptionalBlueprint.Icon iconSize={120} icon="applications" />
+          <OptionalBlueprint.Icon className="default-zero-state-icon" size="large" icon="APPLICATIONS" />
         </div>
         <h4 className={OptionalBlueprint.getClasses('HEADING')}>No Windows Present</h4>
         <div>

@@ -72,7 +72,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
         </div>
         <div className="mosaic-window-body">
           <h4>{title}</h4>
-          <OptionalBlueprint.Icon iconSize={72} icon="application" />
+          <OptionalBlueprint.Icon className="default-preview-icon" size="large" icon="APPLICATION" />
         </div>
       </div>
     ),
