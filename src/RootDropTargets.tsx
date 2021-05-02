@@ -36,21 +36,18 @@ function useDelayedTrue(currentValue: boolean, delay: number): boolean {
     setCounter((count) => count + 1);
   };
 
+  if (!currentValue) {
+    delayedRef.current = false;
+  }
+
   React.useEffect(() => {
-    if (delayedRef.current === currentValue) {
+    if (delayedRef.current === currentValue || !currentValue) {
       return;
     }
 
-    let timer: number | undefined;
-    if (currentValue) {
-      timer = window.setTimeout(() => setAndRender(true), delay);
-    } else {
-      setAndRender(false);
-    }
+    const timer = window.setTimeout(() => setAndRender(true), delay);
     return () => {
-      if (timer) {
-        window.clearTimeout(timer);
-      }
+      window.clearTimeout(timer);
     };
   }, [currentValue]);
 
