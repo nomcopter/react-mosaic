@@ -65,15 +65,9 @@ const config: webpack.Configuration = {
           },
           {
             loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
           },
           {
             loader: 'less-loader',
-            options: {
-              sourceMap: true,
-            },
           },
         ],
       },

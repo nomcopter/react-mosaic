@@ -16,7 +16,7 @@
   "scripts": {
     "build": "npm-run-all clean -lp build:**",
     "build:ts": "tsc -p tsconfig-build.json",
-    "build:less": "lessc --autoprefix=defaults --source-map styles/index.less react-mosaic-component.css",
+    "build:less": "lessc --autoprefix=defaults styles/index.less react-mosaic-component.css",
     "bundle": "rm -rf docs/ && webpack --config webpack/bundle.ts",
     "clean": "rm -rf lib/",
     "start": "webpack-dev-server --config webpack/hot.ts",
