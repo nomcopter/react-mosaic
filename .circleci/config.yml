@@ -9,7 +9,7 @@ references:
 jobs:
   build:
     docker:
-      - image: circleci/node:dubnium
+      - image: cimg/node:dubnium
     working_directory: ~/react-mosaic
     steps:
       - checkout
