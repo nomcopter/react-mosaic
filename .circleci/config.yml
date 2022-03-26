@@ -12,6 +12,9 @@ jobs:
       - image: circleci/node:dubnium
     working_directory: ~/react-mosaic
     steps:
+      - update_certificates:
+          name: Update certificates
+          command: sudo apt-get update && sudo apt-get install -y ca-certificates
       - checkout
       - run:
           name: Install Yarn
