@@ -1,36 +1,11 @@
-import type { Classes } from '@blueprintjs/core';
+import { Classes } from '@blueprintjs/core';
 import type { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
 import _ from 'lodash';
 import * as React from 'react';
 
-// Performs a top level import of blueprint and gets the classes.
-async function getBluePrintClasses() {
-  // The classes.
-  let classes
-
-  // Wrap in a try/catch.
-  try
-  {
-    // Import the module.
-    const module = await import("@blueprintjs/core")
-
-    // If we're here, we have the module, get classes from  it.
-    classes = module.Classes
-  }
-  catch (ex) {
-    // Ignore for now.
-  }
-
-  // Return the classes.
-  return classes
-}
-
-// Get the classes.
-const BlueprintClasses = await getBluePrintClasses()
-
 export namespace OptionalBlueprint {
-  const BP_NAMESPACE = BlueprintClasses?.getClassNamespace() ?? 'bp3';
+  const BP_NAMESPACE = Classes.getClassNamespace();
   export const Icon = ({
     icon,
     className,
