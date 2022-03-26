@@ -165,10 +165,10 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
             <button
               onClick={() => this.setAdditionalControlsOpen(!additionalControlsOpen)}
               className={classNames(
-                OptionalBlueprint.getClasses('BUTTON', 'MINIMAL'),
-                OptionalBlueprint.getIconClass('MORE'),
+                OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'BUTTON', 'MINIMAL'),
+                OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'MORE'),
                 {
-                  [OptionalBlueprint.getClasses('ACTIVE')]: additionalControlsOpen,
+                  [OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'ACTIVE')]: additionalControlsOpen,
                 },
               )}
             >
@@ -231,6 +231,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   };
 
   private readonly childContext: MosaicWindowContext = {
+    blueprintNamespace: this.context.blueprintNamespace,
     mosaicWindowActions: {
       split: this.split,
       replaceWithNew: this.swap,

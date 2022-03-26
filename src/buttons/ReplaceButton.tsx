@@ -4,17 +4,22 @@ import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
 import { OptionalBlueprint } from '../util/OptionalBlueprint';
-import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
+import { DefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class ReplaceButton extends React.PureComponent<MosaicButtonProps> {
   static contextType = MosaicWindowContext;
   context!: MosaicWindowContext;
 
   render() {
-    return createDefaultToolbarButton(
-      'Replace Window',
-      classNames('replace-button', OptionalBlueprint.getIconClass('EXCHANGE')),
-      this.replace,
+    return (
+      <DefaultToolbarButton
+        title="Replace Window"
+        className={classNames(
+          'replace-button',
+          OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'EXCHANGE'),
+        )}
+        onClick={this.replace}
+      />
     );
   }
 

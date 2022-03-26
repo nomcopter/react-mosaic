@@ -48,7 +48,7 @@ class MosaicDropTargetClass extends React.PureComponent<Props> {
   }
 }
 
-export const MosaicDropTarget = (DropTarget(
+export const MosaicDropTarget = DropTarget(
   MosaicDragType.WINDOW,
   dropTarget,
   (connect, monitor): DropTargetProps => ({
@@ -56,4 +56,4 @@ export const MosaicDropTarget = (DropTarget(
     isOver: monitor.isOver(),
     draggedMosaicId: ((monitor.getItem() || {}) as MosaicDragItem).mosaicId,
   }),
-)(MosaicDropTargetClass) as any) as React.ComponentType<MosaicDropTargetProps>;
+)(MosaicDropTargetClass) as any as React.ComponentType<MosaicDropTargetProps>;

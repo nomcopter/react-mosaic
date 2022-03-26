@@ -199,6 +199,12 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Random UUID
    */
   mosaicId?: string;
+  /**
+   * Make it possible to use different versions of Blueprint with `mosaic-blueprint-theme`
+   * Note: does not support updating after instantiation
+   * default: 'bp3'
+   */
+  blueprintNamespace?: string;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {

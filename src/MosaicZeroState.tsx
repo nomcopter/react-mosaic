@@ -16,15 +16,23 @@ export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<Mo
 
   render() {
     return (
-      <div className={classNames('mosaic-zero-state', OptionalBlueprint.getClasses('NON_IDEAL_STATE'))}>
-        <div className={OptionalBlueprint.getClasses('NON_IDEAL_STATE_VISUAL')}>
+      <div
+        className={classNames(
+          'mosaic-zero-state',
+          OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'NON_IDEAL_STATE'),
+        )}
+      >
+        <div className={OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'NON_IDEAL_STATE_VISUAL')}>
           <OptionalBlueprint.Icon className="default-zero-state-icon" size="large" icon="APPLICATIONS" />
         </div>
-        <h4 className={OptionalBlueprint.getClasses('HEADING')}>No Windows Present</h4>
+        <h4 className={OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'HEADING')}>No Windows Present</h4>
         <div>
           {this.props.createNode && (
             <button
-              className={classNames(OptionalBlueprint.getClasses('BUTTON'), OptionalBlueprint.getIconClass('ADD'))}
+              className={classNames(
+                OptionalBlueprint.getClasses(this.context.blueprintNamespace, 'BUTTON'),
+                OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'ADD'),
+              )}
               onClick={this.replace}
             >
               Add New Window
