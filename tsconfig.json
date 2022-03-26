@@ -8,17 +8,20 @@
     "jsx": "react",
     "lib": [
       "dom",
-      "scripthost"
+      "es5",
+      "scripthost",
+      "es2015.promise"
     ],
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "target": "es2020",
+    "target": "es2017",
     "sourceMap": true,
     "strict": true,
-    "module": "es2020"
+    "module": "esnext",
+    "moduleResolution": "node"
   },
   "exclude": [
     "docs",

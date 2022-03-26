@@ -31,7 +31,7 @@ async function getBluePrintClassNamespace() {
 }
 
 // Get the blueprint class namespace.
-const BP_NAMESPACE = await getBluePrintClasses()
+const BP_NAMESPACE = await getBluePrintClassNamespace()
 
 export namespace OptionalBlueprint {
   export const Icon = ({
