@@ -12,10 +12,10 @@ export class RemoveButton extends React.PureComponent<MosaicButtonProps> {
   render() {
     return (
       <MosaicContext.Consumer>
-        {({ mosaicActions }) =>
+        {({ mosaicActions, blueprintNamespace }) =>
           createDefaultToolbarButton(
             'Close Window',
-            classNames('close-button', OptionalBlueprint.getIconClass('CROSS')),
+            classNames('close-button', OptionalBlueprint.getIconClass(blueprintNamespace, 'CROSS')),
             this.createRemove(mosaicActions),
           )
         }

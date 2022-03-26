@@ -13,7 +13,7 @@ export class SplitButton extends React.PureComponent<MosaicButtonProps> {
   render() {
     return createDefaultToolbarButton(
       'Split Window',
-      classNames('split-button', OptionalBlueprint.getIconClass('ADD_COLUMN_RIGHT')),
+      classNames('split-button', OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'ADD_COLUMN_RIGHT')),
       this.split,
     );
   }

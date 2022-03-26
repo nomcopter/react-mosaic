@@ -13,12 +13,14 @@ import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate } from './types';
 export interface MosaicContext<T extends MosaicKey> {
   mosaicActions: MosaicRootActions<T>;
   mosaicId: string;
+  blueprintNamespace: string;
 }
 
 /**
  * Context provided to everything within a Mosaic Window
  */
 export interface MosaicWindowContext {
+  blueprintNamespace: string;
   mosaicWindowActions: MosaicWindowActions;
 }
 

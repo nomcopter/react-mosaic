@@ -51,6 +51,12 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * default: Random UUID
    */
   mosaicId?: string;
+  /**
+   * Make it possible to use different versions of Blueprint with `mosaic-blueprint-theme`
+   * Note: does not support updating after instantiation
+   * default: 'bp3'
+   */
+  blueprintNamespace?: string;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey> extends MosaicBaseProps<T> {
@@ -88,6 +94,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     onChange: () => void 0,
     zeroStateView: <MosaicZeroState />,
     className: 'mosaic-blueprint-theme',
+    blueprintNamespace: 'bp3',
   };
 
   static getDerivedStateFromProps(
@@ -179,6 +186,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   private readonly childContext: MosaicContext<T> = {
     mosaicActions: this.actions,
     mosaicId: this.state.mosaicId,
+    blueprintNamespace: this.props.blueprintNamespace!,
   };
 
   private renderTree() {

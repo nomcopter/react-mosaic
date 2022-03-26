@@ -13,7 +13,7 @@ export class ReplaceButton extends React.PureComponent<MosaicButtonProps> {
   render() {
     return createDefaultToolbarButton(
       'Replace Window',
-      classNames('replace-button', OptionalBlueprint.getIconClass('EXCHANGE')),
+      classNames('replace-button', OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'EXCHANGE')),
       this.replace,
     );
   }

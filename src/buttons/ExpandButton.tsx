@@ -15,7 +15,7 @@ export class ExpandButton extends React.PureComponent<MosaicButtonProps> {
         {({ mosaicActions }) =>
           createDefaultToolbarButton(
             'Expand',
-            classNames('expand-button', OptionalBlueprint.getIconClass('MAXIMIZE')),
+            classNames('expand-button', OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'MAXIMIZE')),
             this.createExpand(mosaicActions),
           )
         }
