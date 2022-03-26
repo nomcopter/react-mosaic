@@ -7,7 +7,7 @@ import * as React from 'react';
 // Performs a top level import of blueprint and gets the classes.
 async function getBluePrintClasses() {
   // The classes.
-  let classes: Classes | undefined
+  let classes
 
   // Wrap in a try/catch.
   try
@@ -27,7 +27,7 @@ async function getBluePrintClasses() {
 }
 
 // Get the classes.
-const BlueprintClasses: Classes | undefined = await getBluePrintClasses()
+const BlueprintClasses = await getBluePrintClasses()
 
 export namespace OptionalBlueprint {
   const BP_NAMESPACE = BlueprintClasses?.getClassNamespace() ?? 'bp3';
