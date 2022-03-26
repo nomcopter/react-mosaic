@@ -4,12 +4,17 @@ import { MosaicContext } from '../contextTypes';
 
 import { OptionalBlueprint } from '../util/OptionalBlueprint';
 
-export const createDefaultToolbarButton = (
-  title: string,
-  className: string,
-  onClick: (event: React.MouseEvent<any>) => any,
-  text?: string,
-): React.ReactElement<any> => {
+export const DefaultToolbarButton = ({
+  title,
+  className,
+  onClick,
+  text,
+}: {
+  title: string;
+  className: string;
+  onClick: (event: React.MouseEvent<any>) => any;
+  text?: string;
+}) => {
   const { blueprintNamespace } = React.useContext(MosaicContext);
   return (
     <button
@@ -25,6 +30,16 @@ export const createDefaultToolbarButton = (
     </button>
   );
 };
+
+/**
+ * @deprecated: see @DefaultToolbarButton
+ */
+export const createDefaultToolbarButton = (
+  title: string,
+  className: string,
+  onClick: (event: React.MouseEvent<any>) => any,
+  text?: string,
+) => <DefaultToolbarButton title={title} className={className} onClick={onClick} text={text} />;
 
 export interface MosaicButtonProps {
   onClick?: () => void;

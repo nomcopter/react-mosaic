@@ -4,17 +4,22 @@ import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
 import { OptionalBlueprint } from '../util/OptionalBlueprint';
-import { createDefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
+import { DefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class SplitButton extends React.PureComponent<MosaicButtonProps> {
   static contextType = MosaicWindowContext;
   context!: MosaicWindowContext;
 
   render() {
-    return createDefaultToolbarButton(
-      'Split Window',
-      classNames('split-button', OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'ADD_COLUMN_RIGHT')),
-      this.split,
+    return (
+      <DefaultToolbarButton
+        title="Split Window"
+        className={classNames(
+          'split-button',
+          OptionalBlueprint.getIconClass(this.context.blueprintNamespace, 'ADD_COLUMN_RIGHT'),
+        )}
+        onClick={this.split}
+      />
     );
   }
 
