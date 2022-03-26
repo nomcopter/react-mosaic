@@ -9,7 +9,7 @@ references:
 jobs:
   build:
     docker:
-      - image: cimg/node:dubnium
+      - image: cimg/node
     working_directory: ~/react-mosaic
     steps:
       - checkout
@@ -31,7 +31,7 @@ jobs:
             - .
   test:
     docker:
-      - image: circleci/node:dubnium
+      - image: cimg/node
     working_directory: ~/react-mosaic
     steps:
       - *attach_workspace
