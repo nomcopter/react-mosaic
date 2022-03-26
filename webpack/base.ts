@@ -54,7 +54,7 @@ const config: webpack.Configuration = {
         ],
       },
       {
-        test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.eot$/,
+        test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff2?$|\.ttf$|\.eot$/,
         loader: 'file-loader',
       },
       {
