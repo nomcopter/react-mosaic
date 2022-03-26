@@ -5,7 +5,7 @@ import _ from 'lodash';
 import * as React from 'react';
 
 export namespace OptionalBlueprint {
-  const BP_NAMESPACE = 'bp3';
+  const BP_NAMESPACE = Classes['getClassNamespace']?.() ?? 'bp3';
   export const Icon = ({
     icon,
     className,
