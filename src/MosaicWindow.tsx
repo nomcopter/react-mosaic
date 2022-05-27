@@ -37,6 +37,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
   onDragStart?: () => void;
   onDragEnd?: (type: 'drop' | 'reset') => void;
+  children?: React.ReactNode;
 }
 
 export interface InternalDragSourceProps {
@@ -59,7 +60,7 @@ export interface InternalMosaicWindowState {
 }
 
 export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
-  InternalMosaicWindowProps<T> & {children?: ReactNode | undefined},
+  InternalMosaicWindowProps<T>,
   InternalMosaicWindowState
 > {
   static defaultProps: Partial<InternalMosaicWindowProps<any>> = {
