@@ -59,7 +59,7 @@ export interface InternalMosaicWindowState {
 }
 
 export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
-  InternalMosaicWindowProps<T>,
+  InternalMosaicWindowProps<T> & {children?: ReactNode | undefined},
   InternalMosaicWindowState
 > {
   static defaultProps: Partial<InternalMosaicWindowProps<any>> = {
