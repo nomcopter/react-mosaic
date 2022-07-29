@@ -87,11 +87,6 @@
     "react-dnd-touch-backend": "^14.1.1",
     "uuid": "^3.4.0"
   },
-  "overrides": {
-    "react-dnd-multi-backend": {
-      "react-dnd": "$react-dnd"
-    }
-  },
   "peerDependencies": {
     "react": "16 - 18"
   },
