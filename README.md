@@ -34,6 +34,7 @@ By default, Mosaic renders with the `mosaic-blueprint-theme` class.
 This uses the excellent [Blueprint](http://blueprintjs.com/) React UI Toolkit to provide a good starting state.
 It is recommended to at least start developing with this theme.
 To use it install Blueprint `yarn add @blueprintjs/core @blueprintjs/icons` and add their CSS to your page.
+Don't forget to set `blueprintNamespace` in `Mosaic` to the correct value for the version of Blueprint you are using.
 
 See [blueprint-theme.less](./styles/blueprint-theme.less) for an example of creating a theme.
 
@@ -249,6 +250,10 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    * Label for the button that expands the drawer
    */
   additionalControlButtonText?: string;
+  /**
+   * A callback that triggers when a user toggles the additional controls
+   */
+  onAdditionalControlsToggle?: (toggle: boolean) => void;
   /**
    * Whether or not a user should be able to drag windows around
    */
