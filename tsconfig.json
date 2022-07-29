@@ -6,18 +6,14 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": [
-      "dom",
-      "es5",
-      "scripthost",
-      "es2015.promise"
-    ],
+    "lib": ["dom", "es5", "scripthost", "es2015.promise"],
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "target": "es5",
+    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true
   },
