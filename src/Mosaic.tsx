@@ -3,7 +3,7 @@ import countBy from 'lodash/countBy';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
-import { DndProvider } from 'react-dnd-multi-backend';
+import { Backends, DndProvider } from 'react-dnd-multi-backend';
 import HTML5ToTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch';
 import { v4 as uuid } from 'uuid';
 
@@ -213,12 +213,19 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
   }
 }
 
+const FixedDndProvider = DndProvider as React.FC<{
+  context?: any;
+  debugMode?: boolean | undefined;
+  options: Backends;
+  children?: React.ReactNode;
+}>;
+
 export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<MosaicProps<T>> {
   render() {
     return (
-      <DndProvider options={HTML5ToTouch}>
+      <FixedDndProvider options={HTML5ToTouch}>
         <MosaicWithoutDragDropContext<T> {...this.props} />
-      </DndProvider>
+      </FixedDndProvider>
     );
   }
 }
