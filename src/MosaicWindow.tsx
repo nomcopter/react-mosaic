@@ -27,6 +27,7 @@ import { OptionalBlueprint } from './util/OptionalBlueprint';
 export interface MosaicWindowProps<T extends MosaicKey> {
   title: string;
   path: MosaicBranch[];
+  children?: React.ReactNode;
   className?: string;
   toolbarControls?: React.ReactNode;
   additionalControls?: React.ReactNode;
@@ -109,7 +110,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
             ref={(element) => (this.rootElement = element)}
           >
             {this.renderToolbar()}
-            <div className="mosaic-window-body">{this.props.children!}</div>
+            <div className="mosaic-window-body">{this.props.children}</div>
             <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
             <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
             {connectDragPreview(renderPreview!(this.props))}
