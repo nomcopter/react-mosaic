@@ -32,6 +32,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   toolbarControls?: React.ReactNode;
   additionalControls?: React.ReactNode;
   additionalControlButtonText?: string;
+  onAdditionalControlsToggle?: (toggle: boolean) => void;
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
@@ -222,6 +223,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
 
   private setAdditionalControlsOpen = (additionalControlsOpen: boolean) => {
     this.setState({ additionalControlsOpen });
+    this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
   };
 
   private getPath = () => this.props.path;
