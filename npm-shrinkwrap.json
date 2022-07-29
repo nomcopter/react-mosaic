@@ -1,9 +1,10 @@
 {
-  "packages": {
-    "node_modules/react-dnd-preview": {
+  "dependencies": {
+    "react-dnd-preview": {
       "version": "6.0.2",
-      "peerDependencies": {
-        "react": "^16.13.1"
+      "requires": {
+        "prop-types": "^15.7.2",
+        "react-dnd": "^14.0.5"
       }
     }
   }
