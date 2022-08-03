@@ -68,6 +68,7 @@
     "@types/webpack": "^3.8.21",
     "chai": "^4.3.6",
     "css-loader": "^0.28.11",
+    "dnd-core": "14.0.1",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^2.30.1",
