@@ -6,14 +6,22 @@
   "main": "lib/index.js",
   "style": "lib/react-mosaic.css",
   "typings": "lib/index.d.ts",
-  "sideEffects": [
-    "*.css"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/nomcopter/react-mosaic.git"
   },
   "funding": "https://github.com/nomcopter/react-mosaic?sponsor=1",
+  "keywords": [
+    "ui",
+    "react",
+    "component",
+    "typescript",
+    "tiling-window-manager",
+    "window-manager"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "build": "npm-run-all clean -lp build:**",
     "build:ts": "tsc -p tsconfig-build.json",
@@ -29,7 +37,18 @@
     "fix": "npm-run-all -lp fix:**",
     "fix:format": "yarn run prettier:run --write",
     "fix:lint": "yarn run test:lint --fix",
-    "version": "yarn run bundle && git add -A docs/"
+    "version": "npm-run-all test bundle && git add -A docs/"
+  },
+  "dependencies": {
+    "classnames": "^2.3.1",
+    "immutability-helper": "^3.1.1",
+    "lodash": "^4.17.21",
+    "prop-types": "^15.8.1",
+    "react-dnd": "^14.0.5",
+    "react-dnd-html5-backend": "^14.1.0",
+    "react-dnd-multi-backend": "^6.0.2",
+    "react-dnd-touch-backend": "^14.1.1",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@blueprintjs/core": "^4.7.0",
@@ -77,26 +96,10 @@
     "webpack-dev-server": "^2.11.5",
     "yarn-deduplicate": "^3.1.0"
   },
-  "dependencies": {
-    "classnames": "^2.3.1",
-    "immutability-helper": "^3.1.1",
-    "lodash": "^4.17.21",
-    "prop-types": "^15.8.1",
-    "react-dnd": "^14.0.5",
-    "react-dnd-html5-backend": "^14.1.0",
-    "react-dnd-multi-backend": "^6.0.2",
-    "react-dnd-touch-backend": "^14.1.1",
-    "uuid": "^3.4.0"
-  },
   "peerDependencies": {
     "react": "16 - 18"
   },
-  "keywords": [
-    "ui",
-    "react",
-    "component",
-    "typescript",
-    "tiling-window-manager",
-    "window-manager"
-  ]
+  "resolutions": {
+    "dnd-core": "14.0.1"
+  }
 }
