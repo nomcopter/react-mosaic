@@ -12,6 +12,7 @@ import {
   getOtherDirection,
   getPathToCorner,
   Mosaic,
+  MosaicBranch,
   MosaicDirection,
   MosaicNode,
   MosaicParent,
@@ -25,6 +26,7 @@ import { CloseAdditionalControlsButton } from './CloseAdditionalControlsButton';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import '../styles/index.less';
+import './carbon.less';
 import './example.less';
 
 // tslint:disable no-console
@@ -33,8 +35,6 @@ import './example.less';
 const gitHubLogo = require('./GitHub-Mark-Light-32px.png');
 // tslint:disable-next-line no-var-requires
 const { version } = require('../package.json');
-
-let windowCount = 3;
 
 export const THEMES = {
   ['Blueprint']: 'mosaic-blueprint-theme',
@@ -69,27 +69,16 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
   };
 
   render() {
+    const totalWindowCount = getLeaves(this.state.currentNode).length;
     return (
       <React.StrictMode>
         <div className="react-mosaic-example-app">
           {this.renderNavBar()}
           <Mosaic<number>
             renderTile={(count, path) => (
-              <MosaicWindow<number>
-                additionalControls={count === 3 ? additionalControls : EMPTY_ARRAY}
-                title={`Window ${count}`}
-                createNode={this.createNode}
-                path={path}
-                onDragStart={() => console.log('MosaicWindow.onDragStart')}
-                onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
-                renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
-              >
-                <div className="example-window">
-                  <h1>{`Window ${count}`}</h1>
-                </div>
-              </MosaicWindow>
+              <ExampleWindow count={count} path={path} totalWindowCount={totalWindowCount} />
             )}
-            zeroStateView={<MosaicZeroState createNode={this.createNode} />}
+            zeroStateView={<MosaicZeroState createNode={() => totalWindowCount + 1} />}
             value={this.state.currentNode}
             onChange={this.onChange}
             onRelease={this.onRelease}
@@ -109,8 +98,6 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     console.log('Mosaic.onRelease():', currentNode);
   };
 
-  private createNode = () => ++windowCount;
-
   private autoArrange = () => {
     const leaves = getLeaves(this.state.currentNode);
 
@@ -121,6 +108,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
 
   private addToTopRight = () => {
     let { currentNode } = this.state;
+    const totalWindowCount = getLeaves(currentNode).length;
     if (currentNode) {
       const path = getPathToCorner(currentNode, Corner.TOP_RIGHT);
       const parent = getNodeAtPath(currentNode, dropRight(path)) as MosaicParent<number>;
@@ -131,9 +119,9 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
       let second: MosaicNode<number>;
       if (direction === 'row') {
         first = destination;
-        second = ++windowCount;
+        second = totalWindowCount + 1;
       } else {
-        first = ++windowCount;
+        first = totalWindowCount + 1;
         second = destination;
       }
 
@@ -150,7 +138,7 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
         },
       ]);
     } else {
-      currentNode = ++windowCount;
+      currentNode = totalWindowCount + 1;
     }
 
     this.setState({ currentNode });
@@ -198,3 +186,44 @@ export class ExampleApp extends React.PureComponent<{}, ExampleAppState> {
     );
   }
 }
+
+interface ExampleWindowProps {
+  count: number;
+  path: MosaicBranch[];
+  totalWindowCount: number;
+}
+
+const ExampleWindow = ({ count, path, totalWindowCount }: ExampleWindowProps) => {
+  const adContainer = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (adContainer.current == null) {
+      return;
+    }
+
+    const script = document.createElement('script');
+
+    script.src = '//cdn.carbonads.com/carbon.js?serve=CEAIEK3E&placement=nomcoptergithubio';
+    script.async = true;
+    script.type = 'text/javascript';
+    script.id = '_carbonads_js';
+
+    adContainer.current.appendChild(script);
+  }, []);
+
+  return (
+    <MosaicWindow<number>
+      additionalControls={count === 3 ? additionalControls : EMPTY_ARRAY}
+      title={`Window ${count}`}
+      createNode={() => totalWindowCount + 1}
+      path={path}
+      onDragStart={() => console.log('MosaicWindow.onDragStart')}
+      onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
+      renderToolbar={count === 2 ? () => <div className="toolbar-example">Custom Toolbar</div> : null}
+    >
+      <div className="example-window">
+        <h1>{`Window ${count}`}</h1>
+        {count === 3 && <div className="ad-container" ref={adContainer} />}
+      </div>
+    </MosaicWindow>
+  );
+};
