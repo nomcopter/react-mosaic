@@ -44,11 +44,12 @@
     "immutability-helper": "^3.1.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "react-dnd": "^14.0.5",
-    "react-dnd-html5-backend": "^14.1.0",
-    "react-dnd-multi-backend": "^6.0.2",
-    "react-dnd-touch-backend": "^14.1.1",
-    "uuid": "^3.4.0"
+    "rdndmb-html5-to-touch": "^8.0.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dnd-multi-backend": "^8.0.0",
+    "react-dnd-touch-backend": "^16.0.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@blueprintjs/core": "^4.7.0",
@@ -61,14 +62,14 @@
     "@types/mocha": "^5.2.7",
     "@types/prop-types": "^15.7.4",
     "@types/react": "^18.0.15",
-    "@types/react-dnd-multi-backend": "^6.0.1",
+    "@types/react-dnd-multi-backend": "^6.0.2",
     "@types/react-dom": "^18.0.6",
     "@types/react-hot-loader": "^3.0.6",
     "@types/uuid": "^3.4.10",
     "@types/webpack": "^3.8.21",
     "chai": "^4.3.6",
     "css-loader": "^0.28.11",
-    "dnd-core": "14.0.1",
+    "dnd-core": "16.0.1",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^2.30.1",
@@ -101,6 +102,6 @@
     "react": "16 - 18"
   },
   "resolutions": {
-    "dnd-core": "14.0.1"
+    "dnd-core": "16.0.1"
   }
 }
