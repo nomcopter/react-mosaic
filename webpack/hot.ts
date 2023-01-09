@@ -1,8 +1,9 @@
 import webpack from 'webpack';
 import config from './base';
 import { CONSTANTS } from './constants';
+import 'webpack-dev-server';
 
-const baseEntry = config.entry as webpack.Entry;
+const baseEntry = config.entry as webpack.EntryObject;
 const entry = {
   ...baseEntry,
   app: [
@@ -20,7 +21,7 @@ const entry = {
   ],
 };
 
-const rules = (config.module as webpack.NewModule).rules.map((loaderConf: any) => {
+const rules = (config.module as webpack.ModuleOptions).rules?.map((loaderConf: any) => {
   if (loaderConf.test.test('test.ts')) {
     return {
       ...loaderConf,
@@ -40,25 +41,20 @@ const module = {
   rules,
 };
 
-const plugins = [
-  ...(config.plugins || []),
-  new webpack.DefinePlugin({
-    'process.env.NODE_ENV': 'null',
-  }),
-  new webpack.HotModuleReplacementPlugin(),
-];
-
-const hotConfig = {
+const hotConfig: webpack.Configuration = {
   ...config,
+  mode: 'development',
   entry,
   module,
-  plugins,
-  devtool: '#cheap-module-source-map',
+  devtool: 'cheap-module-source-map',
+  stats: 'minimal',
+  optimization: {
+    runtimeChunk: 'single',
+  },
   devServer: {
-    contentBase: CONSTANTS.DOCS_DIR,
+    static: CONSTANTS.DOCS_DIR,
     historyApiFallback: true,
     hot: true,
-    stats: 'minimal',
     host: '0.0.0.0',
     port: CONSTANTS.DEV_SERVER_PORT,
     open: true,
