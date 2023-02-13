@@ -10,9 +10,9 @@ import { MosaicDragType } from './types';
 export const RootDropTargets = React.memo(() => {
   const [{ isDragging }] = useDrop({
     accept: MosaicDragType.WINDOW,
-    collect(monitor) {
-      return { isDragging: monitor.getItem() !== null && monitor.getItemType() === MosaicDragType.WINDOW };
-    },
+    collect: (monitor) => ({
+      isDragging: monitor.getItem() !== null && monitor.getItemType() === MosaicDragType.WINDOW,
+    }),
   });
   const delayedIsDragging = useDelayedTrue(isDragging, 0);
   return (

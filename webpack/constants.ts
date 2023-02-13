@@ -6,4 +6,5 @@ export const CONSTANTS = {
   HTML_TEMPLATE: path.join(__dirname, 'index-template.html'),
   DOCS_DIR: path.join(__dirname, '..', 'docs/'),
   DEV_SERVER_PORT: 8092,
+  PUBLIC_PATH: '/public/',
 };

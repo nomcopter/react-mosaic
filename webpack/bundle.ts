@@ -3,6 +3,7 @@ import config from './base';
 
 const bundleConfig: webpack.Configuration = {
   ...config,
+  mode: 'production',
   optimization: {
     ...config.optimization,
     minimize: true,
