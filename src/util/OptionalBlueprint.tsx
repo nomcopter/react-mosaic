@@ -24,7 +24,7 @@ export namespace OptionalBlueprint {
   };
 
   type BlueprintClass = {
-    [K in keyof typeof Classes]: typeof Classes[K] extends string ? K : never;
+    [K in keyof typeof Classes]: (typeof Classes)[K] extends string ? K : never;
   }[keyof typeof Classes];
 
   export function getClasses(blueprintNamespace: string, ...names: BlueprintClass[]): string {
