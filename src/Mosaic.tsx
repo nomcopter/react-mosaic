@@ -3,10 +3,10 @@ import { DragDropManager } from 'dnd-core';
 import countBy from 'lodash/countBy';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
+import { HTML5toTouch } from 'rdndmb-html5-to-touch';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
-import MultiBackend from 'react-dnd-multi-backend';
-import HTML5ToTouch from 'react-dnd-multi-backend/dist/cjs/HTML5toTouch';
+import { MultiBackend } from 'react-dnd-multi-backend';
 import { v4 as uuid } from 'uuid';
 
 import { MosaicContext, MosaicRootActions } from './contextTypes';
@@ -224,7 +224,7 @@ export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<Mo
     return (
       <DndProvider
         backend={MultiBackend}
-        options={HTML5ToTouch}
+        options={HTML5toTouch}
         {...(this.props.dragAndDropManager && { manager: this.props.dragAndDropManager })}
       >
         <MosaicWithoutDragDropContext<T> {...this.props} />

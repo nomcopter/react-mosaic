@@ -14,9 +14,12 @@ const config: webpack.Configuration = {
     filename: '[name].js',
     path: CONSTANTS.DOCS_DIR,
   },
-  devtool: '#source-map',
+  devtool: 'source-map',
   resolve: {
     extensions: ['.webpack.js', '.web.js', '.json', '.ts', '.js', '.tsx'],
+  },
+  optimization: {
+    moduleIds: 'named'
   },
   module: {
     rules: [
@@ -74,14 +77,8 @@ const config: webpack.Configuration = {
     ],
   },
   plugins: [
-    new webpack.NamedModulesPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity,
-    }),
     new HtmlWebpackPlugin({
       template: CONSTANTS.HTML_TEMPLATE,
-      chunksSortMode: 'dependency',
     }),
   ],
 };
