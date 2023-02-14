@@ -258,7 +258,7 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(props: Inte
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(props.path));
       return {
-        mosaicId: mosaicId,
+        mosaicId,
         hideTimer,
       };
     },
@@ -296,12 +296,10 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(props: Inte
 
   const [{ isOver, draggedMosaicId }, connectDropTarget] = useDrop({
     accept: MosaicDragType.WINDOW,
-    collect(monitor: DropTargetMonitor<MosaicDragItem>) {
-      return {
-        isOver: monitor.isOver(),
-        draggedMosaicId: (monitor.getItem() || {}).mosaicId,
-      };
-    },
+    collect: (monitor: DropTargetMonitor<MosaicDragItem>) => ({
+      isOver: monitor.isOver(),
+      draggedMosaicId: monitor.getItem()?.mosaicId,
+    }),
   });
   return (
     <InternalMosaicWindow
