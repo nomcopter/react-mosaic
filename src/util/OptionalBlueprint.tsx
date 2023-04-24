@@ -1,7 +1,7 @@
 import type { Classes } from '@blueprintjs/core';
 import type { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import _ from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 import * as React from 'react';
 import { MosaicContext } from '../contextTypes';
 
@@ -28,10 +28,10 @@ export namespace OptionalBlueprint {
   }[keyof typeof Classes];
 
   export function getClasses(blueprintNamespace: string, ...names: BlueprintClass[]): string {
-    return names.map((name) => `${blueprintNamespace}-${_.kebabCase(name)}`).join(' ');
+    return names.map((name) => `${blueprintNamespace}-${kebabCase(name)}`).join(' ');
   }
 
   export function getIconClass(blueprintNamespace: string, iconName: keyof typeof IconNames): string {
-    return `${blueprintNamespace}-icon-${_.kebabCase(iconName)}`;
+    return `${blueprintNamespace}-icon-${kebabCase(iconName)}`;
   }
 }
