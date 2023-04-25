@@ -20,7 +20,7 @@ rules:
       import-sources-order: case-insensitive
       module-source-path: full
       named-imports-order: case-insensitive
-  import-blacklist: [true, "lodash"]
+  import-blacklist: [true, 'lodash']
   prettier: true
   no-namespace: false
   variable-name:
