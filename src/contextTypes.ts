@@ -80,6 +80,10 @@ export interface MosaicWindowActions {
    */
   setAdditionalControlsOpen: (open: boolean) => void;
   /**
+   * Sets the open state for the tray that holds additional controls
+   */
+  toggleAdditionalControlsOpen: () => void;
+  /**
    * Returns the path to this window
    */
   getPath: () => MosaicPath;

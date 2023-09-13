@@ -33,6 +33,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   additionalControls?: React.ReactNode;
   additionalControlButtonText?: string;
   onAdditionalControlsToggle?: (toggle: boolean) => void;
+  closeAdditionalControlsOnClickBody?: boolean;
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
@@ -98,6 +99,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       connectDropTarget,
       connectDragPreview,
       draggedMosaicId,
+      closeAdditionalControlsOnClickBody,
     } = this.props;
 
     return (
@@ -112,7 +114,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           >
             {this.renderToolbar()}
             <div className="mosaic-window-body">{this.props.children}</div>
-            <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
+            <div className="mosaic-window-body-overlay" onClick={() => {
+              if (closeAdditionalControlsOnClickBody !== false) {
+                this.setAdditionalControlsOpen(false);
+              }
+            }} />
             <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
             {connectDragPreview(renderPreview!(this.props))}
             <div className="drop-target-container">
@@ -226,6 +232,12 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
   };
 
+  private toggleAdditionalControlsOpen = () => {
+    const additionalControlsOpen = !this.state.additionalControlsOpen;
+    this.setState({ additionalControlsOpen });
+    this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
+  };
+
   private getPath = () => this.props.path;
 
   private connectDragSource = (connectedElements: React.ReactElement<any>) => {
@@ -239,6 +251,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       split: this.split,
       replaceWithNew: this.swap,
       setAdditionalControlsOpen: this.setAdditionalControlsOpen,
+      toggleAdditionalControlsOpen: this.toggleAdditionalControlsOpen,
       getPath: this.getPath,
       connectDragSource: this.connectDragSource,
     },
