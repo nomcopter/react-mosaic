@@ -371,9 +371,10 @@ export interface MosaicWindowActions {
    */
   replaceWithNew: () => Promise<void>;
   /**
-   * Sets the open state for the tray that holds additional controls
+   * Sets the open state for the tray that holds additional controls.
+   * Pass 'toggle' to invert the current state.
    */
-  setAdditionalControlsOpen: (open: boolean) => void;
+  setAdditionalControlsOpen: (open: boolean | 'toggle') => void;
   /**
    * Returns the path to this window
    */

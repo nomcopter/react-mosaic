@@ -230,13 +230,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     return Promise.resolve(createNode!(...args)).then((node) => mosaicActions.replaceWith(path, node));
   };
 
-  private setAdditionalControlsOpen = (additionalControlsOpen: boolean) => {
-    this.setState({ additionalControlsOpen });
-    this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
-  };
-
-  private toggleAdditionalControlsOpen = () => {
-    const additionalControlsOpen = !this.state.additionalControlsOpen;
+  private setAdditionalControlsOpen = (additionalControlsOpenOption: boolean | 'toggle') => {
+    const additionalControlsOpen =
+      additionalControlsOpenOption === 'toggle' ? !this.state.additionalControlsOpen : additionalControlsOpenOption;
     this.setState({ additionalControlsOpen });
     this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
   };
@@ -254,7 +250,6 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       split: this.split,
       replaceWithNew: this.swap,
       setAdditionalControlsOpen: this.setAdditionalControlsOpen,
-      toggleAdditionalControlsOpen: this.toggleAdditionalControlsOpen,
       getPath: this.getPath,
       connectDragSource: this.connectDragSource,
     },
