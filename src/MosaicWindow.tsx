@@ -33,6 +33,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   additionalControls?: React.ReactNode;
   additionalControlButtonText?: string;
   onAdditionalControlsToggle?: (toggle: boolean) => void;
+  disableAdditionalControlsOverlay?: boolean;
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
@@ -98,6 +99,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       connectDropTarget,
       connectDragPreview,
       draggedMosaicId,
+      disableAdditionalControlsOverlay,
     } = this.props;
 
     return (
@@ -112,7 +114,14 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           >
             {this.renderToolbar()}
             <div className="mosaic-window-body">{this.props.children}</div>
-            <div className="mosaic-window-body-overlay" onClick={() => this.setAdditionalControlsOpen(false)} />
+            {!disableAdditionalControlsOverlay && (
+              <div
+                className="mosaic-window-body-overlay"
+                onClick={() => {
+                  this.setAdditionalControlsOpen(false);
+                }}
+              />
+            )}
             <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
             {connectDragPreview(renderPreview!(this.props))}
             <div className="drop-target-container">
@@ -221,7 +230,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     return Promise.resolve(createNode!(...args)).then((node) => mosaicActions.replaceWith(path, node));
   };
 
-  private setAdditionalControlsOpen = (additionalControlsOpen: boolean) => {
+  private setAdditionalControlsOpen = (additionalControlsOpenOption: boolean | 'toggle') => {
+    const additionalControlsOpen =
+      additionalControlsOpenOption === 'toggle' ? !this.state.additionalControlsOpen : additionalControlsOpenOption;
     this.setState({ additionalControlsOpen });
     this.props.onAdditionalControlsToggle?.(additionalControlsOpen);
   };

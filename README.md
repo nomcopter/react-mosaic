@@ -259,6 +259,10 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    */
   onAdditionalControlsToggle?: (toggle: boolean) => void;
   /**
+   * Disables the overlay that blocks interaction with the window when additional controls are open
+   */
+  disableAdditionalControlsOverlay?: boolean;
+  /**
    * Whether or not a user should be able to drag windows around
    */
   draggable?: boolean;
@@ -367,9 +371,10 @@ export interface MosaicWindowActions {
    */
   replaceWithNew: () => Promise<void>;
   /**
-   * Sets the open state for the tray that holds additional controls
+   * Sets the open state for the tray that holds additional controls.
+   * Pass 'toggle' to invert the current state.
    */
-  setAdditionalControlsOpen: (open: boolean) => void;
+  setAdditionalControlsOpen: (open: boolean | 'toggle') => void;
   /**
    * Returns the path to this window
    */
