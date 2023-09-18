@@ -33,7 +33,7 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   additionalControls?: React.ReactNode;
   additionalControlButtonText?: string;
   onAdditionalControlsToggle?: (toggle: boolean) => void;
-  closeAdditionalControlsOnClickBody?: boolean;
+  disableAdditionalControlsOverlay?: boolean;
   draggable?: boolean;
   createNode?: CreateNode<T>;
   renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
@@ -99,7 +99,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
       connectDropTarget,
       connectDragPreview,
       draggedMosaicId,
-      closeAdditionalControlsOnClickBody,
+      disableAdditionalControlsOverlay,
     } = this.props;
 
     return (
@@ -114,11 +114,14 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           >
             {this.renderToolbar()}
             <div className="mosaic-window-body">{this.props.children}</div>
-            <div className="mosaic-window-body-overlay" onClick={() => {
-              if (closeAdditionalControlsOnClickBody !== false) {
-                this.setAdditionalControlsOpen(false);
-              }
-            }} />
+            {!disableAdditionalControlsOverlay && (
+              <div
+                className="mosaic-window-body-overlay"
+                onClick={() => {
+                  this.setAdditionalControlsOpen(false);
+                }}
+              />
+            )}
             <div className="mosaic-window-additional-actions-bar">{additionalControls}</div>
             {connectDragPreview(renderPreview!(this.props))}
             <div className="drop-target-container">

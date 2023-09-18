@@ -259,6 +259,10 @@ export interface MosaicWindowProps<T extends MosaicKey> {
    */
   onAdditionalControlsToggle?: (toggle: boolean) => void;
   /**
+   * Disables the overlay that blocks interaction with the window when additional controls are open
+   */
+  disableAdditionalControlsOverlay?: boolean;
+  /**
    * Whether or not a user should be able to drag windows around
    */
   draggable?: boolean;
