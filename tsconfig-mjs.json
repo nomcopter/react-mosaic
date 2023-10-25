@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig-build.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "outDir": "dist/mjs",
+    "target": "es2021"
+  }
+}

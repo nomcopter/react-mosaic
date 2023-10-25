@@ -1,5 +1,5 @@
 node_modules/
-lib/
+dist/
 /react-mosaic-component.css*
 .*.swp
 react-mosaic.tar.bz2
