@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "noEmit": false,
-    "outDir": "lib",
-    "rootDir": "src"
+    "declaration": true,
   },
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": [
     "demo",
     "docs",

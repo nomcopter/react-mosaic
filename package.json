@@ -3,10 +3,19 @@
   "version": "6.1.0",
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "typings": "index.d.ts",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./cjs/index.js",
+    "default": "./cjs/index.js"
+  },
   "style": "lib/react-mosaic.css",
-  "type": "commonjs",
-  "typings": "lib/index.d.ts",
+  "files": [
+    "/lib",
+    "/index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/nomcopter/react-mosaic.git"
@@ -25,10 +34,12 @@
   ],
   "scripts": {
     "build": "npm-run-all clean -lp build:**",
-    "build:ts": "tsc -p tsconfig-build.json",
     "build:less": "lessc --autoprefix=defaults styles/index.less react-mosaic-component.css",
-    "bundle": "rm -rf docs/ && webpack --config webpack/bundle.ts",
-    "clean": "rm -rf lib/",
+    "build:esm": "tsc --project tsconfig-build.json --declaration false --rootDir src --module esnext --outDir ./lib/esm",
+    "build:cjs": "tsc --project tsconfig-build.json --declaration false --rootDir src --module commonjs --outDir ./lib/cjs",
+    "build:declaration": "tsc --project tsconfig-build.json --rootDir src --outDir ./lib --emitDeclarationOnly",
+    "bundle": "shx rm -rf docs/ && webpack --config webpack/bundle.ts",
+    "clean": "shx rm -rf lib/",
     "start": "webpack-dev-server --config webpack/hot.ts",
     "prettier:run": "prettier 'styles/*.less' '*.md' '{,.}*.yml' '.circleci/*.yml'",
     "test": "npm-run-all build -lp test:**",
@@ -42,6 +53,7 @@
   },
   "dependencies": {
     "classnames": "^2.3.2",
+    "dnd-core": "16.0.1",
     "immutability-helper": "^3.1.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
@@ -68,7 +80,6 @@
     "@types/webpack": "^5.28.0",
     "chai": "^4.3.6",
     "css-loader": "^6.7.3",
-    "dnd-core": "16.0.1",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
     "jsdom": "^15.2.1",
@@ -85,6 +96,7 @@
     "react-dom": "^18.2.0",
     "react-refresh": "^0.14.0",
     "source-map-loader": "^4.0.1",
+    "shx": "0.3.4",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
