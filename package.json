@@ -3,19 +3,16 @@
   "version": "6.1.0",
   "description": "A React Tiling Window Manager",
   "license": "Apache-2.0",
-  "main": "./cjs/index.js",
-  "module": "./esm/index.js",
-  "typings": "index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "typings": "./lib/index.d.ts",
   "exports": {
-    "import": "./esm/index.js",
-    "require": "./cjs/index.js",
-    "default": "./cjs/index.js"
+    "import": "./lib/esm/index.js",
+    "require": "./lib/cjs/index.js",
+    "default": "./lib/cjs/index.js"
   },
-  "style": "lib/react-mosaic.css",
-  "files": [
-    "/lib",
-    "/index.d.ts"
-  ],
+  "style": "./react-mosaic-component.css",
+  "files": ["/lib", "react-mosaic-component.css"],
   "repository": {
     "type": "git",
     "url": "https://github.com/nomcopter/react-mosaic.git"
