@@ -7,9 +7,14 @@
   "module": "./lib/esm/index.js",
   "typings": "./lib/index.d.ts",
   "exports": {
-    "import": "./lib/esm/index.js",
-    "require": "./lib/cjs/index.js",
-    "default": "./lib/cjs/index.js"
+    ".": {
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js"
+    },
+    "./react-mosaic-component.css": {
+      "import": "./react-mosaic-component.css",
+      "require": "./react-mosaic-component.css"
+    }
   },
   "style": "./react-mosaic-component.css",
   "files": ["/lib", "react-mosaic-component.css"],
