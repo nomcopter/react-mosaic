@@ -1,3 +1,9 @@
+# Explanation
+That's a fork with single change to fix this issue https://github.com/nomcopter/react-mosaic/issues/193
+To install just run 
+`npm i react-mosaic-component2@6.4.0`
+
+
 # react-mosaic
 
 [![CircleCI](https://circleci.com/gh/nomcopter/react-mosaic/tree/master.svg?style=svg)](https://circleci.com/gh/nomcopter/react-mosaic/tree/master)
