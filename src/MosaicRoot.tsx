@@ -1,4 +1,4 @@
-import flatten from 'lodash/flatten';
+import { flatten } from 'lodash-es';
 import React from 'react';
 import { MosaicContext } from './contextTypes';
 import { Split } from './Split';
@@ -14,7 +14,7 @@ export interface MosaicRootProps<T extends MosaicKey> {
 
 export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicRootProps<T>> {
   static contextType = MosaicContext;
-  context!: MosaicContext<T>;
+  declare context: React.ContextType<typeof MosaicContext>;
 
   render() {
     const { root } = this.props;

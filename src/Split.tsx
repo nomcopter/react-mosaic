@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import clamp from 'lodash/clamp';
-import throttle from 'lodash/throttle';
+import { clamp } from 'lodash-es';
+import { throttle } from 'lodash-es';
 import React from 'react';
 
 import { EnabledResizeOptions, MosaicDirection } from './types';

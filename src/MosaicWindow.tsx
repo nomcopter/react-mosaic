@@ -1,9 +1,5 @@
 import classNames from 'classnames';
-import defer from 'lodash/defer';
-import dropRight from 'lodash/dropRight';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import values from 'lodash/values';
+import { defer, dropRight, isEmpty, isEqual, values } from 'lodash-es';
 import React, { useContext } from 'react';
 import {
   ConnectDragPreview,
@@ -82,7 +78,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     renderToolbar: null,
   };
   static contextType = MosaicContext;
-  context!: MosaicContext<T>;
+  declare context: React.ContextType<typeof MosaicContext>;
 
   state: InternalMosaicWindowState = {
     additionalControlsOpen: false,
@@ -245,6 +241,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
   };
 
   private readonly childContext: MosaicWindowContext = {
+    // @ts-ignore
     blueprintNamespace: this.context.blueprintNamespace,
     mosaicWindowActions: {
       split: this.split,

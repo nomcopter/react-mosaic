@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 import React from 'react';
 
 import { MosaicWindowContext } from '../contextTypes';
@@ -8,7 +8,7 @@ import { DefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class ReplaceButton extends React.PureComponent<MosaicButtonProps> {
   static contextType = MosaicWindowContext;
-  context!: MosaicWindowContext;
+  declare context: React.ContextType<typeof MosaicWindowContext>;
 
   render() {
     return (
