@@ -7,7 +7,7 @@ import { DefaultToolbarButton, MosaicButtonProps } from './MosaicButton';
 
 export class RemoveButton extends React.PureComponent<MosaicButtonProps> {
   static contextType = MosaicWindowContext;
-  context!: MosaicWindowContext;
+  declare context: React.ContextType<typeof MosaicWindowContext>;
 
   render() {
     return (

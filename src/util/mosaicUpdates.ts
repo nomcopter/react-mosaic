@@ -1,12 +1,7 @@
 import update from 'immutability-helper';
-import drop from 'lodash/drop';
-import dropRight from 'lodash/dropRight';
-import isEqual from 'lodash/isEqual';
-import last from 'lodash/last';
-import set from 'lodash/set';
-import take from 'lodash/take';
+import { drop, dropRight, isEqual, last, set, take } from 'lodash-es';
 import { MosaicDropTargetPosition } from '../internalTypes';
-import {
+import type {
   MosaicBranch,
   MosaicDirection,
   MosaicKey,
@@ -17,9 +12,6 @@ import {
   MosaicUpdateSpec,
 } from '../types';
 import { getAndAssertNodeAtPathExists, getOtherBranch } from './mosaicUtilities';
-
-// https://github.com/Microsoft/TypeScript/issues/9944
-export { MosaicParent };
 
 /**
  * Used to prepare `update` for `immutability-helper`

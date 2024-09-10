@@ -20,7 +20,6 @@ rules:
       import-sources-order: case-insensitive
       module-source-path: full
       named-imports-order: case-insensitive
-  import-blacklist: [true, 'lodash']
   prettier: true
   no-namespace: false
   variable-name:
@@ -40,6 +39,6 @@ rules:
   await-promise: true
   ban-comma-operator: true
   prefer-object-spread: true
-  no-default-export: true
+  no-default-export: false
   jsx-no-lambda: false
   jsx-key: false

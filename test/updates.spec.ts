@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import { getNodeAtPath, MosaicNode } from '../src/index';
 import { MosaicDropTargetPosition } from '../src/internalTypes';
 import { MosaicParent, MosaicPath } from '../src/types';

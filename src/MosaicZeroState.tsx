@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 import React from 'react';
 
 import { MosaicContext } from './contextTypes';
@@ -12,7 +12,7 @@ export interface MosaicZeroStateProps<T extends MosaicKey> {
 
 export class MosaicZeroState<T extends MosaicKey> extends React.PureComponent<MosaicZeroStateProps<T>> {
   static contextType = MosaicContext;
-  context!: MosaicContext<T>;
+  declare context: React.ContextType<typeof MosaicContext>;
 
   render() {
     return (

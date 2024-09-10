@@ -16,24 +16,24 @@
  */
 export {
   Mosaic,
-  MosaicProps,
-  MosaicUncontrolledProps,
-  MosaicControlledProps,
+  type MosaicProps,
+  type MosaicUncontrolledProps,
+  type MosaicControlledProps,
   MosaicWithoutDragDropContext,
 } from './Mosaic';
 export {
-  MosaicNode,
+  type MosaicNode,
   MosaicDragType,
-  MosaicDirection,
-  MosaicBranch,
-  CreateNode,
-  MosaicParent,
-  MosaicPath,
-  MosaicUpdate,
-  MosaicUpdateSpec,
-  TileRenderer,
+  type MosaicDirection,
+  type MosaicBranch,
+  type CreateNode,
+  type MosaicParent,
+  type MosaicPath,
+  type MosaicUpdate,
+  type MosaicUpdateSpec,
+  type TileRenderer,
 } from './types';
-export { MosaicContext, MosaicRootActions, MosaicWindowActions, MosaicWindowContext } from './contextTypes';
+export { MosaicContext, type MosaicRootActions, type MosaicWindowActions, MosaicWindowContext } from './contextTypes';
 export {
   buildSpecFromUpdate,
   createDragToUpdates,
@@ -53,9 +53,9 @@ export {
   getPathToCorner,
   isParent,
 } from './util/mosaicUtilities';
-export { MosaicWindow, MosaicWindowProps } from './MosaicWindow';
-export { createDefaultToolbarButton, DefaultToolbarButton, MosaicButtonProps } from './buttons/MosaicButton';
-export { MosaicZeroState, MosaicZeroStateProps } from './MosaicZeroState';
+export { MosaicWindow, type MosaicWindowProps } from './MosaicWindow';
+export { createDefaultToolbarButton, DefaultToolbarButton, type MosaicButtonProps } from './buttons/MosaicButton';
+export { MosaicZeroState, type MosaicZeroStateProps } from './MosaicZeroState';
 export { Separator } from './buttons/Separator';
 export { ExpandButton } from './buttons/ExpandButton';
 export { ReplaceButton } from './buttons/ReplaceButton';

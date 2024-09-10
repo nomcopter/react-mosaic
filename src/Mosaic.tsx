@@ -1,8 +1,6 @@
 import classNames from 'classnames';
 import { DragDropManager } from 'dnd-core';
-import countBy from 'lodash/countBy';
-import keys from 'lodash/keys';
-import pickBy from 'lodash/pickBy';
+import { countBy, keys, pickBy } from 'lodash-es';
 import { HTML5toTouch } from 'rdndmb-html5-to-touch';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
@@ -82,7 +80,7 @@ export interface MosaicUncontrolledProps<T extends MosaicKey> extends MosaicBase
 
 export type MosaicProps<T extends MosaicKey> = MosaicControlledProps<T> | MosaicUncontrolledProps<T>;
 
-function isUncontrolled<T extends MosaicKey>(props: MosaicProps<T>): props is MosaicUncontrolledProps<T> {
+function isUncontrolled<T extends MosaicKey>(props: MosaicProps<T>): props is Readonly<MosaicUncontrolledProps<T>> {
   return (props as MosaicUncontrolledProps<T>).initialValue != null;
 }
 

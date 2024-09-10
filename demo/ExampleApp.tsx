@@ -1,7 +1,7 @@
 import { Classes, HTMLSelect } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import dropRight from 'lodash/dropRight';
+import { dropRight } from 'lodash-es';
 import React from 'react';
 
 import {

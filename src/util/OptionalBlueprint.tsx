@@ -1,7 +1,7 @@
 import type { Classes } from '@blueprintjs/core';
 import type { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
-import kebabCase from 'lodash/kebabCase';
+import { kebabCase } from 'lodash-es';
 import * as React from 'react';
 import { MosaicContext } from '../contextTypes';
 

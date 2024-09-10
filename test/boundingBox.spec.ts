@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 import { BoundingBox } from '../src/util/BoundingBox';
 
 // Yay javascript float precision

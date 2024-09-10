@@ -1,4 +1,4 @@
-import { Spec } from 'immutability-helper';
+import type { Spec } from 'immutability-helper';
 
 /**
  * Valid node types
