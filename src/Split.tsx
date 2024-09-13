@@ -122,7 +122,10 @@ export class Split extends React.PureComponent<SplitProps> {
 
   private calculateRelativePercentage(event: MouseEvent | TouchEvent): number {
     const { minimumPaneSizePercentage, direction, boundingBox } = this.props;
-    const parentBBox = this.rootElement.current!.parentElement!.getBoundingClientRect();
+    if (!this.rootElement.current || !this.rootElement.current.parentElement) {
+      return this.props.splitPercentage;
+    }
+    const parentBBox = this.rootElement.current.parentElement.getBoundingClientRect();
     const location = isTouchEvent(event) ? event.changedTouches[0] : event;
 
     let absolutePercentage: number;
