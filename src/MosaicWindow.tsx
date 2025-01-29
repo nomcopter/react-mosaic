@@ -4,7 +4,7 @@ import dropRight from 'lodash/dropRight';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import values from 'lodash/values';
-import React, { useContext } from 'react';
+import React, { ReactElement, useContext } from 'react';
 import {
   ConnectDragPreview,
   ConnectDragSource,
@@ -36,8 +36,8 @@ export interface MosaicWindowProps<T extends MosaicKey> {
   disableAdditionalControlsOverlay?: boolean;
   draggable?: boolean;
   createNode?: CreateNode<T>;
-  renderPreview?: (props: MosaicWindowProps<T>) => JSX.Element;
-  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => JSX.Element) | null;
+  renderPreview?: (props: MosaicWindowProps<T>) => ReactElement;
+  renderToolbar?: ((props: MosaicWindowProps<T>, draggable: boolean | undefined) => ReactElement) | null;
   onDragStart?: () => void;
   onDragEnd?: (type: 'drop' | 'reset') => void;
 }
@@ -110,7 +110,9 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
               'drop-target-hover': isOver && draggedMosaicId === this.context.mosaicId,
               'additional-controls-open': this.state.additionalControlsOpen,
             })}
-            ref={(element) => (this.rootElement = element)}
+            ref={(element) => {
+              this.rootElement = element;
+            }}
           >
             {this.renderToolbar()}
             <div className="mosaic-window-body">{this.props.children}</div>

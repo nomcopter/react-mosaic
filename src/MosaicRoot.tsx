@@ -1,5 +1,5 @@
 import flatten from 'lodash/flatten';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { MosaicContext } from './contextTypes';
 import { Split } from './Split';
 import { MosaicBranch, MosaicDirection, MosaicKey, MosaicNode, ResizeOptions, TileRenderer } from './types';
@@ -25,7 +25,7 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicR
     node: MosaicNode<T>,
     boundingBox: BoundingBox,
     path: MosaicBranch[],
-  ): JSX.Element | JSX.Element[] {
+  ): ReactElement | ReactElement[] {
     if (isParent(node)) {
       const splitPercentage = node.splitPercentage == null ? 50 : node.splitPercentage;
       const { first, second } = BoundingBox.split(boundingBox, splitPercentage, node.direction);
@@ -86,6 +86,6 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<MosaicR
   };
 }
 
-function nonNullElement(x: JSX.Element | JSX.Element[] | null): x is JSX.Element | JSX.Element[] {
+function nonNullElement(x: ReactElement | ReactElement[] | null): x is ReactElement | ReactElement[] {
   return x !== null;
 }

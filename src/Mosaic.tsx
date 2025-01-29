@@ -4,7 +4,7 @@ import countBy from 'lodash/countBy';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import { HTML5toTouch } from 'rdndmb-html5-to-touch';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { DndProvider } from 'react-dnd';
 import { MultiBackend } from 'react-dnd-multi-backend';
 import { v4 as uuid } from 'uuid';
@@ -21,7 +21,7 @@ const DEFAULT_EXPAND_PERCENTAGE = 70;
 
 export interface MosaicBaseProps<T extends MosaicKey> {
   /**
-   * Lookup function to convert `T` to a displayable `JSX.Element`
+   * Lookup function to convert `T` to a displayable `ReactElement`
    */
   renderTile: TileRenderer<T>;
   /**
@@ -46,7 +46,7 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * View to display when the current value is `null`
    * default: Simple NonIdealState view
    */
-  zeroStateView?: JSX.Element;
+  zeroStateView?: ReactElement;
   /**
    * Override the mosaicId passed to `react-dnd` to control how drag and drop works with other components
    * Note: does not support updating after instantiation
@@ -144,7 +144,7 @@ export class MosaicWithoutDragDropContext<T extends MosaicKey = string> extends 
     if (isUncontrolled(this.props)) {
       return this.state.currentNode;
     } else {
-      return this.props.value;
+      return (this.props as MosaicControlledProps<T>).value;
     }
   }
 
