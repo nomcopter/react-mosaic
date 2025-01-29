@@ -1,4 +1,5 @@
 import { Spec } from 'immutability-helper';
+import { ReactElement } from 'react';
 
 /**
  * Valid node types
@@ -41,7 +42,7 @@ export interface MosaicUpdate<T extends MosaicKey> {
  * Mosaic needs a way to resolve `MosaicKey` into react elements for display.
  * This provides a way to render them.
  */
-export type TileRenderer<T extends MosaicKey> = (t: T, path: MosaicBranch[]) => JSX.Element;
+export type TileRenderer<T extends MosaicKey> = (t: T, path: MosaicBranch[]) => ReactElement;
 
 /**
  * Function that provides a new node to put into the tree
