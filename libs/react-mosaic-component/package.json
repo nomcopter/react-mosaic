@@ -1,6 +1,6 @@
 {
   "name": "react-mosaic-component",
-  "version": "7.0.0",
+  "version": "7.0.0-beta0",
   "description": "A React Tiling Window Manager",
   "main": "./index.mjs",
   "type": "module",
