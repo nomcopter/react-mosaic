@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '@blueprintjs/core';
 import {
   MosaicWindow,
@@ -7,19 +7,87 @@ import {
   RemoveButton,
 } from 'react-mosaic-component';
 import { ExampleWindowProps } from '../types/demo-types';
+import { createNode } from '../utils/demo-utils';
+import { CloseAdditionalControlsButton } from '../app/toolbars';
 
-const EMPTY_ARRAY: any[] = [];
-const createNode = () => Date.now();
+type Status = 'Active' | 'On Leave' | 'Remote' | 'Part-time';
 
-export const ExampleWindow = ({ panelId, path }: ExampleWindowProps) => {
+interface Row {
+  id: number;
+  name: string;
+  email: string;
+  department: string;
+  position: string;
+  salary: string;
+  startDate: string;
+  status: Status;
+}
+
+const DEPARTMENTS = [
+  'Engineering',
+  'Marketing',
+  'Sales',
+  'HR',
+  'Finance',
+  'Operations',
+];
+const POSITIONS = [
+  'Manager',
+  'Senior',
+  'Junior',
+  'Lead',
+  'Director',
+  'Analyst',
+];
+const STATUSES: Status[] = ['Active', 'On Leave', 'Remote', 'Part-time'];
+
+const STATUS_CLASS: Record<Status, string> = {
+  Active: 'example-window__status--active',
+  Remote: 'example-window__status--remote',
+  'On Leave': 'example-window__status--on-leave',
+  'Part-time': 'example-window__status--part-time',
+};
+
+const ADDITIONAL_CONTROLS = React.Children.toArray([
+  <CloseAdditionalControlsButton />,
+]);
+
+function buildRows(panelId: string): Row[] {
+  const panelOffset = Number.isFinite(parseInt(panelId, 10))
+    ? parseInt(panelId, 10)
+    : 0;
+  return Array.from({ length: 100 }, (_, index) => {
+    const id = index + 1 + panelOffset * 100;
+    return {
+      id,
+      name: `User ${id} Panel${panelId}`,
+      email: `user${id}@company.com`,
+      department: DEPARTMENTS[index % DEPARTMENTS.length],
+      position: POSITIONS[index % POSITIONS.length],
+      salary: `$${(50000 + index * 1000 + panelOffset * 5000).toLocaleString()}`,
+      startDate: new Date(
+        2020 + (index % 4),
+        index % 12,
+        (index % 28) + 1,
+      ).toLocaleDateString(),
+      status: STATUSES[index % STATUSES.length],
+    };
+  });
+}
+
+export const ExampleWindow: React.FC<ExampleWindowProps> = ({
+  panelId,
+  path,
+  title,
+}) => {
+  const rows = useMemo(() => buildRows(panelId), [panelId]);
+
   return (
-    <MosaicWindow<number>
-      additionalControls={panelId === '3' ? [] : EMPTY_ARRAY}
-      title={`Panel ${panelId}`}
-      createNode={createNode}
+    <MosaicWindow<string>
+      title={title}
       path={path}
-      onDragStart={() => console.log('MosaicWindow.onDragStart')}
-      onDragEnd={(type) => console.log('MosaicWindow.onDragEnd', type)}
+      createNode={createNode}
+      additionalControls={panelId === '3' ? ADDITIONAL_CONTROLS : []}
       renderToolbar={
         panelId === '2'
           ? () => (
@@ -46,247 +114,41 @@ export const ExampleWindow = ({ panelId, path }: ExampleWindowProps) => {
           : null
       }
     >
-      <div
-        className="example-window"
-        style={{
-          height: '100%',
-          overflow: 'auto',
-          padding: '0',
-          boxSizing: 'border-box',
-        }}
-      >
-        <h1
-          style={{ margin: '0 0 16px 0' }}
-        >{`Panel ${panelId} - Data Table`}</h1>
-
-        <div style={{ overflow: 'auto', width: '100%' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: '14px',
-              minWidth: '800px',
-            }}
-          >
-            <thead
-              style={{
-                backgroundColor: '#f5f8fa',
-              }}
-            >
+      <div className="example-window">
+        <h1 className="example-window__heading">{`${title} — Data Table`}</h1>
+        <div className="example-window__table-wrapper">
+          <table className="example-window__table">
+            <thead>
               <tr>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  ID
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Name
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Email
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Department
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Position
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Salary
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Start Date
-                </th>
-                <th
-                  style={{
-                    border: '1px solid #e1e5e9',
-                    padding: '12px 8px',
-                    textAlign: 'left',
-                    fontWeight: '600',
-                  }}
-                >
-                  Status
-                </th>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Department</th>
+                <th scope="col">Position</th>
+                <th scope="col">Salary</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
-              {Array.from({ length: 100 }, (_, index) => {
-                const id = index + 1 + parseInt(panelId) * 100;
-                const departments = [
-                  'Engineering',
-                  'Marketing',
-                  'Sales',
-                  'HR',
-                  'Finance',
-                  'Operations',
-                ];
-                const positions = [
-                  'Manager',
-                  'Senior',
-                  'Junior',
-                  'Lead',
-                  'Director',
-                  'Analyst',
-                ];
-                const statuses = ['Active', 'On Leave', 'Remote', 'Part-time'];
-
-                return (
-                  <tr
-                    key={id}
-                    style={{
-                      backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9f9f9',
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundColor = '#e6f3ff')
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor =
-                        index % 2 === 0 ? '#ffffff' : '#f9f9f9')
-                    }
-                  >
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
+              {rows.map((row) => (
+                <tr key={row.id}>
+                  <td>{row.id}</td>
+                  <td>{row.name}</td>
+                  <td>{row.email}</td>
+                  <td>{row.department}</td>
+                  <td>{row.position}</td>
+                  <td>{row.salary}</td>
+                  <td>{row.startDate}</td>
+                  <td>
+                    <span
+                      className={`example-window__status ${STATUS_CLASS[row.status]}`}
                     >
-                      {id}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      {`User ${id} Panel${panelId}`}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      {`user${id}@company.com`}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      {departments[index % departments.length]}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      {positions[index % positions.length]}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      ${(50000 + index * 1000 + parseInt(panelId) * 5000).toLocaleString()}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      {new Date(
-                        2020 + (index % 4),
-                        index % 12,
-                        (index % 28) + 1,
-                      ).toLocaleDateString()}
-                    </td>
-                    <td
-                      style={{
-                        border: '1px solid #e1e5e9',
-                        padding: '10px 8px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          padding: '4px 8px',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          backgroundColor:
-                            statuses[index % statuses.length] === 'Active'
-                              ? '#e6f7d6'
-                              : statuses[index % statuses.length] === 'Remote'
-                                ? '#e6f3ff'
-                                : statuses[index % statuses.length] === 'On Leave'
-                                  ? '#ffeaa7'
-                                  : '#f5f5f5',
-                          color:
-                            statuses[index % statuses.length] === 'Active'
-                              ? '#2d5016'
-                              : statuses[index % statuses.length] === 'Remote'
-                                ? '#1e3a8a'
-                                : statuses[index % statuses.length] === 'On Leave'
-                                  ? '#d68910'
-                                  : '#666',
-                        }}
-                      >
-                        {statuses[index % statuses.length]}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

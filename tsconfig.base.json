@@ -14,9 +14,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "react-mosaic-component": [
-        "libs/react-mosaic-component/src/index.ts"
-      ],
+      "react-mosaic-component": ["libs/react-mosaic-component/src/index.ts"],
       "react-mosaic-component/styles": [
         "libs/react-mosaic-component/src/lib/styles/index.less"
       ]

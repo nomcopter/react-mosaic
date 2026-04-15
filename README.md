@@ -168,7 +168,12 @@ interface MosaicProps<T> {
   createNode?: CreateNode<T>;
   resize?: ResizeOptions;
   zeroStateView?: ReactElement;
+
+  // Tabs customisation
   renderTabTitle?: TabTitleRenderer<T>;
+  renderTabButton?: TabButtonRenderer<T>;
+  renderTabToolbar?: TabToolbarRenderer<T>;
+  canClose?: TabCanCloseFunction<T>;
 
   // Drag & Drop
   dragAndDropManager?: DragDropManager;
@@ -348,7 +353,11 @@ const tabsExample: MosaicNode<string> = {
       <p>This is content for {id}</p>
     </div>
   )}
-  renderTabTitle={(tabKey) => `📄 ${tabKey.toUpperCase()}`}
+  renderTabTitle={({ tabKey, isActive }) => (
+    <span style={{ fontWeight: isActive ? 'bold' : 'normal' }}>
+      📄 {String(tabKey).toUpperCase()}
+    </span>
+  )}
 />;
 ```
 
@@ -394,7 +403,14 @@ import {
   updateTree,
   createRemoveUpdate,
   createExpandUpdate,
+  createHideUpdate,
+  createDragToUpdates,
   getNodeAtPath,
+  getParentNode,
+  getParentPath,
+  isSplitNode,
+  isTabsNode,
+  convertLegacyToNary,
 } from 'react-mosaic-component';
 
 // Get all leaf nodes (panel IDs)
@@ -445,6 +461,117 @@ const MyCustomComponent = () => {
   );
 };
 ```
+
+## 📚 Complete API Reference
+
+The sections above cover the most common workflows. This appendix lists every public
+export so you can find the right import without spelunking through the source.
+
+### Components
+
+| Export                                                | Purpose                                                                                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `Mosaic`                                              | Top-level tiling component. Handles drag-and-drop context.                                                                |
+| `MosaicWithoutDragDropContext`                        | Same as `Mosaic` but without wrapping a `DndProvider`, for apps that already own the react-dnd context.                   |
+| `MosaicWindow`                                        | Window wrapper with title bar, toolbar, and drag handle.                                                                  |
+| `MosaicTabs`                                          | Tabbed container used internally for `MosaicTabsNode`. Exported so you can render it yourself from a custom `renderTile`. |
+| `MosaicZeroState`                                     | Default "no windows" view. Accepts `createNode` to offer an "Add New Window" button.                                      |
+| `DraggableTab`                                        | Low-level draggable tab primitive used inside custom `renderTabToolbar` implementations.                                  |
+| `DefaultToolbarButton` / `createDefaultToolbarButton` | Styled button factory matching the default toolbar look.                                                                  |
+
+### Toolbar button exports
+
+Panel (split) buttons:
+
+- `ExpandButton`, `RemoveButton`, `ReplaceButton`, `SplitButton`, `AddTabButton`, `Separator`
+
+Tab-group buttons (rendered inside a `MosaicTabsNode`):
+
+- `TabSplitButton`, `TabRemoveButton`, `TabExpandButton`, `TabDragButton`
+
+Presets you can spread into `toolbarControls` / `tabToolbarControls`:
+
+```tsx
+import {
+  DEFAULT_CONTROLS_WITH_CREATION, // Replace, Split, AddTab, Expand, Remove
+  DEFAULT_CONTROLS_WITHOUT_CREATION, // Expand, Remove
+  DEFAULT_CONTROLS_IN_TABS, // Remove (for panels nested inside a tab group)
+  createDefaultTabsControls, // (path, connectDragSource?) => [TabDrag, TabSplit, TabRemove]
+} from 'react-mosaic-component';
+```
+
+### Renderer / callback types
+
+All are generic in the panel key type `T`:
+
+| Type                     | Signature                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `TileRenderer<T>`        | `(id: T, path: MosaicPath) => ReactElement`                                                                                                      |
+| `TabTitleRenderer<T>`    | `(props: { tabKey: T; index: number; isActive: boolean; path: MosaicPath; mosaicId: string }) => ReactNode`                                      |
+| `TabButtonRenderer<T>`   | `(props: { tabKey, index, isActive, path, mosaicId, onTabClick, mosaicActions, renderTabTitle?, canClose?, onTabClose?, tabs }) => ReactElement` |
+| `TabToolbarRenderer<T>`  | `(props: { tabs: T[]; activeTabIndex: number; path: MosaicPath; DraggableTab }) => ReactElement`                                                 |
+| `TabCanCloseFunction<T>` | `(tabKey: T, tabs: T[], index: number, path: MosaicPath) => TabCloseState`                                                                       |
+| `TabCloseState`          | `'canClose' \| 'cannotClose' \| 'noClose'`                                                                                                       |
+| `CreateNode<T>`          | `(...args: any[]) => MosaicNode<T> \| Promise<MosaicNode<T>>`                                                                                    |
+| `MosaicUpdate<T>`        | `{ path: MosaicPath; spec: MosaicUpdateSpec<T> }`                                                                                                |
+| `MosaicUpdateSpec<T>`    | `Spec<MosaicNode<T>>` (from `immutability-helper`)                                                                                               |
+| `MosaicDragType`         | `{ WINDOW: 'MosaicWindow' }` — the react-dnd drag type constant                                                                                  |
+
+### Tree utilities (`mosaicUtilities`)
+
+```tsx
+isSplitNode(node)          // type guard for MosaicSplitNode<T>
+isTabsNode(node)           // type guard for MosaicTabsNode<T>
+getLeaves(tree)            // flatten tree to an array of panel keys
+getNodeAtPath(tree, path)  // node at path, or null
+getAndAssertNodeAtPathExists(tree, path)  // like above, throws on miss
+getParentNode(tree, path)  // parent node, or null if path is root
+getParentPath(path)        // path.slice(0, -1)
+getPathToCorner(tree, corner) // path to a given Corner (TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT)
+getOtherDirection(direction)  // 'row' <-> 'column'
+createBalancedTreeFromLeaves(leaves, startDirection?) // build a balanced split tree
+convertLegacyToNary(legacyNode)   // upgrade a v0.19 binary tree to the n-ary format
+```
+
+### Tree update helpers (`mosaicUpdates`)
+
+```tsx
+updateTree(tree, updates); // apply an array of MosaicUpdate<T>
+buildSpecFromUpdate(update); // low-level spec builder
+createRemoveUpdate(path); // remove node at path
+createHideUpdate(tree, path); // collapse a pane to 0% without removing it
+createExpandUpdate(path, percentage); // grow a pane toward `percentage`
+createDragToUpdates(tree, sourcePath, destinationPath, dropInfo);
+// dropInfo is one of:
+//   { type: 'split', position: MosaicDropTargetPosition }
+//   { type: 'tab-container' }
+//   { type: 'tab-reorder', insertIndex: number }
+```
+
+`createDragToUpdates` is what powers drag-drop inside the library — reach for it if you're
+implementing programmatic "move panel here" actions from outside the drag layer.
+
+### Legacy (v0.19) types
+
+If you're migrating an older layout, these re-exports accept the old binary-tree shape:
+
+```tsx
+import {
+  convertLegacyToNary,
+  LegacyMosaicNode,
+  LegacyMosaicParent,
+  LegacyMosaicKey,
+  LegacyMosaicDirection,
+  LegacyMosaicBranch,
+  LegacyMosaicPath,
+} from 'react-mosaic-component';
+
+const naryTree = convertLegacyToNary(oldBinaryTree);
+```
+
+`<Mosaic value={...}>` also accepts legacy nodes directly and normalises them on first
+render, so the explicit conversion is only needed when you want to hold the upgraded
+shape in your own state.
 
 ## 🏗️ Development
 
@@ -628,22 +755,22 @@ Replace deprecated types with new ones:
 
 ```typescript
 // OLD: Deprecated types
-import { 
-  MosaicBranch,    // ❌ Use numeric indices instead
-  MosaicParent,    // ❌ Use MosaicSplitNode instead
-  MosaicNode       // ✅ Still valid but structure changed
+import {
+  MosaicBranch, // ❌ Use numeric indices instead
+  MosaicParent, // ❌ Use MosaicSplitNode instead
+  MosaicNode, // ✅ Still valid but structure changed
 } from 'react-mosaic-component';
 
 // NEW: Updated types
-import { 
-  MosaicSplitNode,     // ✅ Replaces MosaicParent
-  MosaicTabsNode,      // ✅ New tab container type
-  MosaicNode,          // ✅ Union of split, tabs, or leaf
-  MosaicPath,          // ✅ Now number[] instead of string[]
+import {
+  MosaicSplitNode, // ✅ Replaces MosaicParent
+  MosaicTabsNode, // ✅ New tab container type
+  MosaicNode, // ✅ Union of split, tabs, or leaf
+  MosaicPath, // ✅ Now number[] instead of string[]
   // Helper functions for type checking
   isSplitNode,
   isTabsNode,
-  convertLegacyToNary  // ✅ Migration utility
+  convertLegacyToNary, // ✅ Migration utility
 } from 'react-mosaic-component';
 ```
 
@@ -700,7 +827,7 @@ const legacyTree = {
   direction: 'row',
   first: 'panel1',
   second: 'panel2',
-  splitPercentage: 40
+  splitPercentage: 40,
 };
 
 const modernTree = convertLegacyToNary(legacyTree);
@@ -746,14 +873,14 @@ const convertedTree = convertLegacyToNary(oldTree);
 **Working with the New Tree Structure:**
 
 ```typescript
-import { 
-  MosaicNode, 
-  MosaicSplitNode, 
+import {
+  MosaicNode,
+  MosaicSplitNode,
   MosaicTabsNode,
   isSplitNode,
   isTabsNode,
   getNodeAtPath,
-  getLeaves
+  getLeaves,
 } from 'react-mosaic-component';
 
 // Type-safe tree traversal
@@ -764,7 +891,11 @@ function processNode<T>(node: MosaicNode<T>, path: number[] = []): void {
       processNode(child, [...path, index]);
     });
   } else if (isTabsNode(node)) {
-    console.log(`Tab group at path [${path.join(', ')}]:`, node.tabs.length, 'tabs');
+    console.log(
+      `Tab group at path [${path.join(', ')}]:`,
+      node.tabs.length,
+      'tabs',
+    );
     node.tabs.forEach((tab, index) => {
       console.log(`  Tab ${index}:`, tab);
     });

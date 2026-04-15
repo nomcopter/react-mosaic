@@ -3,7 +3,6 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
-/.circleci
 /.github
 /.idea
 /.parcel-cache

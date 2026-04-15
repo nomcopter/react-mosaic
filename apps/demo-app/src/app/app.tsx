@@ -2,262 +2,239 @@ import { Classes, HTMLSelect } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import classNames from 'classnames';
 import update from 'immutability-helper';
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import packageJson from '../../../../libs/react-mosaic-component/package.json';
 
-// Import new n-ary types and utilities
 import {
   createBalancedTreeFromLeaves,
   getLeaves,
   Mosaic,
   MosaicNode,
-  MosaicPath,
   MosaicSplitNode,
   MosaicZeroState,
 } from 'react-mosaic-component';
-import { CloseAdditionalControlsButton } from './toolbars';
 
-// Import extracted components and types
-import {
-  ExampleWindow,
-  EditableTabTitle,
-  CustomTabButton,
-} from '../components';
-import { DemoAppState, THEMES, Theme } from '../types/demo-types';
-import { findFirstLeafPath, createNode } from '../utils/demo-utils';
+import { ExampleWindow, EditableTabTitle } from '../components';
+import { THEMES, Theme } from '../types/demo-types';
+import { createNode } from '../utils/demo-utils';
 
 const version = packageJson.version;
 
-const additionalControls = React.Children.toArray([
-  <CloseAdditionalControlsButton />,
-]);
-
-export class DemoApp extends React.PureComponent<object, DemoAppState> {
-  state: DemoAppState = {
-    // The initial state now uses the new n-ary structure
-    currentNode: {
+// Initial layout showcases the n-ary tree shape added in v1.0:
+//   - a 3-child `split` (n-ary — splitPercentages has 3 entries)
+//   - a `tabs` node nested inside that split
+//   - a further column `split` on the right
+const INITIAL_TREE: MosaicNode<string> = {
+  type: 'split',
+  direction: 'row',
+  splitPercentages: [25, 45, 30],
+  children: [
+    '1',
+    {
+      type: 'tabs',
+      tabs: ['2', '3', '4'],
+      activeTabIndex: 0,
+    },
+    {
       type: 'split',
-      direction: 'row',
-      splitPercentages: [40, 60], // Replaces `splitPercentage`
-      children: [
-        '1',
-        {
-          type: 'split',
-          direction: 'column',
-          splitPercentages: [50, 50],
-          children: ['2', '3'],
-        },
-      ],
+      direction: 'column',
+      splitPercentages: [60, 40],
+      children: ['5', '6'],
     },
-    currentTheme: 'Blueprint',
-    editableTitles: {
-      1: 'Panel 1',
-      2: 'Panel 2',
-      3: 'Panel 3',
+  ],
+};
+
+const INITIAL_TITLES: Record<string, string> = {
+  '1': 'Dashboard',
+  '2': 'Metrics',
+  '3': 'Logs',
+  '4': 'Traces',
+  '5': 'Alerts',
+  '6': 'Settings',
+};
+
+export const DemoApp: React.FC = () => {
+  const [currentNode, setCurrentNode] = useState<MosaicNode<string> | null>(
+    INITIAL_TREE,
+  );
+  const [currentTheme, setCurrentTheme] = useState<Theme>('Blueprint');
+  const [editableTitles, setEditableTitles] =
+    useState<Record<string, string>>(INITIAL_TITLES);
+
+  const updateTitle = useCallback((panelId: string, newTitle: string) => {
+    setEditableTitles((titles) => ({ ...titles, [panelId]: newTitle }));
+  }, []);
+
+  const autoArrange = useCallback(() => {
+    setCurrentNode((node) => createBalancedTreeFromLeaves(getLeaves(node)));
+  }, []);
+
+  // Adds a new panel to the root split, demonstrating the n-ary structure by
+  // growing the children array instead of nesting a new binary split.
+  const addWindow = useCallback(() => {
+    setCurrentNode((node) => {
+      const totalWindowCount = getLeaves(node).length;
+      const newWindow = (totalWindowCount + 1).toString();
+
+      if (!node) {
+        return newWindow;
+      }
+
+      if (typeof node === 'object' && node.type === 'split') {
+        const numChildren = node.children.length;
+        return update(node, {
+          children: { $push: [newWindow] },
+          splitPercentages: {
+            $set: Array(numChildren + 1).fill(100 / (numChildren + 1)),
+          },
+        });
+      }
+
+      // Root is a single panel or a tab group: wrap it in a new split.
+      const nextRoot: MosaicSplitNode<string> = {
+        type: 'split',
+        direction: 'row',
+        splitPercentages: [50, 50],
+        children: [node, newWindow],
+      };
+      return nextRoot;
+    });
+  }, []);
+
+  const renderTile = useCallback(
+    (tileId: string, path: number[]) => (
+      <ExampleWindow
+        panelId={tileId}
+        path={path}
+        title={editableTitles[tileId] ?? `Panel ${tileId}`}
+      />
+    ),
+    [editableTitles],
+  );
+
+  const renderTabTitle = useCallback(
+    ({ tabKey }: { tabKey: string }) => (
+      <EditableTabTitle
+        key={tabKey}
+        title={editableTitles[tabKey] ?? `Window ${tabKey}`}
+        onUpdateTitle={(newTitle) => updateTitle(tabKey, newTitle)}
+      />
+    ),
+    [editableTitles, updateTitle],
+  );
+
+  // Example close logic — exercises all three TabCloseState values so users
+  // can see what they look like side-by-side.
+  const canClose = useCallback(
+    (
+      tabKey: string,
+      tabs: string[],
+    ): 'canClose' | 'cannotClose' | 'noClose' => {
+      if (tabKey === '2') return 'cannotClose'; // protected — button visible but disabled
+      if (tabKey === '3') return 'noClose'; // button hidden entirely
+      if (tabs.length <= 1) return 'cannotClose';
+      return 'canClose';
     },
-    dragInProgress: false,
-    dragOverPath: null,
-  };
+    [],
+  );
 
-  render() {
-    return (
-      <React.StrictMode>
-        <div className="react-mosaic-example-app">
-          {this.renderNavBar()}
-          <Mosaic<string>
-            // The `path` passed to renderTile is now MosaicPath (number[])
-            renderTile={(tileId, path) => (
-              <ExampleWindow
-                panelId={tileId}
-                path={path}
-                onUpdateTitle={this.updateTitle}
-                editableTitle={this.state.editableTitles[tileId]}
-                dragInProgress={this.state.dragInProgress}
-                onDragStart={this.onDragStart}
-                onDragEnd={this.onDragEnd}
-                onDragOver={() => this.onDragOver(path)}
-              />
-            )}
-            zeroStateView={<MosaicZeroState />}
-            initialValue={this.state.currentNode}
-            onChange={this.onChange}
-            onRelease={this.onRelease}
-            createNode={createNode}
-            className={THEMES[this.state.currentTheme]}
-            blueprintNamespace="bp5"
-            renderTabTitle={({tabKey}) => (
-              <EditableTabTitle
-                key={tabKey}
-                tabKey={tabKey}
-                title={this.state.editableTitles[tabKey] || `Window ${tabKey}`}
-                onUpdateTitle={(newTitle) => this.updateTitle(tabKey, newTitle)}
-              />
-            )}
-            canClose={(tabKey, tabs, index, path) => {
-              // Example close logic:
-              // - Tab 1 cannot be closed (protected)
-              // - Tab 2 has no close button
-              // - Other tabs can be closed normally
-              // - If only one tab remains, it cannot be closed
-              if (tabKey === '1') {
-                return 'cannotClose'; // Protected tab
-              }
-              if (tabKey === '2') {
-                return 'noClose'; // No close button
-              }
-              if (tabs.length <= 1) {
-                return 'cannotClose'; // Last tab cannot be closed
-              }
-              return 'canClose'; // Normal tabs can be closed
-            }}
-            //renderTabButton={CustomTabButton} // Now enabled with custom tab buttons
-          />
-        </div>
-      </React.StrictMode>
-    );
-  }
+  const zeroStateView = useMemo(() => <MosaicZeroState />, []);
 
-  private onChange = (currentNode: MosaicNode<string> | null) => {
-    this.setState({ currentNode });
-    console.log('Mosaic.onChange', currentNode);
-  };
+  return (
+    <div className="react-mosaic-example-app">
+      <NavBar
+        currentTheme={currentTheme}
+        onThemeChange={setCurrentTheme}
+        onAutoArrange={autoArrange}
+        onAddWindow={addWindow}
+      />
+      <Mosaic<string>
+        renderTile={renderTile}
+        zeroStateView={zeroStateView}
+        value={currentNode}
+        onChange={setCurrentNode}
+        createNode={createNode}
+        className={THEMES[currentTheme]}
+        blueprintNamespace="bp5"
+        renderTabTitle={renderTabTitle}
+        canClose={canClose}
+      />
+    </div>
+  );
+};
 
-  private onRelease = (currentNode: MosaicNode<string> | null) => {
-    console.log('Mosaic.onRelease():', currentNode);
-  };
-
-  private autoArrange = () => {
-    const leaves = getLeaves(this.state.currentNode);
-    this.setState({
-      currentNode: createBalancedTreeFromLeaves(leaves),
-    });
-  };
-
-  // This action now adds a new panel to the root, demonstrating the n-ary nature
-  private addWindow = () => {
-    const { currentNode } = this.state;
-    const totalWindowCount = getLeaves(currentNode).length;
-    const newWindow = (totalWindowCount + 1).toString();
-
-    if (!currentNode) {
-      this.setState({ currentNode: newWindow });
-      return;
-    }
-
-    // Add the new window to the root split, or create a new root split
-    let spec;
-    if (typeof currentNode === 'object' && currentNode.type === 'split') {
-      const numChildren = currentNode.children.length;
-      spec = {
-        children: { $push: [newWindow] },
-        // Distribute space equally among all children
-        splitPercentages: {
-          $set: Array(numChildren + 1).fill(100 / (numChildren + 1)),
-        },
-      };
-    } else {
-      // Root is a single panel or a tab group, replace it with a split
-      spec = {
-        $set: {
-          type: 'split',
-          direction: 'row',
-          splitPercentages: [50, 50],
-          children: [currentNode, newWindow],
-        } as MosaicSplitNode<string>,
-      };
-    }
-
-    const newTree = update(currentNode, spec);
-    this.setState({ currentNode: newTree });
-  };
-
-  // Handle editable titles
-  private updateTitle = (panelId: string, newTitle: string) => {
-    this.setState({
-      editableTitles: {
-        ...this.state.editableTitles,
-        [panelId]: newTitle,
-      },
-    });
-  };
-
-  // Handle drag events for visual feedback
-  private onDragStart = () => {
-    this.setState({ dragInProgress: true });
-  };
-
-  private onDragEnd = () => {
-    this.setState({ dragInProgress: false, dragOverPath: null });
-  };
-
-  private onDragOver = (path: MosaicPath) => {
-    this.setState({ dragOverPath: path });
-  };
-
-  private renderNavBar() {
-    return (
-      <div className={classNames(Classes.NAVBAR, Classes.DARK)}>
-        <div className={Classes.NAVBAR_GROUP}>
-          <div className={Classes.NAVBAR_HEADING}>
-            <a href="https://github.com/nomcopter/react-mosaic">
-              react-mosaic <span className="version">v{version}</span>
-            </a>
-          </div>
-        </div>
-        <div className={classNames(Classes.NAVBAR_GROUP, Classes.BUTTON_GROUP)}>
-          <label
-            className={classNames(
-              'theme-selection',
-              Classes.LABEL,
-              Classes.INLINE,
-            )}
-          >
-            Theme:
-            <HTMLSelect
-              value={this.state.currentTheme}
-              onChange={(e) =>
-                this.setState({ currentTheme: e.currentTarget.value as Theme })
-              }
-            >
-              {React.Children.toArray(
-                Object.keys(THEMES).map((label) => (
-                  <option key={label}>{label}</option>
-                )),
-              )}
-            </HTMLSelect>
-          </label>
-          <div className="navbar-separator" />
-          <span className="actions-label">Example Actions:</span>
-          <button
-            className={classNames(
-              Classes.BUTTON,
-              Classes.iconClass(IconNames.GRID_VIEW),
-            )}
-            onClick={this.autoArrange}
-          >
-            Auto Arrange
-          </button>
-          <button
-            className={classNames(
-              Classes.BUTTON,
-              Classes.iconClass(IconNames.APPLICATION),
-            )}
-            onClick={this.addWindow}
-          >
-            Add Window
-          </button>
-          <a
-            className="github-link"
-            href="https://github.com/nomcopter/react-mosaic"
-          >
-            <img title="Github Link" src="./GitHub-Mark-Light-32px.png" />
-          </a>
-        </div>
-      </div>
-    );
-  }
+interface NavBarProps {
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
+  onAutoArrange: () => void;
+  onAddWindow: () => void;
 }
+
+const NavBar: React.FC<NavBarProps> = ({
+  currentTheme,
+  onThemeChange,
+  onAutoArrange,
+  onAddWindow,
+}) => (
+  <div className={classNames(Classes.NAVBAR, Classes.DARK)}>
+    <div className={Classes.NAVBAR_GROUP}>
+      <div className={Classes.NAVBAR_HEADING}>
+        <a href="https://github.com/nomcopter/react-mosaic">
+          react-mosaic <span className="version">v{version}</span>
+        </a>
+      </div>
+    </div>
+    <div className={classNames(Classes.NAVBAR_GROUP, Classes.BUTTON_GROUP)}>
+      <label
+        className={classNames('theme-selection', Classes.LABEL, Classes.INLINE)}
+      >
+        Theme:
+        <HTMLSelect
+          value={currentTheme}
+          aria-label="Theme"
+          onChange={(e) => onThemeChange(e.currentTarget.value as Theme)}
+        >
+          {Object.keys(THEMES).map((label) => (
+            <option key={label}>{label}</option>
+          ))}
+        </HTMLSelect>
+      </label>
+      <div className="navbar-separator" />
+      <span className="actions-label">Example Actions:</span>
+      <button
+        type="button"
+        className={classNames(
+          Classes.BUTTON,
+          Classes.iconClass(IconNames.GRID_VIEW),
+        )}
+        onClick={onAutoArrange}
+      >
+        Auto Arrange
+      </button>
+      <button
+        type="button"
+        className={classNames(
+          Classes.BUTTON,
+          Classes.iconClass(IconNames.APPLICATION),
+        )}
+        onClick={onAddWindow}
+      >
+        Add Window
+      </button>
+      <a
+        className="github-link"
+        href="https://github.com/nomcopter/react-mosaic"
+      >
+        <img
+          alt="react-mosaic on GitHub"
+          title="Github Link"
+          src="./GitHub-Mark-Light-32px.png"
+        />
+      </a>
+    </div>
+  </div>
+);

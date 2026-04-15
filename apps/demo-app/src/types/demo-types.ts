@@ -1,39 +1,14 @@
-import { MosaicNode, MosaicPath } from 'react-mosaic-component';
-
-export interface DemoAppState {
-  currentNode: MosaicNode<string> | null;
-  currentTheme: Theme;
-  editableTitles: Record<string, string>;
-  dragInProgress: boolean;
-  dragOverPath: MosaicPath | null;
-}
+import { MosaicPath } from 'react-mosaic-component';
 
 export interface ExampleWindowProps {
-  path: MosaicPath;
-  onUpdateTitle?: (panelId: string, newTitle: string) => void;
-  editableTitle?: string;
-  dragInProgress?: boolean;
-  onDragStart?: () => void;
-  onDragEnd?: () => void;
-  onDragOver?: () => void;
   panelId: string;
+  path: MosaicPath;
+  title: string;
 }
 
 export interface EditableTabTitleProps {
-  tabKey: number | string;
   title: string;
   onUpdateTitle: (newTitle: string) => void;
-}
-
-export interface CustomTabButtonProps {
-  tabKey: number;
-  index: number;
-  isActive: boolean;
-  path: MosaicPath;
-  mosaicId: string;
-  onTabClick: () => void;
-  mosaicActions: any; // MosaicRootActions<number>
-  renderTabTitle?: (tabKey: number, path: MosaicPath) => React.ReactNode;
 }
 
 export const THEMES = {

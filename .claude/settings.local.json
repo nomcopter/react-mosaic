@@ -1,11 +1,7 @@
 {
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "nx-mcp"
-  ],
   "permissions": {
-    "allow": [
-      "Bash(npm run build:lib:*)"
-    ]
-  }
+    "allow": ["Bash(npm run build:lib:*)", "Bash(grep:*)", "Bash(npx nx:*)"]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["nx-mcp"]
 }
