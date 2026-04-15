@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <!-- Outer border -->
+  <rect x="4" y="4" width="56" height="56" rx="6" stroke="#61DAFB" stroke-width="2" fill="none"/>
+
+  <!-- Mosaic tiles -->
+  <rect x="8" y="8" width="20" height="20" fill="#61DAFB" rx="2"/>
+  <rect x="36" y="8" width="20" height="12" fill="#61DAFB" rx="2"/>
+  <rect x="36" y="24" width="20" height="20" fill="#21A1F1" rx="2"/>
+  <rect x="8" y="36" width="20" height="20" fill="#21A1F1" rx="2"/>
+  <rect x="28" y="36" width="28" height="20" fill="#147EBA" rx="2"/>
+
+  <!-- Drag/resize handles (suggesting interactivity) -->
+  <line x1="28" y1="4" x2="28" y2="60" stroke="#999" stroke-width="1" stroke-dasharray="2 2"/>
+  <line x1="4" y1="28" x2="60" y2="28" stroke="#999" stroke-width="1" stroke-dasharray="2 2"/>
+</svg>

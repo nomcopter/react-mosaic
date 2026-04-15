@@ -1,0 +1,125 @@
+---
+id: tree-structure
+title: Tree structure
+sidebar_position: 1
+---
+
+# Tree structure
+
+Every layout in react-mosaic is a `MosaicNode<T>` — a tree of three kinds of
+node:
+
+1. **Leaf nodes** — a single panel, represented by its key of type `T`.
+2. **Split nodes** — `{ type: 'split', direction, children, splitPercentages? }`.
+   Holds any number of child nodes laid out horizontally (`'row'`) or vertically
+   (`'column'`).
+3. **Tab nodes** — `{ type: 'tabs', tabs, activeTabIndex }`. Holds any number of
+   leaf keys and displays them as a tab group.
+
+The type signature is:
+
+```ts
+type MosaicNode<T extends MosaicKey> =
+  | MosaicSplitNode<T>
+  | MosaicTabsNode<T>
+  | T;
+
+interface MosaicSplitNode<T> {
+  type: 'split';
+  direction: 'row' | 'column';
+  children: MosaicNode<T>[];
+  /** Array summing to 100. Omit for equal distribution. */
+  splitPercentages?: number[];
+}
+
+interface MosaicTabsNode<T> {
+  type: 'tabs';
+  tabs: T[];
+  activeTabIndex: number;
+}
+```
+
+## Try it
+
+The code block below is live — edit any value and the preview above it updates
+immediately. Change `direction`, add a third child to `children`, adjust
+`splitPercentages`:
+
+```tsx live
+function TreeStructureExample() {
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Panel ${id}`}>
+            <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+              <strong>{id}</strong>
+            </div>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          splitPercentages: [30, 40, 30],
+          children: [
+            'left',
+            {
+              type: 'tabs',
+              tabs: ['inbox', 'drafts', 'sent'],
+              activeTabIndex: 0,
+            },
+            {
+              type: 'split',
+              direction: 'column',
+              splitPercentages: [60, 40],
+              children: ['main', 'console'],
+            },
+          ],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+## Paths
+
+A `MosaicPath` is the route to a node through the tree, expressed as an array
+of numeric indices:
+
+- `[]` — the root
+- `[0]` — first child of the root
+- `[1, 2]` — third child of the second child of the root
+
+Paths are how every tree-manipulation utility identifies which node to operate
+on. The `path` argument you receive in `renderTile` and `MosaicWindow` is the
+path to _that panel's_ current location — you don't track it yourself, the
+component gives it to you.
+
+## Leaf keys
+
+Panel identifiers (`T`) must be serialisable and unique within the tree.
+`string` and `number` are both fine. The library does not care what the key
+means — it's your identifier for whatever that panel represents (a file, a
+report, a view mode, a tab inside your own model).
+
+Leaf keys appear:
+
+- In the tree as bare values (`children: ['a', 'b']`).
+- As the first argument to your `renderTile` function.
+- As the first argument to `TabTitleRenderer`, `TabButtonRenderer`, etc.
+
+## Why n-ary?
+
+Before v7, split nodes were binary: every split had `first` and `second`
+children. Adding a third panel meant nesting another split inside, which made
+the tree deep and the indices shift every time you added a panel.
+
+N-ary splits let a single split hold three, five, ten children with one
+`splitPercentages` array. The "auto arrange" action in the [demo](/demo)
+demonstrates the difference directly — notice the tree stays shallow.
+
+If you have a legacy binary tree in storage, you don't need to migrate it
+manually: `<Mosaic value={legacyTree}>` converts on the fly, and
+[`convertLegacyToNary`](../migration/from-v6) is available for explicit
+upgrades.

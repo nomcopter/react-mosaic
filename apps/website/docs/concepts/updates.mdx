@@ -1,0 +1,100 @@
+---
+id: updates
+title: Updates and mutations
+sidebar_position: 4
+---
+
+# Updates and mutations
+
+The tree is immutable. Every mutation — drag-to-resize, dropping a panel,
+clicking the remove button — produces a brand-new tree and hands it to
+`onChange`. The library never mutates the value you pass in.
+
+That immutability is made practical by a small set of helpers that take a
+tree and a path, and return a new tree.
+
+## `updateTree` and `MosaicUpdate`
+
+Everything funnels through `updateTree`:
+
+```ts
+import { updateTree, MosaicUpdate } from 'react-mosaic-component';
+
+const updates: MosaicUpdate<string>[] = [
+  { path: ['direction' /* path index */], spec: { $set: 'column' } },
+];
+const next = updateTree(tree, updates);
+```
+
+A `MosaicUpdate` is a `{ path, spec }` pair. The spec is an
+[`immutability-helper`](https://github.com/kolodny/immutability-helper)
+command — `$set`, `$push`, `$apply`, etc. — applied at the node addressed
+by `path`.
+
+You rarely write specs by hand. The library ships a handful of factories
+that produce the common ones for you.
+
+## The update factories
+
+| Factory | What it does |
+| --- | --- |
+| `createRemoveUpdate(tree, path)` | Removes the node at `path`, collapsing its parent if needed. |
+| `createHideUpdate(path)` | Temporarily hides a split node (sets its percentage to 0). |
+| `createExpandUpdate(path, percentage)` | Grows the node at `path` to take `percentage` of its parent. |
+| `createDragToUpdates(tree, sourcePath, destinationPath, position)` | Produces the full update sequence for a drag-and-drop operation. |
+
+All of them return `MosaicUpdate<T>[]`, so you compose them by concatenating
+arrays and passing the result to `updateTree`.
+
+## Example: a "reset layout" button
+
+```tsx
+import { useState } from 'react';
+import {
+  Mosaic,
+  MosaicWindow,
+  MosaicNode,
+  createBalancedTreeFromLeaves,
+  getLeaves,
+} from 'react-mosaic-component';
+
+function App() {
+  const [tree, setTree] = useState<MosaicNode<string> | null>(INITIAL);
+
+  const rebalance = () => {
+    setTree((current) => createBalancedTreeFromLeaves(getLeaves(current)));
+  };
+
+  return (
+    <>
+      <button onClick={rebalance}>Auto arrange</button>
+      <Mosaic value={tree} onChange={setTree} renderTile={/* ... */} />
+    </>
+  );
+}
+```
+
+`getLeaves` walks the tree and returns the leaf keys in order;
+`createBalancedTreeFromLeaves` packs them back into a minimal-depth n-ary
+tree. Chaining the two gives you "reshuffle into a clean grid" in one line.
+
+## Why not just mutate?
+
+Immutability keeps rendering predictable: React re-renders only when the
+reference changes, and because `Mosaic` is happy to be driven by `value`,
+you get free time-travel. Keep a stack of past trees and you have undo for
+the price of one array.
+
+```tsx
+const [history, setHistory] = useState<MosaicNode<string>[]>([INITIAL]);
+const tree = history[history.length - 1];
+
+const push = (next: MosaicNode<string>) =>
+  setHistory((h) => [...h, next]);
+
+const undo = () =>
+  setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
+```
+
+Because mosaic hands you a whole new tree on every `onChange`, this pattern
+is as simple as it looks.

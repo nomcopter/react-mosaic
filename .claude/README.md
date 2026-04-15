@@ -58,7 +58,7 @@ react-mosaic/
 │       ├── types.ts                  # Type definitions
 │       ├── contextTypes.ts           # Context types
 │       └── util/                     # Utility functions
-├── apps/demo-app/                    # Demo application
+├── apps/website/                     # Docusaurus docs + demo
 ├── claude.md                         # LLM integration guide
 ├── CONTRIBUTING_AI.md                # AI contribution guidelines
 ├── QUICKREF.md                       # Quick reference
@@ -189,6 +189,6 @@ For issues or questions:
 
 ## Version
 
-This integration is designed for React Mosaic v0.20.0.
+This integration is designed for React Mosaic v7.
 
-Last updated: 2025-12-04
+Last updated: 2026-04-15

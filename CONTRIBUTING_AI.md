@@ -101,7 +101,7 @@ When adding/modifying code:
 
 1. **Unit tests** - Add tests for new utilities in `*.spec.ts` files
 2. **Type tests** - Ensure TypeScript compilation passes
-3. **Visual tests** - Test in demo app for component changes
+3. **Visual tests** - Test in the website playground (`npm start`) for component changes
 4. **Edge cases** - Test with empty trees, single nodes, deeply nested trees
 
 ### Code Style Checklist
@@ -393,13 +393,13 @@ When unsure about implementation:
 - **User docs**: `README.md`
 - **Type reference**: `libs/react-mosaic-component/src/lib/types.ts`
 - **Utility reference**: `libs/react-mosaic-component/src/lib/util/`
-- **Demo examples**: `apps/demo-app/src/`
+- **Demo examples**: `apps/website/src/components/Playground/`
 
 ## Helpful Commands
 
 ```bash
 # Development
-npm start                  # Start demo app
+npm start                  # Start Docusaurus site (with live playground)
 npm test                   # Run tests
 npm run test:watch        # Watch mode
 npm run build:lib         # Build library

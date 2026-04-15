@@ -1,0 +1,106 @@
+---
+id: theming
+title: Theming
+sidebar_position: 3
+---
+
+# Theming
+
+react-mosaic ships a neutral default theme plus a Blueprint-integrated one.
+Both are opt-in: the library renders nothing visible until you pull in a
+stylesheet, and which stylesheet you pull in decides the look.
+
+## The required stylesheet
+
+You must import the library CSS somewhere in your app:
+
+```ts
+import 'react-mosaic-component/react-mosaic-component.css';
+```
+
+This bundles the layout rules (split bars, drop targets, drag preview) and
+the default theme in one file. Without it, panels render but have no
+dividers, no hover states, and no drop indicators.
+
+## Applying a theme: `className` on `<Mosaic>`
+
+The `className` prop on `Mosaic` is how you pick a theme. The library
+recognises two built-in values:
+
+- `'mosaic-blueprint-theme'` — matches Blueprint's default (light) palette.
+- `'mosaic-blueprint-theme bp5-dark'` — Blueprint dark mode. (Combine with
+  `blueprintNamespace="bp5"` so internal icons render via Blueprint's icon
+  font.)
+
+```tsx
+<Mosaic<string>
+  className="mosaic-blueprint-theme bp5-dark"
+  blueprintNamespace="bp5"
+  renderTile={/* ... */}
+  initialValue={/* ... */}
+/>
+```
+
+If you're not using Blueprint at all, leave `className` empty — the default
+neutral theme is always on.
+
+## Writing your own theme
+
+Every visual rule in the library is namespaced under `.mosaic-*`. To theme
+your own panels, add a class to `Mosaic` and scope overrides to it:
+
+```css
+.my-theme.mosaic {
+  background: #0b1220;
+}
+
+.my-theme .mosaic-window {
+  background: #111a2c;
+  border: 1px solid #1f2a44;
+  border-radius: 6px;
+}
+
+.my-theme .mosaic-window-title {
+  background: linear-gradient(90deg, #1a2236, #111a2c);
+  color: #cbd5e0;
+}
+
+.my-theme .mosaic-split:hover {
+  background: #4c90f0;
+}
+```
+
+```tsx
+<Mosaic className="my-theme" renderTile={/* ... */} />
+```
+
+You don't need to restyle everything — the default theme is the base, and
+your class overrides only what you specify.
+
+## The class names that matter
+
+When writing a theme, these are the selectors you'll most often target:
+
+| Selector | What it is |
+| --- | --- |
+| `.mosaic` | Root container |
+| `.mosaic-window` | Individual panel |
+| `.mosaic-window-title` | Title bar area |
+| `.mosaic-window-body` | Panel content area |
+| `.mosaic-window-toolbar` | Right-hand button cluster |
+| `.mosaic-split` | Draggable divider between siblings |
+| `.mosaic-split.-row` / `.-column` | Direction-specific divider |
+| `.mosaic-drop-target` | Hover target shown during drag |
+| `.mosaic-tab` | Single tab header |
+| `.mosaic-tab.-active` | The currently-selected tab header |
+| `.mosaic-zero-state` | Empty-state placeholder |
+
+The BEM-ish pattern (`block__element--modifier`) is consistent across the
+whole library, so if you can't find a class, inspect a running demo in
+DevTools — the names are stable.
+
+## Live example
+
+Flip between themes in the [demo app](/demo) — the theme selector in the
+toolbar toggles `className` on a live `<Mosaic>` instance. That's the whole
+integration: one string.

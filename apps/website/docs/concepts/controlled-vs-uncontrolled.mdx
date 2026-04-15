@@ -1,0 +1,106 @@
+---
+id: controlled-vs-uncontrolled
+title: Controlled vs uncontrolled
+sidebar_position: 2
+---
+
+# Controlled vs uncontrolled
+
+`Mosaic` supports both controlled and uncontrolled patterns, mirroring the way
+`<input>` works in React. Which one you pick determines who owns the layout
+state.
+
+## Uncontrolled — `initialValue`
+
+Pass `initialValue` and let the component manage the tree internally. This is
+the shortest path to a working layout:
+
+```tsx live
+function UncontrolledExample() {
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Panel ${id}`}>
+            <div style={{ padding: 16 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          children: ['a', 'b', 'c'],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+Use this when you don't need to read the tree from outside the component —
+the user rearranges panels and you never touch the state.
+
+## Controlled — `value` + `onChange`
+
+Pass `value` and `onChange` to own the state yourself. This is required any
+time you need to:
+
+- **persist the layout** (localStorage, server, URL);
+- **programmatically mutate it** (add a panel from a button outside the
+  mosaic, reset to a preset);
+- **react to changes** (analytics, undo/redo, derived UI).
+
+```tsx
+import { useState } from 'react';
+import { Mosaic, MosaicWindow, MosaicNode } from 'react-mosaic-component';
+
+function ControlledExample() {
+  const [tree, setTree] = useState<MosaicNode<string> | null>({
+    type: 'split',
+    direction: 'row',
+    children: ['a', 'b'],
+  });
+
+  return (
+    <Mosaic<string>
+      value={tree}
+      onChange={setTree}
+      renderTile={(id, path) => (
+        <MosaicWindow path={path} title={`Panel ${id}`}>
+          <div>{id}</div>
+        </MosaicWindow>
+      )}
+    />
+  );
+}
+```
+
+The `onChange` callback fires for every mutation — drag-to-resize,
+drag-to-rearrange, button clicks, tab switches. `value` can be `null` to
+represent an empty layout (the `zeroStateView` is rendered in that case).
+
+## Mixing the two: `onRelease`
+
+`onChange` fires on every frame of an ongoing drag. If you're persisting to
+disk or hitting an API, throttle that — or better, use `onRelease` to only
+save when the user finishes the interaction:
+
+```tsx
+<Mosaic
+  value={tree}
+  onChange={setTree}
+  onRelease={(finalTree) => savePreference('layout', finalTree)}
+  renderTile={/* ... */}
+/>
+```
+
+`onRelease` fires once, with the final tree, after the user releases the
+drag.
+
+## Rules of thumb
+
+- **Throwaway / demo / docs embed** → `initialValue`. Nothing external needs
+  to see the tree.
+- **Anything you persist or manipulate from outside** → controlled `value` +
+  `onChange`. Throttle or debounce the write path with `onRelease`.
+- **Don't mix them.** Pass `initialValue` *or* `value`, not both — the
+  component will warn you at runtime.

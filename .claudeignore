@@ -62,9 +62,9 @@ pnpm-lock.yaml
 *.js.map
 *.css.map
 
-# Demo app specific
-apps/demo-app/dist/
-apps/demo-app/.vite/
+# Website build output
+apps/website/build/
+apps/website/.docusaurus/
 
 # Git files
 .git/

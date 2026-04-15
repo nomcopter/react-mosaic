@@ -1,0 +1,74 @@
+/**
+ * Global styles for the react-mosaic documentation site.
+ *
+ * Docusaurus uses Infima (https://infima.dev/) under the hood. Override its
+ * CSS variables to theme the site, then import the react-mosaic library's
+ * compiled stylesheet so interactive examples render with the default theme.
+ */
+
+/* ---- react-mosaic library styles ---------------------------------------- */
+/* Imported from the published dist so live code blocks render mosaics correctly.
+ * If this fails to resolve, run `npm run build:lib` once to populate dist/.  */
+@import url('../../../../dist/libs/react-mosaic-component/react-mosaic-component.css');
+
+/* ---- Defend against Blueprint's unscoped base rules --------------------- */
+/* `blueprint.css` is registered as a site-wide stylesheet in docusaurus.config
+ * so icon fonts resolve on every page. It ships an unscoped
+ *   body { color: #1c2127; font-family: -apple-system, ... }
+ * rule that clobbers Docusaurus's dark-mode text. `html body` has specificity
+ * (0,0,2) vs Blueprint's `body` at (0,0,1), so these win regardless of load
+ * order. We bind to Infima's CSS variables so both light and dark themes work
+ * automatically.
+ */
+html body {
+  color: var(--ifm-font-color-base);
+  background-color: var(--ifm-background-color);
+  font-family: var(--ifm-font-family-base);
+}
+
+/* ---- Infima theme overrides --------------------------------------------- */
+:root {
+  --ifm-color-primary: #106ba3;
+  --ifm-color-primary-dark: #0e6093;
+  --ifm-color-primary-darker: #0d5b8b;
+  --ifm-color-primary-darkest: #0b4b73;
+  --ifm-color-primary-light: #1276b3;
+  --ifm-color-primary-lighter: #137bbb;
+  --ifm-color-primary-lightest: #178bd3;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4c90f0;
+  --ifm-color-primary-dark: #2d7bec;
+  --ifm-color-primary-darker: #1e71ea;
+  --ifm-color-primary-darkest: #1260cc;
+  --ifm-color-primary-light: #6ba5f3;
+  --ifm-color-primary-lighter: #7aaff4;
+  --ifm-color-primary-lightest: #a6c8f8;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Live-codeblock playground tweaks ----------------------------------- */
+
+/* Give embedded mosaics a fixed height so they actually render.
+ * Mosaic is absolutely-positioned and fills its container — without an
+ * explicit height the parent has intrinsic size 0 and nothing is visible. */
+.live-mosaic-frame {
+  position: relative;
+  height: 320px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.live-mosaic-frame .mosaic {
+  position: absolute;
+  inset: 0;
+}
+
+/* The react-live preview pane — give it breathing room. */
+.theme-live-codeblock {
+  margin-bottom: 1.5rem;
+}

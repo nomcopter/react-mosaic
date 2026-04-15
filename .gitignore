@@ -19,3 +19,9 @@ vitest.config.*.timestamp*
 .parcel-cache
 .tsup
 /dist
+
+# Staged at Docusaurus config load — see apps/website/docusaurus.config.ts.
+# Blueprint CSS is copied here so it can be served as plain static files and
+# attached via the `stylesheets` config, instead of being bundled into the
+# site-wide stylesheet (which would leak Blueprint's unscoped body rules).
+apps/website/static/css/

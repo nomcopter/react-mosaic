@@ -34,6 +34,6 @@ jobs:
 
       - name: Build library
         run: npm run build:lib
-        
-      - name: Build app
-        run: npm run build:app
+
+      - name: Build website
+        run: npm run build:site

@@ -1,0 +1,104 @@
+---
+id: tabs
+title: Tabs
+sidebar_position: 3
+---
+
+# Tabs
+
+Tab containers are a first-class node type in react-mosaic. They are not a
+convention built on top of splits — they have their own shape in the tree,
+their own drop targets, and their own close semantics.
+
+## The node shape
+
+```ts
+interface MosaicTabsNode<T> {
+  type: 'tabs';
+  tabs: T[];
+  activeTabIndex: number;
+}
+```
+
+A tab node is a container that displays any number of leaf keys as a tab
+strip. The active tab is rendered as a full panel below the tabs; clicking a
+tab header switches `activeTabIndex`.
+
+Tab nodes can appear anywhere a leaf node can — including inside a split,
+inside another tab's panels? No: tabs can't nest directly. If a leaf is
+itself a complex layout, model it as a leaf that renders its own mosaic, not
+as a tab containing a tab.
+
+## A live tabbed layout
+
+```tsx live
+function TabsExample() {
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Panel ${id}`}>
+            <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+              Tab: <strong>{id}</strong>
+            </div>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          children: [
+            'sidebar',
+            {
+              type: 'tabs',
+              tabs: ['inbox', 'drafts', 'sent'],
+              activeTabIndex: 0,
+            },
+          ],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+Drag a tab header to split it out into its own panel. Drag a non-tab panel
+onto a tab strip to add it to the group.
+
+## Close semantics: `canClose`
+
+`Mosaic`'s `canClose` prop decides, per tab, whether the close button is
+rendered, visible-but-disabled, or fully enabled. Return one of three
+strings:
+
+- `'canClose'` — close button is enabled.
+- `'cannotClose'` — close button is visible but disabled (hover tooltip
+  typically explains why).
+- `'noClose'` — close button is not rendered at all.
+
+```tsx
+const canClose: TabCanCloseFunction<string> = (tabKey, tabs) => {
+  if (tabKey === 'home') return 'noClose';       // pinned, no X at all
+  if (tabKey === 'readme') return 'cannotClose'; // protected, X disabled
+  if (tabs.length <= 1) return 'cannotClose';    // don't allow empty group
+  return 'canClose';
+};
+```
+
+The three states let you model pinned tabs, protected tabs, and the normal
+case without building your own custom toolbar.
+
+## Editable tab titles
+
+`renderTabTitle` lets you replace the default label with any React node —
+including an inline editor. The demo at [/demo](/demo) uses this to let
+users double-click a tab header and rename it in place. The prop receives
+`{ tabKey, isActive }`, so you can swap out the render based on which tab is
+focused.
+
+## Tab-group toolbars
+
+Tab nodes have their own toolbar, configured via `renderTabToolbar`.
+Tab-specific button variants live in the library: `AddTabButton`,
+`TabSplitButton`, `TabExpandButton`, `TabRemoveButton`. See the [custom
+toolbars guide](../guides/custom-toolbar#toolbars-inside-tab-groups) for the
+full shape.

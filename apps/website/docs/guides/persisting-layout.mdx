@@ -1,0 +1,127 @@
+---
+id: persisting-layout
+title: Persisting layout
+sidebar_position: 2
+---
+
+# Persisting layout
+
+The `MosaicNode` tree is JSON-serialisable by design — no class instances,
+no functions, no circular refs. That means "persist the user's layout" is
+`JSON.stringify` + your storage of choice.
+
+## localStorage (synchronous)
+
+```tsx
+import { useEffect, useState } from 'react';
+import { Mosaic, MosaicWindow, MosaicNode } from 'react-mosaic-component';
+
+const STORAGE_KEY = 'myapp.layout.v1';
+
+const DEFAULT_LAYOUT: MosaicNode<string> = {
+  type: 'split',
+  direction: 'row',
+  children: ['a', 'b'],
+};
+
+function loadInitial(): MosaicNode<string> | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as MosaicNode<string>) : DEFAULT_LAYOUT;
+  } catch {
+    return DEFAULT_LAYOUT;
+  }
+}
+
+export function App() {
+  const [tree, setTree] = useState<MosaicNode<string> | null>(loadInitial);
+
+  return (
+    <Mosaic<string>
+      value={tree}
+      onChange={setTree}
+      onRelease={(finalTree) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(finalTree));
+      }}
+      renderTile={(id, path) => (
+        <MosaicWindow path={path} title={`Panel ${id}`}>
+          <div>{id}</div>
+        </MosaicWindow>
+      )}
+    />
+  );
+}
+```
+
+The key bit is **`onRelease` rather than `onChange`**. `onChange` fires on
+every frame of an ongoing drag; writing to localStorage on every frame
+wastes cycles and, for remote storage, makes you rate-limit yourself. Use
+`onRelease` to write once per user interaction.
+
+## Versioning the stored shape
+
+Treat your persisted tree like any other on-disk format: if you ever change
+it, bump the key.
+
+```ts
+const STORAGE_KEY = 'myapp.layout.v2'; // v1 → v2 when the schema changed
+```
+
+You can also branch on a version field inside the payload and migrate
+forward:
+
+```ts
+interface StoredLayout {
+  version: 2;
+  tree: MosaicNode<string>;
+}
+
+function load(): MosaicNode<string> {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return DEFAULT_LAYOUT;
+  const stored = JSON.parse(raw) as { version: number; tree: unknown };
+  if (stored.version === 1) return migrateV1toV2(stored.tree);
+  return stored.tree as MosaicNode<string>;
+}
+```
+
+## Remote storage
+
+For server-backed persistence, the pattern is the same but the write is
+async. Debounce so that rapid `onRelease` calls collapse into one request:
+
+```tsx
+import { useMemo } from 'react';
+import debounce from 'lodash-es/debounce';
+
+const save = useMemo(
+  () =>
+    debounce((next: MosaicNode<string>) => {
+      fetch('/api/layout', {
+        method: 'PUT',
+        body: JSON.stringify(next),
+      });
+    }, 500),
+  [],
+);
+
+<Mosaic value={tree} onChange={setTree} onRelease={save} renderTile={/*…*/} />
+```
+
+## Legacy binary trees
+
+If you're loading data persisted by react-mosaic v6 or earlier, it will be
+in the binary `first`/`second` shape. You have two options:
+
+1. **Lazy conversion** — pass the legacy tree straight to `<Mosaic value={...}>`;
+   the component converts it on render. Your `onChange` will emit the
+   n-ary form, so the next save overwrites the legacy shape automatically.
+2. **Explicit conversion** — call `convertLegacyToNary` on load and save
+   the converted tree immediately.
+
+Explicit conversion is preferred for long-lived data because it bakes the
+migration in at load time, instead of leaving mixed-format trees in your
+store.
+
+See the [Migration from v6](../migration/from-v6) page for the full
+breakdown of shape differences.

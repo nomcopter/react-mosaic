@@ -1,0 +1,324 @@
+/*
+ * Demo styles — ported from apps/demo-app/src/styles/*.less and flattened to
+ * plain CSS. Kept co-located with the Demo component so Docusaurus can
+ * lazy-load the whole bundle.
+ *
+ * Blueprint variables have been inlined:
+ *   @gray1 → #5c7080
+ *   @gray2 → #738694
+ *   @white → #ffffff
+ *   @ns    → bp5
+ */
+
+/* ---- Layout ------------------------------------------------------------- */
+
+.react-mosaic-example-app {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* Pin text color so inherited Docusaurus dark-mode white doesn't make
+   * tables/labels invisible against Blueprint's light panel background.
+   * Blueprint's own dark theme (`bp5-dark`) scopes its overrides to its
+   * own namespace, so this doesn't break the "Blueprint Dark" option. */
+  color: #1c2127;
+}
+
+.react-mosaic-example-app .actions-label {
+  margin-right: 10px;
+}
+
+.react-mosaic-example-app .theme-selection {
+  margin: 0;
+}
+
+.react-mosaic-example-app .navbar-separator {
+  height: 20px;
+  border-left: 1px solid #5c7080;
+  margin: 10px;
+}
+
+.react-mosaic-example-app .bp5-navbar {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.react-mosaic-example-app .bp5-navbar-heading a {
+  color: #ffffff;
+}
+
+.react-mosaic-example-app .bp5-navbar-heading a .version {
+  color: #738694;
+}
+
+.react-mosaic-example-app > .mosaic {
+  height: calc(100% - 50px);
+}
+
+.react-mosaic-example-app .github-link {
+  height: 32px;
+  width: 32px;
+  margin-left: 15px;
+}
+
+.react-mosaic-example-app .toolbar-example {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Editable tab titles ------------------------------------------------ */
+
+.editable-tab-title {
+  color: #007acc;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.editable-tab-title:hover,
+.editable-tab-title:focus {
+  background-color: rgba(0, 122, 204, 0.1);
+  outline: none;
+}
+
+.editable-tab-title__input {
+  background: transparent;
+  border: 1px solid #007acc;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-size: 12px;
+  color: #007acc;
+  font-weight: bold;
+  width: 80px;
+}
+
+/* ---- Example window table ----------------------------------------------- */
+
+.example-window {
+  height: 100%;
+  overflow: auto;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.example-window::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #667eea,
+    #764ba2,
+    #f093fb,
+    #f5576c,
+    #4facfe,
+    #00f2fe
+  );
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.example-window__heading {
+  margin: 0 0 16px 0;
+}
+
+.example-window__table-wrapper {
+  overflow: auto;
+  width: 100%;
+}
+
+.example-window__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 800px;
+}
+
+.example-window__table thead {
+  background-color: #f5f8fa;
+}
+
+.example-window__table th {
+  border: 1px solid #e1e5e9;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.example-window__table td {
+  border: 1px solid #e1e5e9;
+  padding: 10px 8px;
+}
+
+.example-window__table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.example-window__table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.example-window__table tbody tr:hover {
+  background-color: #e6f3ff;
+}
+
+.example-window__status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  background-color: #f5f5f5;
+}
+
+.example-window__status--active {
+  background-color: #e6f7d6;
+  color: #2d5016;
+}
+
+.example-window__status--remote {
+  background-color: #e6f3ff;
+  color: #1e3a8a;
+}
+
+.example-window__status--on-leave {
+  background-color: #ffeaa7;
+  color: #d68910;
+}
+
+.example-window__status--part-time {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* ---- Dark-theme table variants ------------------------------------------ */
+/* Blueprint dark (`bp5-dark`) and the custom dark theme both need table rows
+ * recoloured — the base table styles hard-code light backgrounds. Use a
+ * comma-selector so the same rules apply regardless of which wrapper class
+ * is active. */
+.bp5-dark .example-window__table thead,
+.mosaic-custom-dark-theme .example-window__table thead {
+  background-color: #2a3441;
+}
+
+.bp5-dark .example-window__table th,
+.mosaic-custom-dark-theme .example-window__table th {
+  border-color: #3b4858;
+  color: #e2e8f0;
+}
+
+.bp5-dark .example-window__table td,
+.mosaic-custom-dark-theme .example-window__table td {
+  border-color: #3b4858;
+  color: #e2e8f0;
+}
+
+.bp5-dark .example-window__table tbody tr:nth-child(even),
+.mosaic-custom-dark-theme .example-window__table tbody tr:nth-child(even) {
+  background-color: #232b36;
+}
+
+.bp5-dark .example-window__table tbody tr:nth-child(odd),
+.mosaic-custom-dark-theme .example-window__table tbody tr:nth-child(odd) {
+  background-color: #2d3748;
+}
+
+.bp5-dark .example-window__table tbody tr:hover,
+.mosaic-custom-dark-theme .example-window__table tbody tr:hover {
+  background-color: #3a4a63;
+}
+
+/* Status pills: keep the accent colour but darken the chip background so
+ * they stay legible on dark rows. */
+.bp5-dark .example-window__status,
+.mosaic-custom-dark-theme .example-window__status {
+  background-color: #3b4858;
+  color: #cbd5e0;
+}
+
+.bp5-dark .example-window__status--active,
+.mosaic-custom-dark-theme .example-window__status--active {
+  background-color: #1f3a1f;
+  color: #9ae6b4;
+}
+
+.bp5-dark .example-window__status--remote,
+.mosaic-custom-dark-theme .example-window__status--remote {
+  background-color: #1e2f4d;
+  color: #90cdf4;
+}
+
+.bp5-dark .example-window__status--on-leave,
+.mosaic-custom-dark-theme .example-window__status--on-leave {
+  background-color: #4a3c0f;
+  color: #fbd38d;
+}
+
+.bp5-dark .example-window__status--part-time,
+.mosaic-custom-dark-theme .example-window__status--part-time {
+  background-color: #3b4858;
+  color: #cbd5e0;
+}
+
+/* ---- Custom dark/light themes ------------------------------------------- */
+
+.mosaic-custom-dark-theme {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.mosaic-custom-dark-theme .mosaic-window {
+  background: #2d3748;
+  border: 1px solid #4a5568;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mosaic-custom-dark-theme .mosaic-window-title {
+  background: linear-gradient(90deg, #2d3748 0%, #4a5568 100%);
+  color: #e2e8f0;
+  border-bottom: 1px solid #4a5568;
+}
+
+.mosaic-custom-dark-theme .mosaic-window-body {
+  background: #2d3748;
+  color: #e2e8f0;
+}
+
+.mosaic-custom-dark-theme .mosaic-split {
+  background: #1a202c;
+}
+
+.mosaic-custom-light-theme {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.mosaic-custom-light-theme .mosaic-window {
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mosaic-custom-light-theme .mosaic-window-title {
+  background: linear-gradient(90deg, #f7fafc 0%, #edf2f7 100%);
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mosaic-custom-light-theme .mosaic-split {
+  background: #f7fafc;
+}

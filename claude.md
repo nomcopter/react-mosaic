@@ -7,7 +7,7 @@
 **Key Information:**
 
 - **Package**: `react-mosaic-component`
-- **Version**: 0.20.0
+- **Version**: 7.0.0-beta0
 - **License**: Apache License 2.0
 - **React Support**: React 16-19
 - **TypeScript**: Full TypeScript support
@@ -63,11 +63,13 @@ Built on `react-dnd` with support for:
 ```
 react-mosaic/
 ├── apps/
-│   └── demo-app/                           # Demo application
+│   └── website/                            # Docusaurus docs + demo
+│       ├── docs/                           # Markdown/MDX docs + typedoc API
 │       ├── src/
-│       │   ├── main.tsx                    # React entry point
-│       │   ├── app/                        # App components
-│       │   └── styles/                     # App styles
+│       │   ├── pages/                      # Landing, /demo
+│       │   └── components/Demo/            # Live demo app
+│       ├── static/img/                     # Favicon, logos
+│       ├── docusaurus.config.ts            # Site config (typedoc, webpack alias)
 │       └── project.json                    # Nx project config
 │
 ├── libs/
@@ -117,7 +119,7 @@ react-mosaic/
 - **`libs/react-mosaic-component/src/lib/`**: Core library implementation (all components, utilities, types)
 - **`libs/react-mosaic-component/src/lib/util/`**: Tree manipulation utilities (CRUCIAL for understanding layout logic)
 - **`libs/react-mosaic-component/src/lib/buttons/`**: Toolbar button components
-- **`apps/demo-app/`**: Full-featured demo showcasing all features
+- **`apps/website/`**: Docusaurus documentation site, including the interactive `/demo` app under `src/components/Demo/`
 
 ## Important Files Reference
 
@@ -190,7 +192,7 @@ react-mosaic/
 - `getParentNode(tree, path)`: Get parent of node
 - `getLeaves(tree)`: Get all leaf node IDs
 - `createBalancedTreeFromLeaves(leaves)`: Create balanced layout
-- `convertLegacyToNary(legacyNode)`: Convert v0.19 binary trees to n-ary
+- `convertLegacyToNary(legacyNode)`: Convert v6 binary trees to n-ary
 
 **`libs/react-mosaic-component/src/lib/util/mosaicUpdates.ts`**
 
@@ -218,7 +220,7 @@ react-mosaic/
 # Install dependencies
 npm install
 
-# Start dev server (runs demo app)
+# Start dev server (runs Docusaurus site with hot-reloading demo)
 npm start
 
 # Run tests
@@ -240,14 +242,8 @@ npm run format
 # Build library (outputs to dist/libs/react-mosaic-component/)
 npm run build:lib
 
-# Build demo app
-npm run build:app
-
-# Build everything
-npm run build
-
-# Watch mode
-npm run build:watch
+# Build the docs site (outputs to apps/website/build/)
+npm run build:site
 ```
 
 ### Testing
@@ -443,12 +439,18 @@ Build process:
 3. Type definition generation
 4. Package.json and README copying
 
-### Demo App Build (Vite)
+### Website Build (Docusaurus)
 
-**Configuration**: `apps/demo-app/vite.config.ts`
+**Configuration**: `apps/website/docusaurus.config.ts`
 
 Build target: GitHub Pages static site
-Output: `dist/apps/demo-app/`
+Output: `apps/website/build/`
+
+Build process:
+
+1. `docusaurus-plugin-typedoc` regenerates `docs/api/` from the library source
+2. Docusaurus bundles docs, the landing page, and the `/demo` route
+3. The demo webpack-aliases `react-mosaic-component` to the prebuilt `dist/libs/react-mosaic-component/index.mjs`, so `npm run build:lib` must run first (Nx's `implicitDependencies` handles this automatically)
 
 ## CI/CD
 
@@ -461,8 +463,8 @@ Output: `dist/apps/demo-app/`
 
 **`.github/workflows/deployment.yml`** - Deployment
 
-- Deploys demo app to GitHub Pages
-- Triggers on push to main branch
+- Builds the library, then the Docusaurus site, and deploys to GitHub Pages
+- Triggers on push to master branch
 
 **`.github/workflows/publish.yaml`** - Publishing
 
@@ -528,13 +530,12 @@ Output: `dist/apps/demo-app/`
 
 ## Version History
 
-- **v0.20.0**: Current version with GitHub Actions integration
-- **v0.19.0**: Previous version
-- **v1.0.0**: Major version with n-ary tree support (migrated from binary trees)
+- **v7.0.0**: Major version with n-ary tree support (migrated from binary trees), Docusaurus docs site with embedded demo
+- **v6.x**: Legacy binary-tree versions
 
 ## Migration Notes
 
-If working with legacy code (v0.19 or earlier), note that:
+If working with legacy code (v6 or earlier), note that:
 
 - Binary trees (`first`/`second`) are now n-ary (`children` array)
 - String paths are now numeric paths

@@ -1,0 +1,14 @@
+.wrapper {
+  position: relative;
+  height: calc(100vh - var(--ifm-navbar-height));
+  width: 100%;
+}
+
+.fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: var(--ifm-font-family-base);
+  color: var(--ifm-color-emphasis-600);
+}

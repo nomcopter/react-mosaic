@@ -1,0 +1,176 @@
+---
+id: custom-toolbar
+title: Custom toolbars
+sidebar_position: 1
+---
+
+# Custom toolbars
+
+Every `MosaicWindow` renders a title bar with a default set of controls on the
+right. You can replace that set entirely, add to it, or style it — all by
+passing React nodes to the `toolbarControls` prop.
+
+## The default toolbar
+
+Out of the box you get split, expand and remove buttons. The presets are
+exported so you can reuse them:
+
+```tsx
+import {
+  DEFAULT_CONTROLS_WITH_CREATION,
+  DEFAULT_CONTROLS_WITHOUT_CREATION,
+} from 'react-mosaic-component';
+```
+
+- `DEFAULT_CONTROLS_WITH_CREATION` — Split, Expand, Remove
+- `DEFAULT_CONTROLS_WITHOUT_CREATION` — Expand, Remove (no Split)
+
+Passing `toolbarControls={DEFAULT_CONTROLS_WITHOUT_CREATION}` disables the
+split button without forcing you to rebuild the toolbar.
+
+## Editable example — change a button color live
+
+Edit the `buttonColor` constant below and watch the toolbar update. This is
+the entire value of live-coding docs: the example _is_ the API surface.
+
+```tsx live
+function CustomToolbarExample() {
+  const buttonColor = '#106ba3'; // try '#db3737', '#0f9960', '#d9822b'
+
+  const toolbar = (
+    <div className="mosaic-window-controls" style={{ color: buttonColor }}>
+      <button
+        className="mosaic-default-control bp5-button bp5-minimal"
+        style={{ color: buttonColor }}
+        onClick={() => alert('custom action!')}
+      >
+        Custom
+      </button>
+      <Separator />
+      <ExpandButton />
+      <RemoveButton />
+    </div>
+  );
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow
+            path={path}
+            title={`Panel ${id}`}
+            toolbarControls={toolbar}
+          >
+            <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+              Edit <code>buttonColor</code> above to re-theme the toolbar.
+            </div>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          children: ['left', 'right'],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+## Building your own buttons
+
+Each default button is a thin wrapper around `DefaultToolbarButton`, which
+handles the icon+label+click plumbing. You can compose your own:
+
+```tsx live
+function CustomButtonExample() {
+  function StarButton() {
+    return (
+      <DefaultToolbarButton
+        title="Star this panel"
+        className="custom-star-button"
+        onClick={() => alert('starred!')}
+      >
+        ★
+      </DefaultToolbarButton>
+    );
+  }
+
+  const toolbar = (
+    <div className="mosaic-window-controls">
+      <StarButton />
+      <Separator />
+      <ExpandButton />
+      <RemoveButton />
+    </div>
+  );
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow
+            path={path}
+            title={`Panel ${id}`}
+            toolbarControls={toolbar}
+          >
+            <div style={{ padding: 20 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+        initialValue={{ type: 'split', direction: 'row', children: ['a', 'b'] }}
+      />
+    </div>
+  );
+}
+```
+
+## Accessing window actions from a custom button
+
+Custom buttons often need to operate on the panel they live in — remove it,
+expand it, replace its content. `MosaicWindowContext` exposes those actions:
+
+```tsx
+import { useContext } from 'react';
+import {
+  MosaicWindowContext,
+  DefaultToolbarButton,
+} from 'react-mosaic-component';
+
+function DuplicateButton() {
+  const { mosaicWindowActions } = useContext(MosaicWindowContext);
+
+  return (
+    <DefaultToolbarButton
+      title="Duplicate"
+      onClick={() => mosaicWindowActions.split()}
+    >
+      ⎘
+    </DefaultToolbarButton>
+  );
+}
+```
+
+Similarly, `MosaicContext` gives you tree-level actions (`hide`, `expand`,
+`remove`, `replaceWith`, `updateTree`) for operations that aren't scoped to a
+single window.
+
+## Toolbars inside tab groups
+
+Tab nodes have their own toolbar, configured via `renderTabToolbar`:
+
+```tsx
+<Mosaic
+  renderTabToolbar={({ tabsNode, path }) => (
+    <div className="mosaic-window-controls">
+      <AddTabButton tabsNode={tabsNode} path={path} />
+      <TabExpandButton path={path} />
+      <TabRemoveButton path={path} />
+    </div>
+  )}
+  // ...
+/>
+```
+
+The `buttons/` directory in the library has a tab-specific variant of every
+button (`TabSplitButton`, `TabRemoveButton`, etc.) that operates on the
+containing tab node instead of a panel.

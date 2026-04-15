@@ -21,9 +21,8 @@ A quick reference guide for developers and AI assistants working with React Mosa
 |------|---------|
 | Start dev server | `npm start` |
 | Run tests | `npm test` |
-| Watch tests | `npm run test:watch` |
 | Build library | `npm run build:lib` |
-| Build demo | `npm run build:app` |
+| Build docs site | `npm run build:site` |
 | Lint | `npm run lint` |
 | Format | `npm run format` |
 | Type check | `npm run build-lib:check` |
@@ -450,7 +449,7 @@ npm run test:watch
 ## Migration (Legacy to Modern)
 
 ```typescript
-// OLD (v0.19)
+// OLD (v6)
 {
   direction: 'row',
   first: 'left',
@@ -458,7 +457,7 @@ npm run test:watch
   splitPercentage: 40
 }
 
-// NEW (v1.0+)
+// NEW (v7+)
 {
   type: 'split',
   direction: 'row',

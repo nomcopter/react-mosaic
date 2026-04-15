@@ -35,8 +35,14 @@ jobs:
       - name: Npm install
         run: npm ci
 
-      - name: Build
-        run: npm run build:app
+      # The website imports the library from its built ESM bundle (see the
+      # webpack alias in apps/website/docusaurus.config.ts), so the library
+      # must be built before Docusaurus.
+      - name: Build library
+        run: npm run build:lib
+
+      - name: Build website
+        run: npx nx run website:build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,8 +50,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Upload apps dist folder
-          path: './dist/apps/demo-app'
+          path: './apps/website/build'
           
       - name: Deploy to GitHub Pages
         id: deployment

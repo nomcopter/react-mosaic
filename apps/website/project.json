@@ -1,0 +1,41 @@
+{
+  "name": "website",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/website/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["react-mosaic-component"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/build"],
+      "options": {
+        "command": "docusaurus build",
+        "cwd": "apps/website"
+      },
+      "dependsOn": ["^build"]
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docusaurus start",
+        "cwd": "apps/website"
+      },
+      "dependsOn": ["^build"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docusaurus serve",
+        "cwd": "apps/website"
+      }
+    },
+    "clear": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docusaurus clear",
+        "cwd": "apps/website"
+      }
+    }
+  }
+}

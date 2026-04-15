@@ -1,0 +1,117 @@
+---
+id: zero-state
+title: Customising the empty state
+sidebar_position: 4
+---
+
+# Customising the empty state
+
+When the layout value is `null` — the user removed the last panel, or the
+tree hasn't been initialised — `Mosaic` renders a `zeroStateView`. Out of
+the box that's the `MosaicZeroState` component, a neutral placeholder with
+a "create new" button.
+
+## Using the default
+
+`MosaicZeroState` ships with the library and is the sensible default:
+
+```tsx live
+function ZeroStateDefault() {
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Panel ${id}`}>
+            <div>{id}</div>
+          </MosaicWindow>
+        )}
+        initialValue={null}
+        zeroStateView={<MosaicZeroState />}
+      />
+    </div>
+  );
+}
+```
+
+Click the "Create New Window" button and the mosaic transitions out of the
+empty state. Under the hood that's the `createNode` prop being invoked and
+the result set as the new root.
+
+## `createNode`: where new panels come from
+
+`MosaicZeroState`'s button — and the default toolbar's "split" button —
+both call `createNode` to ask you for a new leaf key. If you don't provide
+one, the library has no way to invent identifiers for your domain:
+
+```tsx
+import { useRef } from 'react';
+
+function App() {
+  const nextId = useRef(1);
+  const createNode = () => `panel-${nextId.current++}`;
+
+  return (
+    <Mosaic<string>
+      renderTile={/* ... */}
+      createNode={createNode}
+      zeroStateView={<MosaicZeroState />}
+      initialValue={null}
+    />
+  );
+}
+```
+
+`createNode` can return a value synchronously or a promise. Returning a
+promise is how you implement "open a picker, let the user choose what to
+put in the new panel, then resolve with its key":
+
+```tsx
+const createNode = async (): Promise<string> => {
+  const choice = await openPanelPicker();
+  return choice.id;
+};
+```
+
+While the promise is pending, the split/creation action waits — no panel
+appears until you resolve.
+
+## A fully custom zero state
+
+Pass any React node as `zeroStateView`. The obvious use case is branding
+the empty state to fit your app:
+
+```tsx
+const zeroState = (
+  <div className="app-zero-state">
+    <img src="/logo.svg" alt="" width={64} />
+    <h2>No panels open</h2>
+    <p>Drag something from the sidebar, or start from a template.</p>
+    <button onClick={loadTemplate}>Load default layout</button>
+  </div>
+);
+
+<Mosaic
+  value={tree}
+  onChange={setTree}
+  zeroStateView={zeroState}
+  renderTile={/* ... */}
+/>
+```
+
+Because it's just React, you can wire it up to your own state, fetch
+templates from the server, or embed a full onboarding flow — the library
+treats it as an opaque node.
+
+## When to use `null` vs a single leaf
+
+If you always want *something* on screen, pass a single leaf as your
+initial value:
+
+```ts
+const INITIAL: MosaicNode<string> = 'welcome';
+```
+
+The user can still remove it (ending up at the zero state), but the
+first-load experience shows content instead of a placeholder. Use `null`
+for apps where "nothing open" is a real, valid state — IDE-style tools
+where tabs are transient are a good fit.
