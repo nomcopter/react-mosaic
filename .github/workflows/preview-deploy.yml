@@ -30,6 +30,8 @@ jobs:
 
       - name: Build website
         run: npx nx run website:build
+        env:
+          SITE_BASE_URL: /
 
       - name: Deploy to Cloudflare Pages
         id: deploy

@@ -44,7 +44,7 @@ const config: Config = {
   // Set the production url of your site here
   url: 'https://nomcopter.github.io',
   // Pages is published under /react-mosaic/
-  baseUrl: '/react-mosaic/',
+  baseUrl: process.env.SITE_BASE_URL || '/react-mosaic/',
 
   organizationName: 'nomcopter',
   projectName: 'react-mosaic',

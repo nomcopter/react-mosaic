@@ -77,5 +77,6 @@
     "nx-release-publish": {
       "dependsOn": ["^build", "build"]
     }
-  }
+  },
+  "analytics": false
 }
