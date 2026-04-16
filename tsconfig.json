@@ -19,5 +19,5 @@
     "sourceMap": true,
     "strict": true
   },
-  "exclude": ["docs", "lib", "node_modules"],
+  "exclude": ["dist", "docs", "lib", "node_modules"],
 }
