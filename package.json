@@ -58,6 +58,7 @@
     "@docusaurus/tsconfig": "^3.10.0",
     "@docusaurus/types": "^3.10.0",
     "@eslint/js": "^9.8.0",
+    "@mdx-js/react": "^3.0.0",
     "@nx/eslint": "22.6.5",
     "@nx/eslint-plugin": "22.6.5",
     "@nx/js": "22.6.5",
@@ -98,7 +99,6 @@
     "lefthook": "^1.10.0",
     "less": "^3.13.1",
     "less-plugin-autoprefix": "^2.0.0",
-    "@mdx-js/react": "^3.0.0",
     "mock-require": "^3.0.3",
     "npm-run-all2": "8.0.4",
     "nx": "22.6.5",
@@ -118,7 +118,7 @@
     "vite": "8.0.8",
     "vite-plugin-dts": "~4.5.0",
     "vite-plugin-static-copy": "^4.0.1",
-    "vitest": "4.0.0"
+    "vitest": "^4.1.4"
   },
   "peerDependencies": {
     "react": "16 - 19"
