@@ -25,3 +25,4 @@ vitest.config.*.timestamp*
 # attached via the `stylesheets` config, instead of being bundled into the
 # site-wide stylesheet (which would leak Blueprint's unscoped body rules).
 apps/website/static/css/
+.claude/settings.local.json
