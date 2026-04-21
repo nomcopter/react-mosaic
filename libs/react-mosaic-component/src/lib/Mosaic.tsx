@@ -26,6 +26,8 @@ import {
   TabTitleRenderer,
   TabButtonRenderer,
   TabCanCloseFunction,
+  TabToolbarControlsRenderer,
+  AddTabButtonRenderer,
 } from './types';
 import {
   createExpandUpdate,
@@ -52,6 +54,17 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * Lookup function to convert tab title to a displayable `ReactElement`
    */
   renderTabToolbar?: TabToolbarRenderer<T>;
+  /**
+   * Override the right-side controls in the default tab bar (the split / remove
+   * cluster). The library keeps ownership of the tab-group drag handle.
+   * Ignored when `renderTabToolbar` is provided.
+   */
+  renderTabToolbarControls?: TabToolbarControlsRenderer<T>;
+  /**
+   * Override the "+" add-tab button. Return `null` to hide it.
+   * Ignored when `renderTabToolbar` is provided.
+   */
+  renderAddTabButton?: AddTabButtonRenderer<T>;
   /**
    * Function to render custom tab titles
    */
@@ -335,6 +348,8 @@ export class MosaicWithoutDragDropContext<
           root={root}
           renderTile={renderTile}
           renderTabToolbar={this.props.renderTabToolbar}
+          renderTabToolbarControls={this.props.renderTabToolbarControls}
+          renderAddTabButton={this.props.renderAddTabButton}
           resize={resize}
           renderTabTitle={this.props.renderTabTitle}
           renderTabButton={this.props.renderTabButton}

@@ -12,6 +12,9 @@ import {
   TabTitleRenderer,
   TabButtonRenderer,
   TabCanCloseFunction,
+  TabToolbarControlsRenderer,
+  AddTabButtonRenderer,
+  TabGroupContext,
 } from './types';
 import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
@@ -35,7 +38,8 @@ export interface MosaicTabsProps<T extends MosaicKey> {
   boundingBox: BoundingBox;
   renderTabTitle?: TabTitleRenderer<T>;
   renderTabButton?: TabButtonRenderer<T>;
-  tabToolbarControls?: React.ReactNode;
+  renderTabToolbarControls?: TabToolbarControlsRenderer<T>;
+  renderAddTabButton?: AddTabButtonRenderer<T>;
   canClose?: TabCanCloseFunction<T>;
   showTabDragButton?: (path: MosaicPath) => boolean;
 }
@@ -204,7 +208,8 @@ export const MosaicTabs = <T extends MosaicKey>({
   boundingBox,
   renderTabTitle,
   renderTabButton,
-  tabToolbarControls: providedTabToolbarControls,
+  renderTabToolbarControls,
+  renderAddTabButton,
   canClose,
   showTabDragButton,
 }: MosaicTabsProps<T>) => {
@@ -291,9 +296,6 @@ export const MosaicTabs = <T extends MosaicKey>({
     },
   });
 
-  const tabToolbarControls =
-    providedTabToolbarControls ||
-    createDefaultTabsControls(path, connectDragSource);
   // Drop target for the tab content area - blocks individual window drop targets
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, connectDropTarget] = useDrop({
@@ -431,14 +433,43 @@ export const MosaicTabs = <T extends MosaicKey>({
 
   const renderDefaultToolbar = () => {
     const isDragAllowed = path.length > 0;
+    const tabGroupCtx: TabGroupContext<T> = {
+      tabs,
+      activeTabIndex,
+      path,
+      mosaicId,
+    };
 
-    // Create a drag button using the same pattern as other toolbar buttons
+    const showDragButton =
+      isDragAllowed && (showTabDragButton ? showTabDragButton(path) : true);
+
+    // When the consumer provides custom controls we render the drag button
+    // as a library-owned sibling before them. With the default controls the
+    // drag button lives inside the cluster (via createDefaultTabsControls).
     const dragButton =
-      isDragAllowed &&
-      (showTabDragButton ? showTabDragButton(path) : true) &&
-      providedTabToolbarControls !== undefined ? (
+      showDragButton && renderTabToolbarControls !== undefined ? (
         <TabDragButton connectDragSource={connectDragSource} />
       ) : null;
+
+    const tabToolbarControls = renderTabToolbarControls
+      ? renderTabToolbarControls(tabGroupCtx)
+      : createDefaultTabsControls(
+          path,
+          showDragButton ? connectDragSource : undefined,
+        );
+
+    const addButton = renderAddTabButton ? (
+      renderAddTabButton(tabGroupCtx)
+    ) : (
+      <button
+        className="mosaic-tab-add-button"
+        onClick={addTab}
+        aria-label="Add new tab"
+        title="Add new tab"
+      >
+        +
+      </button>
+    );
 
     return connectTabBarDropTarget(
       <div
@@ -488,16 +519,9 @@ export const MosaicTabs = <T extends MosaicKey>({
           })}
         </div>
 
-        {/* Always-visible controls: drag, add, toolbar */}
+        {/* Always-visible controls: add, drag (library-owned), toolbar */}
         <div className="mosaic-tab-bar-controls">
-          <button
-            className="mosaic-tab-add-button"
-            onClick={addTab}
-            aria-label="Add new tab"
-            title="Add new tab"
-          >
-            +
-          </button>
+          {addButton}
           {dragButton}
 
           <div className="mosaic-tab-toolbar-controls">
