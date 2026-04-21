@@ -63,6 +63,22 @@ export interface MosaicRootActions<T extends MosaicKey> {
   createNode?: CreateNode<T>;
 
   /**
+   * Adds a new tab at `path`, dispatching on the node kind:
+   * - tab-group → append the new tab and make it active
+   * - leaf → replace the leaf with a 2-tab group containing the original and the new tab
+   * Rejects if `createNode` is not set, or if `path` resolves to a split node.
+   */
+  addTab: (path: MosaicPath, ...args: any[]) => Promise<void>;
+
+  /**
+   * Removes the tab at `index` from the tab-group at `path`. Adjusts
+   * `activeTabIndex` and normalizes the tree (collapsing a tab-group with a
+   * single remaining child back to a leaf). No-op if `path` doesn't resolve
+   * to a tab-group or the index is out of range.
+   */
+  removeTab: (path: MosaicPath, index: number) => void;
+
+  /**
    * Replace currentNode at `path` with `node`
    * @param path
    * @param node

@@ -178,22 +178,15 @@ export interface TabGroupContext<T extends MosaicKey> {
 }
 
 /**
- * A function that renders the right-hand controls in the default tab bar
- * (replacing the default split / remove cluster). The library continues to
- * own the tab-group drag handle and all drop targets.
+ * A function that renders the right-hand controls in the default tab bar —
+ * including the add button, split, remove, and any custom buttons. Compose
+ * from `DefaultAddTabButton`, `TabSplitButton`, `TabRemoveButton`, or your
+ * own elements. The library continues to own the tab-group drag handle and
+ * all drop targets.
  */
 export type TabToolbarControlsRenderer<T extends MosaicKey> = (
   ctx: TabGroupContext<T>,
 ) => React.ReactNode;
-
-/**
- * A function that renders the add-tab ("+") button. Return `null` to hide it.
- * Use `mosaicActions` from `MosaicContext` inside the renderer to perform the
- * actual tab-append operation.
- */
-export type AddTabButtonRenderer<T extends MosaicKey> = (
-  ctx: TabGroupContext<T>,
-) => React.ReactNode | null;
 
 /**
  * A function that renders the entire toolbar for a tab group.

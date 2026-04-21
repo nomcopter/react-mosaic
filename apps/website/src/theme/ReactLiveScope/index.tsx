@@ -15,6 +15,7 @@ import {
   TabRemoveButton,
   TabExpandButton,
   TabDragButton,
+  DefaultAddTabButton,
   DefaultToolbarButton,
   MosaicContext,
   MosaicWindowContext,
@@ -59,6 +60,7 @@ const ReactLiveScope: Record<string, unknown> = {
   TabRemoveButton,
   TabExpandButton,
   TabDragButton,
+  DefaultAddTabButton,
   DefaultToolbarButton,
   // Context
   MosaicContext,

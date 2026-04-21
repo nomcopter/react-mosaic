@@ -31,7 +31,6 @@ import {
   MosaicNode,
   MosaicPath,
   MosaicSplitNode,
-  MosaicTabsNode,
 } from './types';
 import { createDragToUpdates } from './util/mosaicUpdates';
 import {
@@ -341,63 +340,15 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
 
   private addTab = (...args: any[]) => {
     this.checkCreateNode();
-    const { path, createNode } = this.props;
+    const { path } = this.props;
     const { mosaicActions } = this.context;
     const root = mosaicActions.getRoot() as MosaicNode<T> | null;
-
-    // The path to a MosaicWindow points to the panel/leaf (T).
-    // To check if it's already in a tab group, we must look at its parent.
+    // If this window already lives inside a tab group, target the containing
+    // group so the new tab is appended there. Otherwise the root action will
+    // convert this leaf into a 2-tab group.
     const parentNode = getParentNode(root, path);
-
-    if (isTabsNode(parentNode)) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(
-          'Mosaic: "Add Tab" from a panel toolbar is disabled when already in a tab group. Use the tab bar\'s "Add" button instead.',
-        );
-      }
-      return Promise.resolve(); // Fail gracefully.
-    }
-
-    const currentNode = getNodeAtPath(root, path);
-    if (!currentNode) {
-      throw new Error('Current node could not be found.');
-    }
-    return Promise.resolve(createNode!(...args)).then((newNode) => {
-      if (typeof newNode !== 'string' && typeof newNode !== 'number') {
-        console.error(
-          'createNode() for addTab should return a MosaicKey (string or number).',
-        );
-        return;
-      }
-
-      // CASE 1: We are adding tab from tab-container toolbar
-      if (typeof currentNode === 'object' && currentNode.type === 'tabs') {
-        const newTabsNode: MosaicTabsNode<T> = {
-          type: 'tabs',
-          tabs: [...currentNode.tabs, newNode],
-          activeTabIndex: currentNode.tabs.length, // Make the new tab active
-        };
-        mosaicActions.replaceWith(path, newTabsNode);
-      }
-      // CASE 2: The panel is standalone (in a split, or is the root).
-      // Replace the panel with a new tab group containing the original panel and the new one.
-      else {
-        if (
-          typeof currentNode !== 'string' &&
-          typeof currentNode !== 'number'
-        ) {
-          // This is a sanity check that should not be hit in a valid tree
-          console.error('Cannot create a tab group from a non-panel node.');
-          return;
-        }
-        const newTabsNode: MosaicTabsNode<T> = {
-          type: 'tabs',
-          tabs: [currentNode, newNode],
-          activeTabIndex: 1, // Make the new tab active
-        };
-        mosaicActions.replaceWith(path, newTabsNode);
-      }
-    });
+    const target = isTabsNode(parentNode) ? path.slice(0, -1) : path;
+    return mosaicActions.addTab(target, ...args);
   };
 
   private getRoot = () => {

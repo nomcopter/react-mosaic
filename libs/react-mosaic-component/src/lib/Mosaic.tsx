@@ -27,7 +27,6 @@ import {
   TabButtonRenderer,
   TabCanCloseFunction,
   TabToolbarControlsRenderer,
-  AddTabButtonRenderer,
 } from './types';
 import {
   createExpandUpdate,
@@ -38,8 +37,10 @@ import {
 import {
   convertLegacyToNary,
   getLeaves,
+  getNodeAtPath,
   getParentAndChildIndex,
   isSplitNode,
+  isTabsNode,
   normalizeMosaicTree,
 } from './util/mosaicUtilities';
 
@@ -55,16 +56,13 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    */
   renderTabToolbar?: TabToolbarRenderer<T>;
   /**
-   * Override the right-side controls in the default tab bar (the split / remove
-   * cluster). The library keeps ownership of the tab-group drag handle.
+   * Override the right-hand controls cluster in the default tab bar — the
+   * add, split, and remove buttons. Compose from `DefaultAddTabButton`,
+   * `TabSplitButton`, `TabRemoveButton`, or your own elements. The library
+   * keeps ownership of the tab-group drag handle.
    * Ignored when `renderTabToolbar` is provided.
    */
   renderTabToolbarControls?: TabToolbarControlsRenderer<T>;
-  /**
-   * Override the "+" add-tab button. Return `null` to hide it.
-   * Ignored when `renderTabToolbar` is provided.
-   */
-  renderAddTabButton?: AddTabButtonRenderer<T>;
   /**
    * Function to render custom tab titles
    */
@@ -319,6 +317,87 @@ export class MosaicWithoutDragDropContext<
       // For tab nodes, the hide operation just changes active tab, so no need to restore
     },
     createNode: this.props.createNode,
+    addTab: (path: MosaicPath, ...args: any[]): Promise<void> => {
+      const { createNode } = this.props;
+      if (createNode == null) {
+        return Promise.reject(
+          new Error('addTab requires `createNode` to be defined on Mosaic'),
+        );
+      }
+      return Promise.resolve(createNode(...args)).then((newNode) => {
+        if (typeof newNode !== 'string' && typeof newNode !== 'number') {
+          console.error(
+            'createNode() for addTab must return a MosaicKey (string or number).',
+          );
+          return;
+        }
+        const root = this.getRoot();
+        if (!root) return;
+        const node = getNodeAtPath(root, path);
+        if (node == null) {
+          console.error('addTab called on an invalid path.');
+          return;
+        }
+        if (isTabsNode(node)) {
+          this.updateRoot(
+            [
+              {
+                path,
+                spec: {
+                  tabs: { $push: [newNode] },
+                  activeTabIndex: { $set: node.tabs.length },
+                },
+              },
+            ],
+            { shouldNormalize: true },
+          );
+          return;
+        }
+        if (isSplitNode(node)) {
+          console.error(
+            'addTab cannot target a split node; pick a leaf or a tabs node.',
+          );
+          return;
+        }
+        this.actions.replaceWith(path, {
+          type: 'tabs',
+          tabs: [node, newNode],
+          activeTabIndex: 1,
+        });
+      });
+    },
+    removeTab: (path: MosaicPath, index: number): void => {
+      const root = this.getRoot();
+      if (!root) return;
+      const node = getNodeAtPath(root, path);
+      if (!isTabsNode(node)) {
+        console.error('removeTab called on a path that is not a tabs node.');
+        return;
+      }
+      if (index < 0 || index >= node.tabs.length) {
+        console.error(`removeTab index ${index} is out of range.`);
+        return;
+      }
+      const newTabs = node.tabs.filter((_, i) => i !== index);
+      let newActiveTabIndex = node.activeTabIndex;
+      if (index === node.activeTabIndex) {
+        newActiveTabIndex = Math.max(0, index - 1);
+      } else if (index < node.activeTabIndex) {
+        newActiveTabIndex = node.activeTabIndex - 1;
+      }
+      this.updateRoot(
+        [
+          {
+            path,
+            spec: {
+              tabs: { $set: newTabs },
+              activeTabIndex: { $set: newActiveTabIndex },
+            },
+          },
+        ],
+        { shouldNormalize: true },
+      );
+    },
     replaceWith: (path: MosaicPath, newNode: MosaicNode<T>) =>
       this.updateRoot([
         {
@@ -349,7 +428,6 @@ export class MosaicWithoutDragDropContext<
           renderTile={renderTile}
           renderTabToolbar={this.props.renderTabToolbar}
           renderTabToolbarControls={this.props.renderTabToolbarControls}
-          renderAddTabButton={this.props.renderAddTabButton}
           resize={resize}
           renderTabTitle={this.props.renderTabTitle}
           renderTabButton={this.props.renderTabButton}

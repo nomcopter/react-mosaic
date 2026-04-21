@@ -35,6 +35,8 @@ export {
   type TabTitleRenderer,
   type TabButtonRenderer,
   type TabToolbarRenderer,
+  type TabToolbarControlsRenderer,
+  type TabGroupContext,
   type TabCanCloseFunction,
   type TabCloseState,
   type LegacyMosaicNode,
@@ -90,6 +92,10 @@ export { TabSplitButton } from './buttons/TabSplitButton';
 export { TabRemoveButton } from './buttons/TabRemoveButton';
 export { TabExpandButton } from './buttons/TabExpandButton';
 export { TabDragButton } from './buttons/TabDragButton';
+export {
+  DefaultAddTabButton,
+  type DefaultAddTabButtonProps,
+} from './buttons/DefaultAddTabButton';
 export { DraggableTab, type DraggableTabProps } from './DraggableTab';
 export {
   DEFAULT_PANEL_CONTROLS_IN_TABS as DEFAULT_CONTROLS_IN_TABS,

@@ -8,6 +8,7 @@ import { AddTabButton } from './AddTabButton';
 import { TabSplitButton } from './TabSplitButton';
 import { TabRemoveButton } from './TabRemoveButton';
 import { TabDragButton } from './TabDragButton';
+import { DefaultAddTabButton } from './DefaultAddTabButton';
 import { MosaicPath } from '../types';
 
 export const DEFAULT_PANEL_CONTROLS_IN_TABS = React.Children.toArray([
@@ -22,6 +23,7 @@ export const createDefaultTabsControls = (
     ...(connectDragSource
       ? [<TabDragButton connectDragSource={connectDragSource} key="tab-drag-btn" />]
       : []),
+    <DefaultAddTabButton path={path} key="tab-add-btn" />,
     <TabSplitButton path={path} key="tab-split-btn" />,
     <TabRemoveButton path={path} key="tab-remove-btn" />,
   ]);

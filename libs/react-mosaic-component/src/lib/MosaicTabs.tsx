@@ -13,18 +13,13 @@ import {
   TabButtonRenderer,
   TabCanCloseFunction,
   TabToolbarControlsRenderer,
-  AddTabButtonRenderer,
   TabGroupContext,
 } from './types';
 import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
-import { updateTree, createDragToUpdates } from './util/mosaicUpdates';
-import {
-  normalizeMosaicTree,
-  getNodeAtPath,
-  isTabsNode,
-} from './util/mosaicUtilities';
+import { createDragToUpdates } from './util/mosaicUpdates';
+import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
 import { DraggableTab } from './DraggableTab';
 import { createDefaultTabsControls } from './buttons/defaultToolbarControls';
@@ -39,7 +34,6 @@ export interface MosaicTabsProps<T extends MosaicKey> {
   renderTabTitle?: TabTitleRenderer<T>;
   renderTabButton?: TabButtonRenderer<T>;
   renderTabToolbarControls?: TabToolbarControlsRenderer<T>;
-  renderAddTabButton?: AddTabButtonRenderer<T>;
   canClose?: TabCanCloseFunction<T>;
   showTabDragButton?: (path: MosaicPath) => boolean;
 }
@@ -209,7 +203,6 @@ export const MosaicTabs = <T extends MosaicKey>({
   renderTabTitle,
   renderTabButton,
   renderTabToolbarControls,
-  renderAddTabButton,
   canClose,
   showTabDragButton,
 }: MosaicTabsProps<T>) => {
@@ -345,90 +338,12 @@ export const MosaicTabs = <T extends MosaicKey>({
   };
 
   const onTabClose = (tabKey: T, index: number) => {
-    // Don't close if canClose returns 'cannotClose' or 'noClose'
     const closeState = canClose
       ? canClose(tabKey, tabs, index, path)
       : 'noClose';
-    if (closeState !== 'canClose') {
-      return;
-    }
-
-    // If there's only one tab left, don't close it (but it should not happen)
-    if (tabs.length <= 1) {
-      return;
-    }
-
-    // Remove the tab from the tabs array
-    const newTabs = tabs.filter((_, i) => i !== index);
-
-    // Adjust activeTabIndex if necessary
-    let newActiveTabIndex = activeTabIndex;
-    if (index === activeTabIndex) {
-      // If closing the active tab, set the previous tab as active, or the first tab if it was the first tab
-      newActiveTabIndex = Math.max(0, index - 1);
-    } else if (index < activeTabIndex) {
-      // If closing a tab before the active tab, decrease the active tab index
-      newActiveTabIndex = activeTabIndex - 1;
-    }
-
-    // Update the tree
-    const updates = [
-      {
-        path,
-        spec: {
-          tabs: { $set: newTabs },
-          activeTabIndex: { $set: newActiveTabIndex },
-        },
-      },
-    ];
-
-    let newTree = mosaicActions.getRoot();
-    if (!newTree) return;
-
-    updates.forEach((update) => {
-      newTree = updateTree(newTree!, [update]);
-    });
-
-    const normalizedTree = normalizeMosaicTree(newTree);
-    mosaicActions.replaceWith([], normalizedTree!);
-  };
-
-  const addTab = () => {
-    if (mosaicActions.createNode == null) {
-      throw new Error(
-        'Operation invalid unless `createNode` is defined on Mosaic',
-      );
-    }
-    Promise.resolve(mosaicActions.createNode()).then((newNode) => {
-      if (typeof newNode !== 'string' && typeof newNode !== 'number') {
-        console.error(
-          'createNode() for adding a tab should return a MosaicKey (string or number).',
-        );
-        return;
-      }
-
-      // Update tree and normalize
-      const updates = [
-        {
-          path, // The path to this tabs node
-          spec: {
-            tabs: { $push: [newNode] },
-            // Set the new tab as active. Its index is the original length of the array.
-            activeTabIndex: { $set: tabs.length },
-          },
-        },
-      ];
-
-      let newTree = mosaicActions.getRoot();
-      if (!newTree) return;
-
-      updates.forEach((update) => {
-        newTree = updateTree(newTree!, [update]);
-      });
-
-      const normalizedTree = normalizeMosaicTree(newTree);
-      mosaicActions.replaceWith([], normalizedTree!);
-    });
+    if (closeState !== 'canClose') return;
+    if (tabs.length <= 1) return;
+    mosaicActions.removeTab(path, index);
   };
 
   const renderDefaultToolbar = () => {
@@ -457,19 +372,6 @@ export const MosaicTabs = <T extends MosaicKey>({
           path,
           showDragButton ? connectDragSource : undefined,
         );
-
-    const addButton = renderAddTabButton ? (
-      renderAddTabButton(tabGroupCtx)
-    ) : (
-      <button
-        className="mosaic-tab-add-button"
-        onClick={addTab}
-        aria-label="Add new tab"
-        title="Add new tab"
-      >
-        +
-      </button>
-    );
 
     return connectTabBarDropTarget(
       <div
@@ -519,11 +421,10 @@ export const MosaicTabs = <T extends MosaicKey>({
           })}
         </div>
 
-        {/* Always-visible controls: add, drag (library-owned), toolbar */}
+        {/* Library-owned drag handle (when consumer overrides controls),
+            followed by controls cluster */}
         <div className="mosaic-tab-bar-controls">
-          {addButton}
           {dragButton}
-
           <div className="mosaic-tab-toolbar-controls">
             {tabToolbarControls}
           </div>

@@ -156,21 +156,193 @@ single window.
 
 ## Toolbars inside tab groups
 
-Tab nodes have their own toolbar, configured via `renderTabToolbar`:
+Tab groups render their own toolbar: tab buttons on the left, then on the
+right a library-owned drag handle followed by a controls cluster (add tab,
+split, remove by default). You can reshape the controls cluster without
+giving up drag-and-drop — that stays with the library.
+
+The customization props, ordered from least to most invasive:
+
+| Prop | What it swaps | Library keeps owning |
+|---|---|---|
+| `renderTabTitle` | Content inside each tab button | Drag, close, DnD |
+| `renderTabToolbarControls` | The right-side controls cluster (add, split, remove, …) | Drag handle, drop targets |
+| `renderTabToolbar` | The entire tab bar (escape hatch) | Nothing — you re-wire DnD yourself |
+
+Prefer the first two. `renderTabToolbar` is a last resort; opting into it
+means re-implementing tab rendering, drop targets, and drag handles.
+
+### Composing your own controls cluster
+
+`renderTabToolbarControls` receives `{ tabs, activeTabIndex, path, mosaicId }`
+and returns a `ReactNode`. You decide which buttons are present, in what
+order, and when. The library injects its drag handle as a sibling before
+your controls, so you never touch `react-dnd`.
+
+The tab-specific buttons are exported so you can drop them in directly:
 
 ```tsx
-<Mosaic
-  renderTabToolbar={({ tabsNode, path }) => (
-    <div className="mosaic-window-controls">
-      <AddTabButton tabsNode={tabsNode} path={path} />
-      <TabExpandButton path={path} />
-      <TabRemoveButton path={path} />
-    </div>
-  )}
-  // ...
-/>
+import {
+  DefaultAddTabButton,
+  TabSplitButton,
+  TabRemoveButton,
+  TabExpandButton,
+} from 'react-mosaic-component';
 ```
 
-The `buttons/` directory in the library has a tab-specific variant of every
-button (`TabSplitButton`, `TabRemoveButton`, etc.) that operates on the
-containing tab node instead of a panel.
+### Per-tab controls
+
+Show buttons that depend on which tab is active — e.g. a preview action
+that's only meaningful for Markdown files.
+
+```tsx live
+function PerTabControlsExample() {
+  const isMarkdown = (id) => typeof id === 'string' && id.endsWith('.md');
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`${id}`}>
+            <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+              Open: <strong>{id}</strong>
+              {isMarkdown(id) && <div>(Preview available)</div>}
+            </div>
+          </MosaicWindow>
+        )}
+        renderTabToolbarControls={({ tabs, activeTabIndex, path }) => (
+          <>
+            {isMarkdown(tabs[activeTabIndex]) && (
+              <DefaultToolbarButton
+                title="Preview"
+                onClick={() => alert('preview ' + tabs[activeTabIndex])}
+              >
+                👁
+              </DefaultToolbarButton>
+            )}
+            <DefaultAddTabButton path={path} />
+            <TabSplitButton path={path} />
+            <TabRemoveButton path={path} />
+          </>
+        )}
+        initialValue={{
+          type: 'tabs',
+          tabs: ['readme.md', 'index.ts', 'notes.md'],
+          activeTabIndex: 0,
+        }}
+      />
+    </div>
+  );
+}
+```
+
+Switch tabs: the preview button appears only for `.md` files. The drag
+handle between the controls and the tab row is still there — you never had
+to think about it.
+
+### Capping the number of tabs
+
+Omit `DefaultAddTabButton` when the tab group is full. Because you compose
+the cluster yourself, conditional rendering is just a React expression.
+
+```tsx live
+function TabLimitExample() {
+  const MAX_TABS = 4;
+  let counter = 0;
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        createNode={() => `tab-${++counter}`}
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Tab ${id}`}>
+            <div style={{ padding: 20 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+        renderTabToolbarControls={({ tabs, path }) => (
+          <>
+            {tabs.length < MAX_TABS && <DefaultAddTabButton path={path} />}
+            <TabSplitButton path={path} />
+            <TabRemoveButton path={path} />
+          </>
+        )}
+        initialValue={{
+          type: 'tabs',
+          tabs: ['a', 'b'],
+          activeTabIndex: 0,
+        }}
+      />
+    </div>
+  );
+}
+```
+
+Add tabs until you reach four — the `+` disappears.
+
+### Fully custom add button
+
+Swap `DefaultAddTabButton` for your own element. Call
+`mosaicActions.addTab(path)` to run the library's tab-add logic: it
+appends to an existing tab group, or converts a leaf into a 2-tab group
+when `path` points at a leaf. Returns a promise that rejects if
+`createNode` isn't set.
+
+```tsx live
+function CustomAddButtonExample() {
+  let counter = 0;
+
+  function CustomAddButton({ path }) {
+    const { mosaicActions } = React.useContext(MosaicContext);
+    return (
+      <DefaultToolbarButton
+        text="New tab"
+        onClick={() => {
+          if (window.confirm('Open a new tab?')) {
+            mosaicActions.addTab(path);
+          }
+        }}
+      >
+        ➕ New
+      </DefaultToolbarButton>
+    );
+  }
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        createNode={() => `tab-${++counter}`}
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Tab ${id}`}>
+            <div style={{ padding: 20 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+        renderTabToolbarControls={({ path }) => (
+          <>
+            <CustomAddButton path={path} />
+            <TabSplitButton path={path} />
+            <TabRemoveButton path={path} />
+          </>
+        )}
+        initialValue={{
+          type: 'tabs',
+          tabs: ['a', 'b'],
+          activeTabIndex: 0,
+        }}
+      />
+    </div>
+  );
+}
+```
+
+The same `mosaicActions.addTab(path)` is available anywhere in your app —
+from keyboard shortcut handlers, menu items, command palettes — not just
+from inside the renderer.
+
+### Escape hatch: `renderTabToolbar`
+
+If none of the slots above fit, `renderTabToolbar` hands you the entire tab
+bar. You receive `{ tabs, activeTabIndex, path, DraggableTab }` and must
+return the full toolbar element, including tab rendering, drop targets, and
+anything else. This is rarely what you want; reach for it only when the
+default layout itself is wrong for your app (e.g. vertical tabs, tabs on the
+bottom).
