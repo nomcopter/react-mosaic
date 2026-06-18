@@ -1,0 +1,881 @@
+/**
+ * @license
+ * Copyright 2019 Kevin Verdieck, originally developed at Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Styles for the `ManagedMosaic` component: a soft default theme plus the
+ * panel visual variants (transparent / no-background / glass / no-border /
+ * hide-toolbar), the per-tile fullscreen overlay, the auto-hiding toolbar
+ * pill and the toolbar buttons. Import this stylesheet to use ManagedMosaic.
+ */
+.mosaic {
+  height: 100%;
+  width: 100%;
+}
+.mosaic,
+.mosaic > * {
+  box-sizing: border-box;
+  font-family: 'Manrope Variable', 'Manrope', 'Roboto', sans-serif;
+}
+.mosaic .mosaic-zero-state {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  left: 6px;
+  width: auto;
+  height: auto;
+  z-index: 1;
+}
+.mosaic-root {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  bottom: 3px;
+  left: 3px;
+}
+.mosaic-split {
+  position: absolute;
+  z-index: 1;
+  touch-action: none;
+  transition: background 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.mosaic-split:hover {
+  background: rgba(93, 91, 91, 0.06);
+}
+.mosaic-split .mosaic-split-line {
+  position: absolute;
+}
+.mosaic-split.-row {
+  margin-left: -3px;
+  width: 6px;
+  cursor: ew-resize;
+}
+.mosaic-split.-row .mosaic-split-line {
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  right: 3px;
+}
+.mosaic-split.-column {
+  margin-top: -3px;
+  height: 6px;
+  cursor: ns-resize;
+}
+.mosaic-split.-column .mosaic-split-line {
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+}
+.mosaic-tile {
+  position: absolute;
+  margin: 3px;
+}
+.mosaic-tile > * {
+  height: 100%;
+  width: 100%;
+}
+.mosaic-tile-fs-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.mosaic-tile-fs-wrapper > .mosaic-window {
+  height: 100%;
+  width: 100%;
+}
+.mosaic-drop-target {
+  position: relative;
+}
+.mosaic-drop-target.drop-target-hover .drop-target-container {
+  display: block;
+}
+.mosaic-drop-target.mosaic > .drop-target-container .drop-target.left {
+  right: calc(100% - 10px);
+}
+.mosaic-drop-target.mosaic > .drop-target-container .drop-target.right {
+  left: calc(100% - 10px);
+}
+.mosaic-drop-target.mosaic > .drop-target-container .drop-target.bottom {
+  top: calc(100% - 10px);
+}
+.mosaic-drop-target.mosaic > .drop-target-container .drop-target.top {
+  bottom: calc(100% - 10px);
+}
+.mosaic-drop-target .drop-target-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+}
+.mosaic-drop-target .drop-target-container.-dragging {
+  display: block;
+}
+.mosaic-drop-target .drop-target-container .drop-target {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(124, 174, 196, 0.12);
+  border: 2px solid rgba(124, 174, 196, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 8px;
+  opacity: 0;
+  z-index: 5;
+  transition: opacity 150ms ease;
+}
+.mosaic-drop-target .drop-target-container .drop-target.left {
+  right: calc(100% - 30%);
+}
+.mosaic-drop-target .drop-target-container .drop-target.right {
+  left: calc(100% - 30%);
+}
+.mosaic-drop-target .drop-target-container .drop-target.bottom {
+  top: calc(100% - 30%);
+}
+.mosaic-drop-target .drop-target-container .drop-target.top {
+  bottom: calc(100% - 30%);
+}
+.mosaic-drop-target .drop-target-container .drop-target.drop-target-hover {
+  opacity: 1;
+}
+.mosaic-drop-target .drop-target-container .drop-target.drop-target-hover.left {
+  right: calc(100% - 50%);
+}
+.mosaic-drop-target
+  .drop-target-container
+  .drop-target.drop-target-hover.right {
+  left: calc(100% - 50%);
+}
+.mosaic-drop-target
+  .drop-target-container
+  .drop-target.drop-target-hover.bottom {
+  top: calc(100% - 50%);
+}
+.mosaic-drop-target .drop-target-container .drop-target.drop-target-hover.top {
+  bottom: calc(100% - 50%);
+}
+.mosaic-window,
+.mosaic-preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(124, 174, 196, 0.2);
+  border-radius: 8px;
+  border: none !important;
+  transition: box-shadow 200ms ease;
+}
+.mosaic-window:focus-within {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(124, 174, 196, 0.22);
+}
+.mosaic-window .mosaic-window-toolbar,
+.mosaic-preview .mosaic-window-toolbar {
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  height: 32px;
+  border-bottom: 1px solid rgba(124, 174, 196, 0.14);
+  box-shadow: none;
+  transition: background 200ms ease;
+}
+.mosaic-window .mosaic-window-toolbar:hover,
+.mosaic-preview .mosaic-window-toolbar:hover {
+  background: #f2f4f5;
+}
+.mosaic-window .mosaic-window-toolbar.draggable,
+.mosaic-preview .mosaic-window-toolbar.draggable {
+  cursor: move;
+}
+.mosaic-window .mosaic-window-title,
+.mosaic-preview .mosaic-window-title {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-left: 12px;
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  min-height: 18px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.mosaic-window .mosaic-window-controls,
+.mosaic-preview .mosaic-window-controls {
+  display: flex;
+  height: 100%;
+}
+.mosaic-window .mosaic-window-controls .separator,
+.mosaic-preview .mosaic-window-controls .separator {
+  height: 20px;
+  border-left: 1px solid rgba(124, 174, 196, 0.3);
+  margin: 5px 4px;
+}
+.mosaic-window .mosaic-window-body,
+.mosaic-preview .mosaic-window-body {
+  position: relative;
+  flex: 1;
+  height: 0;
+  background: white;
+  z-index: 1;
+  overflow: hidden;
+}
+.mosaic-window .mosaic-window-additional-actions-bar,
+.mosaic-preview .mosaic-window-additional-actions-bar {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  bottom: initial;
+  left: 0;
+  height: 0;
+  overflow: hidden;
+  background: white;
+  justify-content: flex-end;
+  display: flex;
+  z-index: 3;
+}
+.mosaic-window .mosaic-window-additional-actions-bar .bp4-button,
+.mosaic-preview .mosaic-window-additional-actions-bar .bp4-button {
+  margin: 0;
+}
+.mosaic-window .mosaic-window-additional-actions-bar .bp4-button:after,
+.mosaic-preview .mosaic-window-additional-actions-bar .bp4-button:after {
+  display: none;
+}
+.mosaic-window .mosaic-window-body-overlay,
+.mosaic-preview .mosaic-window-body-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  background: white;
+  display: none;
+  z-index: 2;
+}
+.mosaic-window.additional-controls-open .mosaic-window-additional-actions-bar,
+.mosaic-preview.additional-controls-open .mosaic-window-additional-actions-bar {
+  height: 30px;
+}
+.mosaic-window.additional-controls-open .mosaic-window-body-overlay,
+.mosaic-preview.additional-controls-open .mosaic-window-body-overlay {
+  display: block;
+}
+.mosaic-window .mosaic-preview,
+.mosaic-preview .mosaic-preview {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 0;
+  border: 1px solid black;
+  max-height: 400px;
+}
+.mosaic-window .mosaic-preview .mosaic-window-body,
+.mosaic-preview .mosaic-preview .mosaic-window-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.mosaic-window .mosaic-preview h4,
+.mosaic-preview .mosaic-preview h4 {
+  margin-bottom: 10px;
+}
+.mosaic:not(.mosaic-blueprint-theme)
+  .mosaic-default-control.close-button:before {
+  content: 'Close';
+}
+.mosaic:not(.mosaic-blueprint-theme)
+  .mosaic-default-control.split-button:before {
+  content: 'Split';
+}
+.mosaic:not(.mosaic-blueprint-theme)
+  .mosaic-default-control.replace-button:before {
+  content: 'Replace';
+}
+.mosaic:not(.mosaic-blueprint-theme)
+  .mosaic-default-control.expand-button:before {
+  content: 'Expand';
+}
+.mosaic.mosaic-blueprint-theme {
+  background: white;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-zero-state {
+  background: #e5e8eb;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(17, 20, 24, 0.15);
+}
+.mosaic.mosaic-blueprint-theme .mosaic-zero-state .default-zero-state-icon {
+  font-size: 120px;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-split:hover {
+  background: none;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-split:hover .mosaic-split-line {
+  box-shadow: 0 0 0 1px #4c90f0;
+}
+.mosaic.mosaic-blueprint-theme.mosaic-drop-target
+  .drop-target-container
+  .drop-target,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-drop-target
+  .drop-target-container
+  .drop-target {
+  background: rgba(138, 187, 255, 0.2);
+  border: 2px solid #4c90f0;
+  transition: opacity 100ms;
+  border-radius: 2px;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window,
+.mosaic.mosaic-blueprint-theme .mosaic-preview {
+  box-shadow: 0 0 0 1px rgba(17, 20, 24, 0.15);
+  border-radius: 8px;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar {
+  box-shadow: 0 1px 1px rgba(17, 20, 24, 0.15);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .mosaic-window-title,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-title {
+  font-weight: 600;
+  color: #1c21276c;
+}
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-controls
+  .separator,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-controls
+  .separator {
+  border-left: 1px solid #dce0e5;
+}
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-controls
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-controls
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-controls
+  .bp4-button:before,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-controls
+  .bp4-button:before {
+  color: #4a5568;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .default-preview-icon,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .default-preview-icon {
+  font-size: 72px;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .mosaic-window-body,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-body {
+  border-top-width: 0;
+  background: white;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-additional-actions-bar,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-additional-actions-bar {
+  transition: height 250ms;
+  box-shadow: 0 1px 1px rgba(17, 20, 24, 0.15);
+}
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-additional-actions-bar
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-additional-actions-bar
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-additional-actions-bar
+  .bp4-button:before,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-additional-actions-bar
+  .bp4-button:before {
+  color: #738091;
+}
+.mosaic.mosaic-blueprint-theme
+  .mosaic-window.additional-controls-open
+  .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme
+  .mosaic-preview.additional-controls-open
+  .mosaic-window-toolbar {
+  box-shadow: 0 1px 0 0 0 0 1px rgba(17, 20, 24, 0.15);
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .mosaic-preview,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-preview {
+  border: 1px solid #8f99a8;
+}
+.mosaic.mosaic-blueprint-theme .mosaic-window .mosaic-preview h4,
+.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-preview h4 {
+  color: #404854;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark {
+  background: #252a31;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-zero-state {
+  background: #383e47;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-split:hover .mosaic-split-line {
+  box-shadow: 0 0 0 1px #2d72d2;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark.mosaic-drop-target
+  .drop-target-container
+  .drop-target,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-drop-target
+  .drop-target-container
+  .drop-target {
+  background: rgba(33, 93, 176, 0.2);
+  border-color: #2d72d2;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window-additional-actions-bar {
+  background: #383e47;
+  box-shadow: 0 1px 1px rgba(17, 20, 24, 0.4);
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-preview {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window .mosaic-window-title,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-preview .mosaic-window-title {
+  color: #dce0e5;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window
+  .mosaic-window-controls
+  .separator,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview
+  .mosaic-window-controls
+  .separator {
+  border-color: #5f6b7c;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window
+  .mosaic-window-controls
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview
+  .mosaic-window-controls
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window
+  .mosaic-window-controls
+  .bp4-button:before,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview
+  .mosaic-window-controls
+  .bp4-button:before {
+  color: #abb3bf;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window .mosaic-window-body,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-preview .mosaic-window-body {
+  background: #252a31;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window
+  .mosaic-window-additional-actions-bar
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview
+  .mosaic-window-additional-actions-bar
+  .bp4-button,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window
+  .mosaic-window-additional-actions-bar
+  .bp4-button:before,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview
+  .mosaic-window-additional-actions-bar
+  .bp4-button:before {
+  color: #c5cbd3;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-window.additional-controls-open
+  .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme.bp4-dark
+  .mosaic-preview.additional-controls-open
+  .mosaic-window-toolbar {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window .mosaic-preview,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-preview .mosaic-preview {
+  border-color: #5f6b7c;
+}
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-window .mosaic-preview h4,
+.mosaic.mosaic-blueprint-theme.bp4-dark .mosaic-preview .mosaic-preview h4 {
+  color: #edeff2;
+}
+
+/* ─── managed toolbar + buttons ──────────────────────────────────────────── */
+/* Replaces the MUI toolbar/IconButton chrome the consumer used to provide. */
+.mosaic-managed-toolbar {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+.mosaic-managed-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-right: 6px;
+}
+.mosaic-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 2px;
+  margin: 0 1px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #1c21276c;
+  transition: color 200ms ease;
+}
+.mosaic-toolbar-btn:hover {
+  color: #1c2127bb;
+  background: transparent;
+}
+.mosaic-undefined-component {
+  padding: 16px;
+  color: #c0392b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ─── fullscreen overlay ─────────────────────────────────────────────────── */
+/* Replaces the MUI Dialog the consumer used for the fullscreen tile. */
+.mosaic-fs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  animation: mosaic-fs-fade-in 180ms ease;
+}
+.mosaic-fs-dialog {
+  width: 90vw;
+  max-width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+}
+.mosaic-fs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(124, 174, 196, 0.18);
+}
+.mosaic-fs-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1c2127;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mosaic-fs-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #1c21276c;
+  transition: color 150ms ease, background 150ms ease;
+}
+.mosaic-fs-close:hover {
+  color: #1c2127;
+  background: rgba(124, 174, 196, 0.14);
+}
+.mosaic-fs-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+.mosaic-fs-body > * {
+  flex: 1;
+}
+@keyframes mosaic-fs-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ─── transparentBackground ──────────────────────────────────────────────── */
+.mosaic.transparent-bg .mosaic-window .mosaic-window-body {
+  background: transparent;
+}
+.mosaic.transparent-bg .mosaic-window .mosaic-window-toolbar {
+  background: rgba(247, 248, 249, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.mosaic.transparent-bg .mosaic-window .mosaic-window-toolbar:hover {
+  background: rgba(242, 244, 245, 0.7);
+}
+
+/* ─── noBackground ───────────────────────────────────────────────────────── */
+/* Fully transparent body and toolbar — no glass effect, no tint.
+   Distinct from transparentBackground which keeps a blurred glass toolbar. */
+.mosaic.no-bg .mosaic-window .mosaic-window-body {
+  background: transparent !important;
+}
+.mosaic.no-bg .mosaic-window .mosaic-window-toolbar {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+}
+.mosaic.no-bg .mosaic-window .mosaic-window-toolbar:hover {
+  background: rgba(247, 248, 249, 0.18) !important;
+}
+/* When hideToolbar reveals the toolbar, keep it transparent in no-bg mode */
+.mosaic.no-bg.hide-toolbar
+  .mosaic-tile-fs-wrapper.toolbar-open
+  .mosaic-window-toolbar {
+  background: rgba(247, 248, 249, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom-color: rgba(124, 174, 196, 0.1);
+}
+
+/* ─── hideToolbar ────────────────────────────────────────────────────────── */
+/* Pull the toolbar out of flow so the body fills 100% of the panel height */
+.mosaic.hide-toolbar .mosaic-window .mosaic-window-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  opacity: 0;
+  background: transparent;
+  border-bottom-color: transparent;
+  transition: opacity 150ms ease, background 150ms ease, transform 150ms ease;
+  pointer-events: none;
+  transform: translateY(-4px);
+}
+/* Expand body to fill the full panel now that toolbar is out of flow */
+.mosaic.hide-toolbar .mosaic-window .mosaic-window-body {
+  height: 100%;
+}
+/* Reveal full toolbar when user has clicked the indicator */
+.mosaic.hide-toolbar .mosaic-tile-fs-wrapper.toolbar-open .mosaic-window-toolbar {
+  opacity: 1;
+  pointer-events: auto;
+  background: #f7f8f9;
+  border-bottom-color: rgba(124, 174, 196, 0.14);
+  transform: translateY(0);
+}
+/* When transparentBackground is also active, use glass toolbar */
+.mosaic.transparent-bg.hide-toolbar
+  .mosaic-tile-fs-wrapper.toolbar-open
+  .mosaic-window-toolbar {
+  background: rgba(247, 248, 249, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: rgba(124, 174, 196, 0.14);
+}
+
+/* Indicator pill – rendered on the tile wrapper (outside the toolbar),
+   so it stays visible and clickable regardless of toolbar state */
+.mosaic.hide-toolbar .mosaic-toolbar-indicator {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 5px;
+  border: none;
+  border-radius: 0 0 4px 4px;
+  background: rgba(124, 174, 196, 0.28);
+  cursor: pointer;
+  padding: 0;
+  z-index: 15;
+  opacity: 0;
+  transition: background 200ms ease, width 200ms ease, height 200ms ease,
+    opacity 400ms ease 2500ms;
+}
+/* Chevron — hidden until hover */
+.mosaic.hide-toolbar .mosaic-toolbar-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -30%) rotate(45deg);
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid rgba(80, 120, 140, 0.85);
+  border-bottom: 1.5px solid rgba(80, 120, 140, 0.85);
+  opacity: 0;
+  transition: opacity 150ms ease, transform 200ms ease;
+}
+/* appear instantly when panel is entered */
+.mosaic.hide-toolbar .mosaic-tile-fs-wrapper:hover .mosaic-toolbar-indicator {
+  opacity: 1;
+  transition: background 200ms ease, width 200ms ease, height 200ms ease,
+    opacity 100ms ease 0ms;
+}
+/* Expand and show chevron on hover */
+.mosaic.hide-toolbar .mosaic-toolbar-indicator:hover {
+  background: rgba(124, 174, 196, 0.5);
+  width: 32px;
+  height: 14px;
+}
+.mosaic.hide-toolbar .mosaic-toolbar-indicator:hover::after {
+  opacity: 1;
+}
+/* Flip chevron up when toolbar is open */
+.mosaic.hide-toolbar .mosaic-toolbar-indicator.is-open::after {
+  transform: translate(-50%, -70%) rotate(225deg);
+}
+/* When toolbar is open: keep indicator visible below the toolbar */
+.mosaic.hide-toolbar .mosaic-tile-fs-wrapper.toolbar-open .mosaic-toolbar-indicator {
+  top: 31px;
+  background: rgba(124, 174, 196, 0.18);
+  opacity: 1;
+  transition: background 200ms ease, width 200ms ease, height 200ms ease,
+    opacity 100ms ease 0ms;
+}
+.mosaic.hide-toolbar
+  .mosaic-tile-fs-wrapper.toolbar-open
+  .mosaic-toolbar-indicator:hover {
+  background: rgba(124, 174, 196, 0.45);
+}
+
+.mosaic.no-border .mosaic-window,
+.mosaic.no-border .mosaic-window:focus-within,
+.mosaic.mosaic-blueprint-theme.no-border .mosaic-window,
+.mosaic.mosaic-blueprint-theme.no-border .mosaic-window:focus-within {
+  box-shadow: 0 1px 8px #7cafc406;
+}
+.mosaic.no-border .mosaic-window .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme.no-border .mosaic-window .mosaic-window-toolbar {
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+
+/* ─── glassBackground ─────────────────────────────────────────────────────── */
+/* Frosted-glass blur on the window frame so the aurora bleeds through.
+   Window gets a very light white tint; body + blueprint-theme body are forced
+   transparent so nothing opaque sits between the glass and panel content. */
+.mosaic.glass-bg .mosaic-window,
+.mosaic.glass-bg .mosaic-preview,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-window,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-preview {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+/* Blur lives on a pseudo-element rather than .mosaic-window itself —
+   backdrop-filter directly on that element breaks Chromium's native HTML5
+   drag-and-drop hit-testing on it (it's the react-dnd drop target), which
+   silently prevented dragged panels from ever highlighting other panels. */
+.mosaic.glass-bg .mosaic-window::before,
+.mosaic.glass-bg .mosaic-preview::before,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-window::before,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  backdrop-filter: blur(18px) saturate(1.8);
+  -webkit-backdrop-filter: blur(18px) saturate(1.8);
+}
+.mosaic.glass-bg .mosaic-window .mosaic-window-body,
+.mosaic.glass-bg .mosaic-preview .mosaic-window-body,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-window .mosaic-window-body,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-preview .mosaic-window-body {
+  background: transparent !important;
+}
+.mosaic.glass-bg .mosaic-window .mosaic-window-toolbar,
+.mosaic.glass-bg .mosaic-preview .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-window .mosaic-window-toolbar,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-preview .mosaic-window-toolbar {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.22) !important;
+  box-shadow: none !important;
+}
+.mosaic.glass-bg .mosaic-window .mosaic-window-toolbar:hover,
+.mosaic.glass-bg .mosaic-preview .mosaic-window-toolbar:hover,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-window .mosaic-window-toolbar:hover,
+.mosaic.mosaic-blueprint-theme.glass-bg .mosaic-preview .mosaic-window-toolbar:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+}
+/* no-border: swap diffuse shadow for the inset ring only */
+.mosaic.no-border.glass-bg .mosaic-window,
+.mosaic.no-border.glass-bg .mosaic-window:focus-within,
+.mosaic.mosaic-blueprint-theme.no-border.glass-bg .mosaic-window,
+.mosaic.mosaic-blueprint-theme.no-border.glass-bg .mosaic-window:focus-within {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55) !important;
+}
+/* Toolbar reveal when hide-toolbar is also active */
+.mosaic.glass-bg.hide-toolbar
+  .mosaic-tile-fs-wrapper.toolbar-open
+  .mosaic-window-toolbar {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom-color: rgba(255, 255, 255, 0.35) !important;
+}

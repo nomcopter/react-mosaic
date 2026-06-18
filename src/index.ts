@@ -54,6 +54,21 @@ export {
   isParent,
 } from './util/mosaicUtilities';
 export { MosaicWindow, MosaicWindowProps } from './MosaicWindow';
+export { ManagedMosaic, ManagedMosaicProps } from './ManagedMosaic';
+export { MosaicFullscreenOverlay, MosaicFullscreenOverlayProps } from './MosaicFullscreenOverlay';
+export { useMosaicFullscreen, MosaicFullscreenApi } from './useMosaicFullscreen';
+export { MosaicTree } from './util/mosaicTree';
+export { MosaicConfigurationHelper } from './configuration/mosaicConfigurationHelper';
+export {
+  DEFAULT_MOSAIC_LABELS,
+  MosaicComponent,
+  MosaicComponentMap,
+  MosaicConfiguration,
+  MosaicLabels,
+  MosaicPanelStyle,
+  MosaicSchema,
+  MosaicViewDefinition,
+} from './configuration/types';
 export { createDefaultToolbarButton, DefaultToolbarButton, MosaicButtonProps } from './buttons/MosaicButton';
 export { MosaicZeroState, MosaicZeroStateProps } from './MosaicZeroState';
 export { Separator } from './buttons/Separator';
