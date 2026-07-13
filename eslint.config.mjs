@@ -7,6 +7,8 @@ export default [
   {
     ignores: [
       '**/dist',
+      'apps/website/build',
+      'apps/website/.docusaurus',
       '**/vite.config.*.timestamp*',
       '**/vitest.config.*.timestamp*',
     ],
