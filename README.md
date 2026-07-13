@@ -65,7 +65,7 @@ For live editable examples, the n-ary tree model, custom toolbars, tabs, theming
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING_AI.md](./CONTRIBUTING_AI.md) for repo layout and development workflow, or jump into the docs:
+Contributions are welcome:
 
 - Clone and install: `npm install`
 - Start the docs site (hot-reloads the demo and live code blocks): `npm start`
