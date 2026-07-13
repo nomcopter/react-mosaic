@@ -6,12 +6,17 @@
   "tags": [],
   "targets": {
     "nx-release-publish": {
+      "dependsOn": ["^build", "build", "test-package"],
       "options": {
         "packageRoot": "dist/{projectRoot}"
       }
     },
     "build": {
       "command": "npm run build:lib"
+    },
+    "test-package": {
+      "command": "npm run test:package",
+      "dependsOn": ["build"]
     }
   },
   "release": {
