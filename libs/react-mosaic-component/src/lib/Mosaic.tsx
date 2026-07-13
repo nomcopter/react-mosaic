@@ -275,11 +275,18 @@ export class MosaicWithoutDragDropContext<
     ) => this.updateRoot([createExpandUpdate<T>(path, percentage)]),
     getRoot: () => this.getRoot()!,
     hide: (path: MosaicPath, suppressOnChange = false) => {
+      // `hide` fires at the start of a drag to collapse the source tile. It is a
+      // transient, in-progress change, not a committed one, so it must never
+      // trigger onRelease — that only fires once the drag is dropped/released.
       this.updateRoot([createHideUpdate<T>(this.getRoot(), path)], {
         suppressOnChange,
+        suppressOnRelease: true,
       });
     },
     show: (path: MosaicPath, suppressOnChange = false) => {
+      // `show` only fires to restore a node when a drag is cancelled. Like
+      // `hide`, it is a transient drag-lifecycle operation, not a committed
+      // change, so it must never trigger onRelease.
       // To show a hidden node, we need to restore its split percentage
       // For split nodes, we restore equal percentages
       // For tab nodes, we make sure the tab is visible (already handled by hide logic)
@@ -311,7 +318,7 @@ export class MosaicWithoutDragDropContext<
               },
             },
           ],
-          { suppressOnChange },
+          { suppressOnChange, suppressOnRelease: true },
         );
       }
       // For tab nodes, the hide operation just changes active tab, so no need to restore
@@ -496,4 +503,3 @@ export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<
     );
   }
 }
-
