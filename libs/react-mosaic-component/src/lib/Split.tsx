@@ -68,8 +68,11 @@ export class Split extends React.PureComponent<SplitProps> {
 
   componentWillUnmount() {
     this.unbindListeners();
+    this.throttledUpdatePercentage.cancel();
     if (this.rootElement.current) {
-      this.rootElement.current.ownerDocument!.removeEventListener(
+      // Must match the addEventListener target in componentDidMount — the
+      // listener is on the element itself, not its document.
+      this.rootElement.current.removeEventListener(
         'touchstart',
         this.onMouseDown,
         TOUCH_EVENT_OPTIONS,
@@ -109,6 +112,8 @@ export class Split extends React.PureComponent<SplitProps> {
 
   private onMouseUp = (event: MouseEvent | TouchEvent) => {
     this.unbindListeners();
+    // A queued trailing call would otherwise deliver onChange after onRelease.
+    this.throttledUpdatePercentage.cancel();
     const newPercentages = this.calculateNewPercentages(event);
     this.props.onRelease!(newPercentages);
   };
@@ -135,9 +140,16 @@ export class Split extends React.PureComponent<SplitProps> {
       splitIndex,
     } = this.props;
 
+    // The split can be unmounted or detached from the DOM mid-drag (e.g. the
+    // layout changed under us). Bail out with the current percentages rather
+    // than throwing on a missing rootElement/parentElement.
+    if (!this.rootElement.current || !this.rootElement.current.parentElement) {
+      return splitPercentages;
+    }
+
     // We need the parent element that this split is rendered into, which is `.mosaic-root`
     const parentBBox =
-      this.rootElement.current!.parentElement!.getBoundingClientRect();
+      this.rootElement.current.parentElement.getBoundingClientRect();
     const location = isTouchEvent(event) ? event.changedTouches[0] : event;
 
     let mouseAbsolutePercentage: number;

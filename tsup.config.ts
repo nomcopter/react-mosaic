@@ -6,7 +6,7 @@ export default defineConfig({
   entry: [
     './libs/react-mosaic-component/src/**/*.ts',
     './libs/react-mosaic-component/src/**/*.tsx',
-    '!./libs/react-mosaic-component/src/**/*.spec.ts',
+    '!./libs/react-mosaic-component/src/**/*.spec.*',
   ],
   format: ['cjs', 'esm'],
   dts: true,

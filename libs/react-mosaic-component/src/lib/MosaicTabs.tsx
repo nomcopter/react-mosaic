@@ -21,9 +21,32 @@ import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { createDragToUpdates } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
-import { DraggableTab } from './DraggableTab';
+import { DraggableTab, DraggableTabProps } from './DraggableTab';
 import { createDefaultTabsControls } from './buttons/defaultToolbarControls';
 import { TabDragButton } from './buttons/TabDragButton';
+
+// Carries the tab container's path so ToolbarDraggableTab can stay a
+// module-level component. Defining the wrapper inside MosaicTabs' render would
+// give it a new element type every render, remounting the consumer's entire
+// renderTabToolbar subtree on every tree update.
+const TabContainerPathContext = React.createContext<MosaicPath>([]);
+
+function ToolbarDraggableTab<T extends MosaicKey>(
+  props: Pick<DraggableTabProps<T>, 'tabKey' | 'tabIndex' | 'children'>,
+) {
+  const { mosaicActions, mosaicId } = React.useContext<MosaicContext<T>>(
+    MosaicContext as any,
+  );
+  const tabContainerPath = React.useContext(TabContainerPathContext);
+  return (
+    <DraggableTab
+      {...props}
+      tabContainerPath={tabContainerPath}
+      mosaicActions={mosaicActions}
+      mosaicId={mosaicId}
+    />
+  );
+}
 
 export interface MosaicTabsProps<T extends MosaicKey> {
   node: MosaicTabsNode<T>;
@@ -482,22 +505,18 @@ export const MosaicTabs = <T extends MosaicKey>({
       style={boundingBoxAsStyles(boundingBox)}
     >
       {/* Use the custom toolbar renderer if provided, otherwise use our default */}
-      {renderTabToolbar
-        ? renderTabToolbar({
+      {renderTabToolbar ? (
+        <TabContainerPathContext.Provider value={path}>
+          {renderTabToolbar({
             tabs,
             activeTabIndex,
             path,
-            DraggableTab: (props) => (
-              <DraggableTab
-                key={props.tabKey}
-                {...props}
-                tabContainerPath={path}
-                mosaicActions={mosaicActions}
-                mosaicId={mosaicId}
-              />
-            ),
-          })
-        : renderDefaultToolbar()}
+            DraggableTab: ToolbarDraggableTab,
+          })}
+        </TabContainerPathContext.Provider>
+      ) : (
+        renderDefaultToolbar()
+      )}
 
       {connectDropTarget(
         <div className="mosaic-tile">{renderTile(activeTabKey, tilePath)}</div>,

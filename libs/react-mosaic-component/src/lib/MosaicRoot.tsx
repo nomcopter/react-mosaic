@@ -121,8 +121,14 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
 
       // Case 3: Node is a tab container
       case 'tabs': {
+        // Key the group by its smallest tab key rather than the positional
+        // fallback: sibling insertions/removals and in-group reorders then
+        // keep the key stable, so the group (and its active tile's DOM and
+        // state) survives. Unique among siblings because leaf IDs are unique
+        // tree-wide.
         return (
           <MosaicTabs<T>
+            key={`tabs-${[...node.tabs].sort()[0]}`}
             node={node}
             path={path}
             renderTile={this.props.renderTile}

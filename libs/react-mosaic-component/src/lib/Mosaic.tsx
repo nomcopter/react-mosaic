@@ -121,7 +121,10 @@ export interface MosaicBaseProps<T extends MosaicKey> {
 export interface MosaicControlledProps<T extends MosaicKey>
   extends MosaicBaseProps<T> {
   /**
-   * The tree to render
+   * The tree to render.
+   * A legacy binary (`first`/`second`) tree is converted on mount and the
+   * converted tree is reported through `onChange` once (without `onRelease`),
+   * so the caller can store and pass back the modern n-ary format.
    */
   value: LegacyMosaicNode<T> | MosaicNode<T> | null;
   onChange: (newNode: MosaicNode<T> | null) => void;
@@ -207,11 +210,59 @@ export class MosaicWithoutDragDropContext<
     );
   }
 
+  private lastControlledValue:
+    | LegacyMosaicNode<T>
+    | MosaicNode<T>
+    | null
+    | undefined;
+  private convertedControlledValue: MosaicNode<T> | null = null;
+  private lastMigratedLegacyValue:
+    | LegacyMosaicNode<T>
+    | MosaicNode<T>
+    | null
+    | undefined;
+
+  componentDidMount() {
+    this.migrateLegacyControlledValue();
+  }
+
+  componentDidUpdate() {
+    this.migrateLegacyControlledValue();
+  }
+
   private getRoot(): MosaicNode<T> | null {
     if (isUncontrolled(this.props)) {
       return this.state.currentNode;
-    } else {
-      return convertLegacyToNary(this.props.value);
+    }
+    // One-slot cache keyed on the value reference: legacy trees would
+    // otherwise be deep-converted on every call (getRoot runs several times
+    // per window per render), each time with a fresh identity.
+    const { value } = this.props;
+    if (value !== this.lastControlledValue) {
+      this.lastControlledValue = value;
+      this.convertedControlledValue = convertLegacyToNary(value);
+    }
+    return this.convertedControlledValue;
+  }
+
+  /**
+   * When a controlled caller passes a legacy (binary `first`/`second`) tree,
+   * report the converted tree through `onChange` so the caller can store the
+   * modern format and pass it back. This is a migration event, not a user
+   * gesture, so `onRelease` is not fired. Guarded per input reference so a
+   * caller that ignores the emit is neither spammed nor able to loop.
+   */
+  private migrateLegacyControlledValue() {
+    if (isUncontrolled(this.props)) {
+      return;
+    }
+    const { value } = this.props;
+    const converted = this.getRoot();
+    // convertLegacyToNary returns modern input by reference, so a changed
+    // identity means exactly "the input was legacy".
+    if (converted !== value && this.lastMigratedLegacyValue !== value) {
+      this.lastMigratedLegacyValue = value;
+      this.props.onChange!(converted);
     }
   }
 
