@@ -9,4 +9,13 @@ export default [
     // Override or add rules here
     rules: {},
   },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      // `flat/react` re-enables the base ESLint `no-redeclare`, which
+      // typescript-eslint's recommended set turns off for TypeScript because
+      // it misreports overload signatures as redeclarations.
+      'no-redeclare': 'off',
+    },
+  },
 ];

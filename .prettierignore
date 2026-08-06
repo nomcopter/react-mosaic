@@ -7,3 +7,4 @@
 /.idea
 /.parcel-cache
 /.tsup
+.nx/self-healing

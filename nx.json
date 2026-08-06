@@ -78,5 +78,9 @@
       "dependsOn": ["^build", "build"]
     }
   },
-  "analytics": false
+  "analytics": false,
+  "neverConnectToCloud": true,
+  "migrate": {
+    "agentic": false
+  }
 }

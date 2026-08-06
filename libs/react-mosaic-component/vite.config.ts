@@ -3,30 +3,22 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/libs/react-mosaic-component',
   plugins: [
     react(),
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin(['*.md', 'package.json']),
     dts({
       entryRoot: 'src',
       afterDiagnostic: (diagnostic) => {
         if (diagnostic.length) {
-          throw new Error('lint failure')
+          throw new Error('lint failure');
         }
       },
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
   ],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
   // Configuration for building your library.
   // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
@@ -48,7 +40,7 @@ export default defineConfig(() => ({
       // Don't forget to update your package.json as well.
       formats: ['es' as const],
     },
-    rollupOptions: {
+    rolldownOptions: {
       // External packages that should not be bundled into your library.
       external: ['react', 'react-dom', 'react/jsx-runtime', 'classnames'],
     },
@@ -62,6 +54,9 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../coverage/libs/react-mosaic-component',
       provider: 'v8' as const,
+      // Vitest 4 removed `coverage.all`; untested files are only reported
+      // when they are matched explicitly.
+      include: ['src/**/*.{ts,tsx}'],
     },
   },
 }));

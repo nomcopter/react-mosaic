@@ -28,3 +28,6 @@ apps/website/static/css/
 .claude/settings.local.json
 
 .claude/worktrees
+.nx/polygraph
+.nx/self-healing
+.nx/migrate-runs
