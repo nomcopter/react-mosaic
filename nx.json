@@ -59,6 +59,7 @@
   },
   "release": {
     "changelog": {
+      "workspaceChangelog": false,
       "projectChangelogs": {
         "file": false,
         "createRelease": "github"
