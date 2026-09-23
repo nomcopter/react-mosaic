@@ -1,4 +1,3 @@
-import { flatten } from 'lodash-es';
 import React, { JSX } from 'react';
 
 import { MosaicContext } from './contextTypes';
@@ -51,30 +50,44 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
       return null;
     }
 
+    const tiles: JSX.Element[] = [];
+    const splits: JSX.Element[] = [];
+    this.collectElements(naryRoot, emptyBoundingBox(), [], tiles, splits);
+
+    // Tiles are absolutely positioned, so their DOM order doesn't matter.
+    // Rendering them as one flat list sorted by key means moving a panel
+    // anywhere in the tree neither remounts it nor moves its DOM node (which
+    // would reload an <iframe>). Splits come last so they stay on top.
+    tiles.sort(compareByKey);
+
     return (
       <div className="mosaic-root">
-        {this.renderRecursively(naryRoot, emptyBoundingBox(), [])}
+        {tiles}
+        {splits}
       </div>
     );
   }
 
-  // The recursive renderer is now updated for the n-ary tree structure
-  private renderRecursively(
+  // Walks the n-ary tree, collecting absolutely positioned tiles and splits
+  private collectElements(
     node: MosaicNode<T>,
     boundingBox: BoundingBox,
     path: MosaicPath,
-  ): JSX.Element | null {
+    tiles: JSX.Element[],
+    splits: JSX.Element[],
+  ): void {
     // Case 1: Node is a leaf (a single panel)
     if (typeof node === 'string' || typeof node === 'number') {
-      return (
+      tiles.push(
         <div
           key={node}
           className="mosaic-tile"
           style={{ ...boundingBoxAsStyles(boundingBox) }}
         >
           {this.props.renderTile(node, path)}
-        </div>
+        </div>,
       );
+      return;
     }
 
     // Node is an object, so it's either a Split or Tabs node
@@ -93,40 +106,33 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
           direction,
         );
 
-        const renderedChildren = children.flatMap((child, index) => {
-          const childPath = path.concat(index);
-          const elements = [
-            this.renderRecursively(child, childBoxes[index], childPath),
-          ];
+        children.forEach((child, index) => {
+          this.collectElements(
+            child,
+            childBoxes[index],
+            path.concat(index),
+            tiles,
+            splits,
+          );
 
           // Add a Splitter between each child, except the last one
           if (index < children.length - 1) {
-            elements.push(this.renderSplit(node, path, index, boundingBox));
+            const split = this.renderSplit(node, path, index, boundingBox);
+            if (split !== null) {
+              splits.push(split);
+            }
           }
-          return elements;
         });
-
-        const flattenedElements =
-          flatten(renderedChildren).filter(nonNullElement);
-        return (
-          <>
-            {flattenedElements.map((element, index) =>
-              React.cloneElement(element, {
-                key: element.key || `${path.join('-')}-${index}`,
-              }),
-            )}
-          </>
-        );
+        return;
       }
 
       // Case 3: Node is a tab container
       case 'tabs': {
-        // Key the group by its smallest tab key rather than the positional
-        // fallback: sibling insertions/removals and in-group reorders then
-        // keep the key stable, so the group (and its active tile's DOM and
-        // state) survives. Unique among siblings because leaf IDs are unique
-        // tree-wide.
-        return (
+        // Key the group by its smallest tab key rather than its position:
+        // sibling insertions/removals and in-group reorders then keep the key
+        // stable, so the group (and its active tile's DOM and state) survives.
+        // Unique among tiles because leaf IDs are unique tree-wide.
+        tiles.push(
           <MosaicTabs<T>
             key={`tabs-${[...node.tabs].sort()[0]}`}
             node={node}
@@ -139,14 +145,14 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
             showTabDragButton={this.props.showTabDragButton}
             renderTabToolbarControls={this.props.renderTabToolbarControls}
             canClose={this.props.canClose}
-          />
+          />,
         );
+        return;
       }
 
       default:
         // Should not happen with valid node types
         console.error('Unknown mosaic node type:', node);
-        return null;
     }
   }
 
@@ -203,6 +209,8 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
   };
 }
 
-function nonNullElement(x: JSX.Element | null): x is JSX.Element {
-  return x !== null;
+function compareByKey(a: JSX.Element, b: JSX.Element): number {
+  const keyA = String(a.key);
+  const keyB = String(b.key);
+  return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
 }
