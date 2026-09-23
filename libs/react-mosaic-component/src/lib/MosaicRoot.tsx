@@ -181,6 +181,7 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
           direction={direction}
           boundingBox={boundingBox}
           splitIndex={splitIndex}
+          depth={path.length}
           splitPercentages={splitPercentages}
           onChange={(percentages) => this.onResize(percentages, path, true)}
           onRelease={(percentages) => this.onResize(percentages, path, false)}

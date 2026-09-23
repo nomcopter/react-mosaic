@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 
 import { Mosaic } from './Mosaic';
 import { RESIZING_CLASS, Split, SplitProps } from './Split';
+import { EnabledResizeOptions } from './types';
 
 describe('Split resize resilience', () => {
   function makeSplit(splitPercentages: number[]): Split {
@@ -439,6 +440,53 @@ describe('Split renderSplitHandle', () => {
     fireEvent.mouseUp(document, { clientX: 300 });
 
     expect(onRelease).toHaveBeenCalledWith([30, 70]);
+  });
+});
+
+describe('Split stacking with handles', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  // A 2x2 grid: the root divider's handle sits right where the inner dividers
+  // meet it, so the root divider has to be on top to stay grabbable.
+  function renderGrid(resize: EnabledResizeOptions) {
+    const { container } = render(
+      React.createElement(Mosaic<string>, {
+        initialValue: {
+          type: 'split',
+          direction: 'row',
+          children: [
+            { type: 'split', direction: 'column', children: ['a', 'b'] },
+            { type: 'split', direction: 'column', children: ['c', 'd'] },
+          ],
+        },
+        renderTile: (id: string) => React.createElement('div', null, id),
+        resize,
+      }),
+    );
+    const zIndex = (selector: string) =>
+      Array.from(container.querySelectorAll<HTMLElement>(selector)).map(
+        (element) => element.style.zIndex,
+      );
+    return {
+      rows: zIndex('.mosaic-split.-row'),
+      columns: zIndex('.mosaic-split.-column'),
+    };
+  }
+
+  it('puts outer dividers above inner ones when handles are rendered', () => {
+    const { rows, columns } = renderGrid({
+      renderSplitHandle: () => React.createElement('span', null, '⋮'),
+    });
+    expect(rows).toEqual(['9']);
+    expect(columns).toEqual(['8', '8']);
+  });
+
+  it('leaves stacking to the stylesheet without handles', () => {
+    const { rows, columns } = renderGrid({});
+    expect(rows).toEqual(['']);
+    expect(columns).toEqual(['', '']);
   });
 });
 

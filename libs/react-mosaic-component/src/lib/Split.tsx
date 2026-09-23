@@ -29,6 +29,9 @@ export const RESIZING_CLASS = 'mosaic-resizing';
 
 export const DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE = 10;
 
+// z-index of a root-level divider with a handle; deeper ones get one less
+const HANDLE_MAX_Z_INDEX = 9;
+
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
   // BoundingBox of the parent split container
@@ -37,6 +40,8 @@ export interface SplitProps extends EnabledResizeOptions {
   splitPercentages: number[];
   // The index of this splitter (e.g., index 0 is between child 0 and 1)
   splitIndex: number;
+  // How deep the parent split is in the tree (0 for the root split)
+  depth?: number;
   // Callback provides the entire new array of percentages
   onChange?: (percentages: number[]) => void;
   onRelease?: (percentages: number[]) => void;
@@ -128,7 +133,24 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
     return {
       ...boundingBoxAsStyles(boundingBox),
       [positionStyle]: `${absolutePercentage}%`,
+      zIndex: this.getHandleZIndex(),
     };
+  }
+
+  // A handle sits in the middle of its divider, which is often exactly where
+  // an inner divider meets it (every 2x2 grid). Stacking outer dividers above
+  // inner ones keeps the handle grabbable there. Only applied when handles are
+  // rendered, and kept below the -preview z-index of 10.
+  private getHandleZIndex(): number | undefined {
+    const { renderSplitHandle, depth } = this.props;
+    if (
+      !renderSplitHandle ||
+      depth === undefined ||
+      this.state.previewPercentages !== null
+    ) {
+      return undefined;
+    }
+    return Math.max(1, HANDLE_MAX_Z_INDEX - depth);
   }
 
   private onMouseDown = (
