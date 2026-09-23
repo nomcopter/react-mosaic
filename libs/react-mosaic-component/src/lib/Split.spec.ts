@@ -282,6 +282,75 @@ describe('Split minimum pane size', () => {
     ).toEqual([20, 75, 5]);
   });
 
+  it('caps the minimum at half of the two panes so neither goes negative', () => {
+    // Two 8% panes can't both be 10% wide: the divider stays in the middle
+    expect(
+      dragSplit(
+        { splitPercentages: [8, 8, 84], splitIndex: 0 },
+        { clientX: 0 },
+      ),
+    ).toEqual([8, 8, 84]);
+  });
+
+  it('applies a pixel minimum when it is larger than the percentage', () => {
+    // 1000px wide: 300px is 30%, larger than the default 10%
+    expect(dragSplit({ minimumPaneSizePx: 300 }, { clientX: 0 })).toEqual([
+      30, 70,
+    ]);
+    expect(dragSplit({ minimumPaneSizePx: 300 }, { clientX: 1000 })).toEqual([
+      70, 30,
+    ]);
+    // 50px is 5%, so the 10% default still wins
+    expect(dragSplit({ minimumPaneSizePx: 50 }, { clientX: 0 })).toEqual([
+      10, 90,
+    ]);
+  });
+
+  it('measures the pixel minimum against the split, not the whole root', () => {
+    // The split is the right half (500px), so 100px is 20% of it
+    expect(
+      dragSplit(
+        {
+          boundingBox: { top: 0, right: 0, bottom: 0, left: 50 },
+          minimumPaneSizePercentage: 0,
+          minimumPaneSizePx: 100,
+        },
+        { clientX: 500 },
+      ),
+    ).toEqual([20, 80]);
+  });
+
+  it('uses per-direction pixel minimums', () => {
+    const minimumPaneSizePx = { column: 100 };
+    // 500px tall: 100px is 20%
+    expect(
+      dragSplit(
+        {
+          direction: 'column',
+          minimumPaneSizePercentage: 0,
+          minimumPaneSizePx,
+        },
+        { clientY: 0 },
+      ),
+    ).toEqual([20, 80]);
+    expect(
+      dragSplit(
+        { minimumPaneSizePercentage: 0, minimumPaneSizePx },
+        { clientX: 0 },
+      ),
+    ).toEqual([0, 100]);
+  });
+
+  it('keeps the current percentages when the root has no size', () => {
+    expect(
+      dragSplit(
+        { minimumPaneSizePercentage: 0, minimumPaneSizePx: 100 },
+        { clientX: 0 },
+        { width: 0, height: 0 },
+      ),
+    ).toEqual([50, 50]);
+  });
+
   it('works inside a nested bounding box', () => {
     // The split covers the right half of the root, so the pointer at 60% of
     // the root is 20% into this split.

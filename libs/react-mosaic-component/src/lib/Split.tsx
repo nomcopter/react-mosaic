@@ -169,6 +169,7 @@ export class Split extends React.PureComponent<SplitProps> {
   private calculateNewPercentages(event: MouseEvent | TouchEvent): number[] {
     const {
       minimumPaneSizePercentage,
+      minimumPaneSizePx,
       direction,
       boundingBox,
       splitPercentages,
@@ -186,6 +187,11 @@ export class Split extends React.PureComponent<SplitProps> {
     const parentBBox =
       this.rootElement.current.parentElement.getBoundingClientRect();
     const location = isTouchEvent(event) ? event.changedTouches[0] : event;
+
+    // A root with no size (e.g. hidden) would turn the maths below into NaN
+    if (parentBBox.width === 0 || parentBBox.height === 0) {
+      return splitPercentages;
+    }
 
     let mouseAbsolutePercentage: number;
     if (direction === 'column') {
@@ -209,10 +215,29 @@ export class Split extends React.PureComponent<SplitProps> {
 
     let newLeftPaneSize = mouseRelativePercentage - startPercentage;
 
-    const minimumPaneSize = resolveByDirection(
-      minimumPaneSizePercentage,
-      direction,
-      DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE,
+    // Pixel size of this split along its direction, to express the pixel
+    // minimum as a percentage of the split
+    const { top, right, bottom, left } = boundingBox;
+    const splitSizePx =
+      direction === 'column'
+        ? (parentBBox.height * (100 - top - bottom)) / 100
+        : (parentBBox.width * (100 - left - right)) / 100;
+    const minimumPx = resolveByDirection(minimumPaneSizePx, direction, 0);
+    const minimumPxAsPercentage =
+      splitSizePx > 0 ? (minimumPx / splitSizePx) * 100 : 0;
+
+    // The larger minimum wins. It can't exceed half of the two panes, or
+    // they couldn't both satisfy it and one would end up negative.
+    const minimumPaneSize = Math.min(
+      Math.max(
+        resolveByDirection(
+          minimumPaneSizePercentage,
+          direction,
+          DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE,
+        ),
+        minimumPxAsPercentage,
+      ),
+      totalSizeOfPanes / 2,
     );
 
     newLeftPaneSize = clamp(
