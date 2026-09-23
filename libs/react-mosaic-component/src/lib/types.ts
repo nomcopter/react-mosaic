@@ -259,6 +259,13 @@ export interface EnabledResizeOptions {
    * of the split bar.
    */
   renderSplitHandle?: (direction: MosaicDirection) => ReactNode;
+  /**
+   * Move only the divider while dragging, and resize the panes once when it
+   * is released. `onChange` and `onRelease` then fire a single time per drag,
+   * which avoids re-rendering heavy tiles on every mouse move.
+   * Default: false
+   */
+  preview?: boolean;
 }
 
 /**

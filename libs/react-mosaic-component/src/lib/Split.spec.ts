@@ -2,6 +2,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 
+import { Mosaic } from './Mosaic';
 import { RESIZING_CLASS, Split, SplitProps } from './Split';
 
 describe('Split resize resilience', () => {
@@ -438,5 +439,106 @@ describe('Split renderSplitHandle', () => {
     fireEvent.mouseUp(document, { clientX: 300 });
 
     expect(onRelease).toHaveBeenCalledWith([30, 70]);
+  });
+});
+
+describe('Split preview', () => {
+  function renderPreviewSplit(preview: boolean) {
+    const onChange = vi.fn();
+    const onRelease = vi.fn();
+    const { container } = render(
+      React.createElement(
+        'div',
+        null,
+        React.createElement(Split, {
+          direction: 'row',
+          boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+          splitPercentages: [50, 50],
+          splitIndex: 0,
+          onChange,
+          onRelease,
+          preview,
+        }),
+      ),
+    );
+    vi.spyOn(
+      container.firstElementChild as HTMLElement,
+      'getBoundingClientRect',
+    ).mockReturnValue({ left: 0, top: 0, width: 1000, height: 500 } as DOMRect);
+    const splitElement = container.querySelector(
+      '.mosaic-split',
+    ) as HTMLElement;
+    return { splitElement, onChange, onRelease };
+  }
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('moves only the divider while dragging, then reports once on release', () => {
+    const { splitElement, onChange, onRelease } = renderPreviewSplit(true);
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseMove(document, { clientX: 300 });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(splitElement.classList.contains('-preview')).toBe(true);
+    expect(splitElement.style.left).toBe('30%');
+
+    fireEvent.mouseUp(document, { clientX: 300 });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenCalledWith([30, 70]);
+    // Back to the props once the drag ends
+    expect(splitElement.classList.contains('-preview')).toBe(false);
+    expect(splitElement.style.left).toBe('50%');
+  });
+
+  it('keeps live updates when preview is off', () => {
+    const { splitElement, onChange } = renderPreviewSplit(false);
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseMove(document, { clientX: 300 });
+
+    expect(onChange).toHaveBeenCalledWith([30, 70]);
+    expect(splitElement.classList.contains('-preview')).toBe(false);
+    fireEvent.mouseUp(document, { clientX: 300 });
+  });
+
+  it('fires Mosaic onChange and onRelease once per preview drag', () => {
+    const onChange = vi.fn();
+    const onRelease = vi.fn();
+    const { container } = render(
+      React.createElement(Mosaic<string>, {
+        initialValue: { type: 'split', direction: 'row', children: ['a', 'b'] },
+        renderTile: (id: string) => React.createElement('div', null, id),
+        resize: { preview: true },
+        onChange,
+        onRelease,
+      }),
+    );
+    vi.spyOn(
+      container.querySelector('.mosaic-root') as HTMLElement,
+      'getBoundingClientRect',
+    ).mockReturnValue({ left: 0, top: 0, width: 1000, height: 500 } as DOMRect);
+    const splitElement = container.querySelector(
+      '.mosaic-split',
+    ) as HTMLElement;
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseMove(document, { clientX: 200 });
+    fireEvent.mouseMove(document, { clientX: 400 });
+    fireEvent.mouseUp(document, { clientX: 400 });
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenCalledWith({
+      type: 'split',
+      direction: 'row',
+      children: ['a', 'b'],
+      splitPercentages: [40, 60],
+    });
   });
 });
