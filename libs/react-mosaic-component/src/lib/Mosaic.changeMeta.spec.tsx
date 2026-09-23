@@ -196,7 +196,7 @@ describe('onChange / onRelease meta', () => {
 
     const splitter = container.querySelectorAll('.mosaic-split')[0];
     fireEvent.mouseDown(splitter, { button: 0 });
-    fireEvent.mouseMove(document, { clientX: 400, clientY: 100 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 400, clientY: 100 });
     expect(lastMeta(onChange)).toEqual({
       type: 'resize',
       path: [],
