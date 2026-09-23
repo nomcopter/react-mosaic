@@ -112,15 +112,20 @@ icon, a header) instead of the whole body so those keep working.
 
 ## Know which panel was removed
 
-Dragging only moves panels around, so a key that's missing from the new tree
-was removed. Compare leaves in `onChange`:
+`onChange` gets a second `meta` argument that says what changed. A removal
+carries the removed node (a panel key, or a whole subtree), and closing a tab
+carries the tab:
 
 ```tsx
-onChange={(next) => {
-  const removed = getLeaves(tree).filter((id) => !getLeaves(next).includes(id));
+onChange={(next, meta) => {
+  if (meta?.type === 'remove') onPanelsRemoved(getLeaves(meta.node));
+  if (meta?.type === 'tab-remove') onPanelsRemoved([meta.tab]);
   setTree(next);
 }}
 ```
+
+On versions before `meta` was added, compare leaves instead:
+`getLeaves(tree).filter((id) => !getLeaves(next).includes(id))`.
 
 ## A layout bigger than the screen
 

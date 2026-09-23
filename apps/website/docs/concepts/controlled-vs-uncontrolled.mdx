@@ -77,8 +77,12 @@ function ControlledExample() {
 The `onChange` callback fires for every mutation — drag-to-resize,
 drag-to-rearrange, button clicks, tab switches. `value` can be `null` to
 represent an empty layout (the `zeroStateView` is rendered in that case).
-It only receives the new tree; to find out what changed (for example which
-panel was removed), see [Know which panel was removed](../guides/recipes#know-which-panel-was-removed).
+It also gets a second, optional `meta` argument that says what caused the
+change, for example `{ type: 'remove', path, node }` or
+`{ type: 'resize', path, splitPercentages }`. `onRelease` receives the same
+`meta`. See `MosaicChangeMeta` in the API reference for every change type, and
+[Know which panel was removed](../guides/recipes#know-which-panel-was-removed)
+for an example.
 
 ## Mixing the two: `onRelease`
 
