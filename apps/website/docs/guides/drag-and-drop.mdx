@@ -124,7 +124,15 @@ function PaletteItem({ panelKey, onDrop }: {
       }
     },
   });
-  return <div ref={drag}>{panelKey}</div>;
+  return (
+    <div
+      ref={(element) => {
+        drag(element);
+      }}
+    >
+      {panelKey}
+    </div>
+  );
 }
 
 export function App() {
@@ -174,8 +182,9 @@ dragged panel's key) and `path` (where it was when the drag started). Tab
 groups dragged as a whole only carry `path`.
 
 Return `{ remove: true }` from `drop()` and Mosaic takes the window (or tab)
-out of the layout, firing `onChange` and `onRelease` as usual. Return nothing
-and the window snaps back to where it was.
+out of the layout, firing `onChange` and `onRelease` as usual. `remove` wins
+if the result also has a `path`. Return nothing and the window snaps back to
+where it was.
 
 ```tsx
 import { useDrop } from 'react-dnd';
@@ -184,7 +193,10 @@ import { MosaicDragType } from 'react-mosaic-component';
 function Sidebar({ onPanelDropped }: { onPanelDropped: (key: string) => void }) {
   const [{ isOver }, drop] = useDrop({
     accept: MosaicDragType.WINDOW,
-    drop: (item: { nodeKey?: string }) => {
+    drop: (item: { nodeKey?: string }, monitor) => {
+      if (monitor.didDrop()) {
+        return undefined; // already handled by a target inside, e.g. the layout
+      }
       if (item.nodeKey == null) {
         return undefined; // e.g. a whole tab group: leave it in the layout
       }
@@ -194,7 +206,12 @@ function Sidebar({ onPanelDropped }: { onPanelDropped: (key: string) => void }) 
     collect: (monitor) => ({ isOver: monitor.isOver() }),
   });
   return (
-    <aside ref={drop} className={isOver ? 'sidebar drop-here' : 'sidebar'}>
+    <aside
+      ref={(element) => {
+        drop(element);
+      }}
+      className={isOver ? 'sidebar drop-here' : 'sidebar'}
+    >
       Drop a panel here to dock it
     </aside>
   );
@@ -203,3 +220,7 @@ function Sidebar({ onPanelDropped }: { onPanelDropped: (key: string) => void }) 
 
 The sidebar has to share Mosaic's drag and drop manager, so render it under
 the same `DndProvider` as `MosaicWithoutDragDropContext`, as shown above.
+
+The `monitor.didDrop()` check matters if the target wraps the Mosaic: react-dnd
+calls outer targets after inner ones, and without it every drop inside the
+layout would also be treated as a drop on the sidebar and remove the window.
