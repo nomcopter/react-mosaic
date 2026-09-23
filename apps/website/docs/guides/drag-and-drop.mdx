@@ -1,0 +1,164 @@
+---
+id: drag-and-drop
+title: Drag and drop integration
+sidebar_position: 6
+---
+
+# Drag and drop integration
+
+Mosaic uses [react-dnd](https://react-dnd.github.io/react-dnd/) with a
+multi-backend (HTML5 on desktop, touch on mobile). Most apps never need to
+think about it. This page is for when your app has its own drag and drop, or
+when you want to drag things from outside into the layout.
+
+## How `Mosaic` sets up react-dnd
+
+`<Mosaic>` wraps itself in a `DndProvider` created with `context={window}`.
+That gives one drag and drop manager per page, shared by every `Mosaic`
+instance, and it survives remounts from route changes, hot reload and React
+`StrictMode`. You don't need to do anything to render several mosaics on one
+page.
+
+## Using your own `DndProvider`
+
+If your app already has a `DndProvider`, don't nest a second one with its own
+multi-backend inside it. Two multi-backends on the same page fail with
+`Cannot have two MultiBackends at the same time`, and components under
+different providers can't drag to each other.
+
+Render `MosaicWithoutDragDropContext` instead. It takes the same props as
+`Mosaic`, minus the provider:
+
+```tsx
+import { DndProvider } from 'react-dnd';
+import { MultiBackend } from 'react-dnd-multi-backend';
+import { HTML5toTouch } from 'rdndmb-html5-to-touch';
+import { MosaicWithoutDragDropContext } from 'react-mosaic-component';
+
+export function App() {
+  return (
+    <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+      <YourOtherDraggableStuff />
+      <MosaicWithoutDragDropContext<string>
+        renderTile={/* ... */}
+        initialValue={/* ... */}
+      />
+    </DndProvider>
+  );
+}
+```
+
+If you create the manager yourself, you can also keep `Mosaic` and pass it the
+`dragAndDropManager` prop.
+
+:::note
+Your app and react-mosaic must share one copy of react-dnd. Install the same
+major versions the library uses (`react-dnd` 16, `react-dnd-multi-backend` 9,
+`rdndmb-html5-to-touch` 9) so your package manager dedupes them. This works
+with the ESM build, which is what Vite, webpack, Next.js and other bundlers
+pick up. The CommonJS build (`index.cjs`) bundles react-dnd inside it, so a
+`DndProvider` from your own copy isn't visible to it.
+:::
+
+## Dragging items into the layout
+
+Anything that shares Mosaic's drag and drop manager can drop onto its drop
+targets. Two things are needed for that to work:
+
+- The drag type must be `MosaicDragType.WINDOW`.
+- The drag item must carry the same `mosaicId` as the `Mosaic` it's dropped
+  on, otherwise the drop zones won't highlight. Pass a fixed `mosaicId` prop
+  so you know it.
+
+When the item is dropped on a window edge or a root edge,
+`monitor.getDropResult()` returns `{ path, position }`, where `position` is
+`'top' | 'bottom' | 'left' | 'right'`. Build the new node there and update
+your controlled `value`:
+
+```tsx
+import { useState } from 'react';
+import { DndProvider, useDrag } from 'react-dnd';
+import { MultiBackend } from 'react-dnd-multi-backend';
+import { HTML5toTouch } from 'rdndmb-html5-to-touch';
+import {
+  MosaicDragType,
+  MosaicNode,
+  MosaicPath,
+  MosaicWindow,
+  MosaicWithoutDragDropContext,
+  getNodeAtPath,
+  updateTree,
+} from 'react-mosaic-component';
+
+const MOSAIC_ID = 'main-layout';
+
+type Position = 'top' | 'bottom' | 'left' | 'right';
+type DropResult = { path?: MosaicPath; position?: Position };
+
+function insertAt(
+  tree: MosaicNode<string>,
+  key: string,
+  path: MosaicPath,
+  position: Position,
+): MosaicNode<string> {
+  const target = getNodeAtPath(tree, path)!;
+  const split: MosaicNode<string> = {
+    type: 'split',
+    direction: position === 'left' || position === 'right' ? 'row' : 'column',
+    children: position === 'left' || position === 'top' ? [key, target] : [target, key],
+  };
+  return path.length === 0 ? split : updateTree(tree, [{ path, spec: { $set: split } }]);
+}
+
+function PaletteItem({ panelKey, onDrop }: {
+  panelKey: string;
+  onDrop: (key: string, path: MosaicPath, position: Position) => void;
+}) {
+  const [, drag] = useDrag({
+    type: MosaicDragType.WINDOW,
+    item: { mosaicId: MOSAIC_ID },
+    end: (_item, monitor) => {
+      const result = monitor.getDropResult<DropResult>();
+      if (result?.path && result.position) {
+        onDrop(panelKey, result.path, result.position);
+      }
+    },
+  });
+  return <div ref={drag}>{panelKey}</div>;
+}
+
+export function App() {
+  const [tree, setTree] = useState<MosaicNode<string>>('a');
+
+  const handleDrop = (key: string, path: MosaicPath, position: Position) =>
+    setTree((current) => insertAt(current, key, path, position));
+
+  return (
+    <DndProvider backend={MultiBackend} options={HTML5toTouch}>
+      <PaletteItem panelKey="b" onDrop={handleDrop} />
+      <PaletteItem panelKey="c" onDrop={handleDrop} />
+      <div style={{ height: 500 }}>
+        <MosaicWithoutDragDropContext<string>
+          mosaicId={MOSAIC_ID}
+          value={tree}
+          onChange={(next) => next && setTree(next)}
+          renderTile={(id, path) => (
+            <MosaicWindow<string> path={path} title={id}>
+              {id}
+            </MosaicWindow>
+          )}
+        />
+      </div>
+    </DndProvider>
+  );
+}
+```
+
+A few things to keep in mind:
+
+- Leaf keys must be unique, so skip or rename keys that are already in the
+  tree (`getLeaves(tree)` gives you the current ones).
+- `mosaicActions` from `MosaicContext` only exist inside the `Mosaic` tree. An
+  outside drag source updates the layout through your own state, as above.
+- Drops onto a tab bar return `{ path }` without a `position`. The example
+  ignores those; handle them if you want outside items to become tabs.

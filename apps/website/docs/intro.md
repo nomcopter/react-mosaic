@@ -51,6 +51,24 @@ export function App() {
 }
 ```
 
+To render it, mount `App` from your entry file as usual:
+
+```tsx
+// main.tsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { App } from './App';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+The wrapper `div` needs a real height; `Mosaic` fills its parent, so a parent
+with no height gives you an empty page.
+
 That's three panels' worth of functionality in 15 lines: two tiles side by side,
 a draggable divider between them, drag handles on each window title bar to
 rearrange, and a default toolbar with split/remove buttons.
@@ -64,6 +82,13 @@ rearrange, and a default toolbar with split/remove buttons.
 - **[Demo](/demo)** — the full kitchen-sink demo app showing themes, editable
   tab titles, and programmatic layout actions.
 - **API reference** — every public export, generated from source.
+
+## Browser support
+
+Current versions of Chrome, Edge, Firefox and Safari, on desktop and mobile
+(touch drag and drop is built in). Internet Explorer is not supported. The
+package is published as modern JavaScript, so if you target older browsers,
+let your bundler transpile `react-mosaic-component` too.
 
 ## Key features
 

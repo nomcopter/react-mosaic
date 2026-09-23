@@ -36,6 +36,8 @@ for (const file of fs.readdirSync(iconsDir)) {
   fs.copyFileSync(path.join(iconsDir, file), path.join(staticCssDir, file));
 }
 
+const baseUrl = process.env.SITE_BASE_URL || '/react-mosaic/';
+
 const config: Config = {
   title: 'react-mosaic',
   tagline: 'A React tiling window manager',
@@ -44,7 +46,7 @@ const config: Config = {
   // Set the production url of your site here
   url: 'https://nomcopter.github.io',
   // Pages is published under /react-mosaic/
-  baseUrl: process.env.SITE_BASE_URL || '/react-mosaic/',
+  baseUrl,
 
   organizationName: 'nomcopter',
   projectName: 'react-mosaic',
@@ -62,9 +64,11 @@ const config: Config = {
   // from Blueprint's icon font. Safe to load globally because custom.css
   // re-asserts Docusaurus body colours with higher specificity, neutralising
   // Blueprint's `body { color }` rule.
+  // Hrefs must be absolute: a relative `css/...` resolves against the page
+  // URL and 404s on nested routes like /docs/guides/*.
   stylesheets: [
-    { href: 'css/blueprint.css' },
-    { href: 'css/blueprint-icons.css' },
+    { href: `${baseUrl}css/blueprint.css` },
+    { href: `${baseUrl}css/blueprint-icons.css` },
   ],
 
   i18n: {

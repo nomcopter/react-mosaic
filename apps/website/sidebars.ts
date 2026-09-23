@@ -29,6 +29,8 @@ const sidebars: SidebarsConfig = {
         'guides/persisting-layout',
         'guides/theming',
         'guides/zero-state',
+        'guides/recipes',
+        'guides/drag-and-drop',
       ],
     },
     {

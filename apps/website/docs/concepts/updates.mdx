@@ -21,7 +21,8 @@ Everything funnels through `updateTree`:
 import { updateTree, MosaicUpdate } from 'react-mosaic-component';
 
 const updates: MosaicUpdate<string>[] = [
-  { path: ['direction' /* path index */], spec: { $set: 'column' } },
+  // flip the root split from row to column
+  { path: [], spec: { direction: { $set: 'column' } } },
 ];
 const next = updateTree(tree, updates);
 ```
@@ -39,12 +40,17 @@ that produce the common ones for you.
 | Factory | What it does |
 | --- | --- |
 | `createRemoveUpdate(tree, path)` | Removes the node at `path`, collapsing its parent if needed. |
-| `createHideUpdate(path)` | Temporarily hides a split node (sets its percentage to 0). |
-| `createExpandUpdate(path, percentage)` | Grows the node at `path` to take `percentage` of its parent. |
-| `createDragToUpdates(tree, sourcePath, destinationPath, position)` | Produces the full update sequence for a drag-and-drop operation. |
+| `createHideUpdate(tree, path)` | Temporarily hides the node at `path` (sets its split percentage to 0). |
+| `createExpandUpdate(path, percentage)` | Grows the node at `path` to take `percentage` of its parent, at every level up to the root. |
+| `createDragToUpdates(tree, sourcePath, destinationPath, dropInfo)` | Produces the full update sequence for a drag-and-drop operation. `dropInfo` is e.g. `{ type: 'split', position: 'left' }`. |
 
-All of them return `MosaicUpdate<T>[]`, so you compose them by concatenating
-arrays and passing the result to `updateTree`.
+`createDragToUpdates` returns an array of updates; the others return a single
+`MosaicUpdate<T>`. Put them together in one array and pass it to
+`updateTree`:
+
+```ts
+const next = updateTree(tree, [createRemoveUpdate(tree, [1, 0])]);
+```
 
 ## Example: a "reset layout" button
 

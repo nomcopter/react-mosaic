@@ -77,6 +77,8 @@ function ControlledExample() {
 The `onChange` callback fires for every mutation — drag-to-resize,
 drag-to-rearrange, button clicks, tab switches. `value` can be `null` to
 represent an empty layout (the `zeroStateView` is rendered in that case).
+It only receives the new tree; to find out what changed (for example which
+panel was removed), see [Know which panel was removed](../guides/recipes#know-which-panel-was-removed).
 
 ## Mixing the two: `onRelease`
 

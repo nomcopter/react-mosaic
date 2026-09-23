@@ -80,7 +80,10 @@ function CustomToolbarExample() {
 ## Building your own buttons
 
 Each default button is a thin wrapper around `DefaultToolbarButton`, which
-handles the icon+label+click plumbing. You can compose your own:
+handles the icon+label+click plumbing. It takes `title`, `className`,
+`onClick` and an optional `text` label; it doesn't render `children`, so put
+the label (or an emoji) in `text`, or style an icon through `className`. You
+can compose your own:
 
 ```tsx live
 function CustomButtonExample() {
@@ -89,10 +92,9 @@ function CustomButtonExample() {
       <DefaultToolbarButton
         title="Star this panel"
         className="custom-star-button"
+        text="★"
         onClick={() => alert('starred!')}
-      >
-        ★
-      </DefaultToolbarButton>
+      />
     );
   }
 
@@ -142,10 +144,10 @@ function DuplicateButton() {
   return (
     <DefaultToolbarButton
       title="Duplicate"
+      className="duplicate-button"
+      text="⎘"
       onClick={() => mosaicWindowActions.split()}
-    >
-      ⎘
-    </DefaultToolbarButton>
+    />
   );
 }
 ```
@@ -153,6 +155,29 @@ function DuplicateButton() {
 Similarly, `MosaicContext` gives you tree-level actions (`hide`, `expand`,
 `remove`, `replaceWith`, `updateTree`) for operations that aren't scoped to a
 single window.
+
+## Additional controls drawer
+
+`additionalControls` adds a "More" button to the title bar that opens a drawer
+under it. While the drawer is open, an overlay covers the window body and
+closes the drawer on click. If you'd rather keep the body interactive, turn
+the overlay off:
+
+```tsx
+<MosaicWindow
+  path={path}
+  title="Panel"
+  additionalControls={<MyExtraControls />}
+  disableAdditionalControlsOverlay
+  onAdditionalControlsToggle={(open) => console.log('drawer open:', open)}
+>
+  ...
+</MosaicWindow>
+```
+
+To open or close the drawer from your own code, call
+`mosaicWindowActions.setAdditionalControlsOpen(true | false | 'toggle')` from
+`MosaicWindowContext`.
 
 ## Toolbars inside tab groups
 
@@ -215,10 +240,10 @@ function PerTabControlsExample() {
             {isMarkdown(tabs[activeTabIndex]) && (
               <DefaultToolbarButton
                 title="Preview"
+                className="preview-button"
+                text="👁"
                 onClick={() => alert('preview ' + tabs[activeTabIndex])}
-              >
-                👁
-              </DefaultToolbarButton>
+              />
             )}
             <DefaultAddTabButton path={path} />
             <TabSplitButton path={path} />
@@ -295,15 +320,15 @@ function CustomAddButtonExample() {
     const { mosaicActions } = React.useContext(MosaicContext);
     return (
       <DefaultToolbarButton
-        text="New tab"
+        title="New tab"
+        className="custom-add-button"
+        text="➕ New"
         onClick={() => {
           if (window.confirm('Open a new tab?')) {
             mosaicActions.addTab(path);
           }
         }}
-      >
-        ➕ New
-      </DefaultToolbarButton>
+      />
     );
   }
 
