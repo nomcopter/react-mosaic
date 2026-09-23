@@ -6,6 +6,7 @@ import { Mosaic } from './Mosaic';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { Split } from './Split';
 import { LegacyMosaicNode, MosaicNode } from './types';
+import { createDragToUpdates, createRemoveUpdate } from './util/mosaicUpdates';
 
 // Rendering-performance characterization.
 //
@@ -378,5 +379,145 @@ describe('Split resize callback ordering', () => {
     await new Promise((resolve) => setTimeout(resolve, 60));
 
     expect(order).toEqual(['change', 'release']);
+  });
+});
+
+describe('stable tile mounts across rearrangement', () => {
+  // Moving a tile must neither remount it nor move its DOM node: browsers
+  // reload an <iframe> whenever its element is re-inserted into the document.
+  function watchTileMoves(container: HTMLElement) {
+    const moved: string[] = [];
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        record.removedNodes.forEach((node) => {
+          const testId = (node as HTMLElement)
+            .querySelector?.('[data-testid]')
+            ?.getAttribute('data-testid');
+          if (testId) {
+            moved.push(testId);
+          }
+        });
+      }
+    });
+    observer.observe(container.querySelector('.mosaic-root')!, {
+      childList: true,
+      subtree: true,
+    });
+    return {
+      moved,
+      flush: () => {
+        moved.push(
+          ...observer
+            .takeRecords()
+            .flatMap((record) => Array.from(record.removedNodes))
+            .map((node) =>
+              (node as HTMLElement)
+                .querySelector?.('[data-testid]')
+                ?.getAttribute('data-testid'),
+            )
+            .filter((id): id is string => id != null),
+        );
+        observer.disconnect();
+        return moved;
+      },
+    };
+  }
+
+  function renderTree(tree: MosaicNode<string>) {
+    const { container, getByTestId } = render(
+      <Mosaic<string> initialValue={tree} renderTile={renderTile} />,
+    );
+    return { container, getByTestId, watch: watchTileMoves(container) };
+  }
+
+  function drag(
+    source: number[],
+    destination: number[],
+    position: 'top' | 'bottom' | 'left' | 'right',
+  ) {
+    act(() => {
+      const root = capturedActions!.getRoot()!;
+      capturedActions!.updateTree(
+        createDragToUpdates(root, source, destination, {
+          type: 'split',
+          position,
+        }),
+      );
+    });
+  }
+
+  it('reordering siblings keeps every tile mounted and in place', () => {
+    const { getByTestId, watch } = renderTree({
+      type: 'split',
+      direction: 'row',
+      children: ['a', 'b', 'c'],
+    });
+    const nodeA = getByTestId('tile-a');
+
+    act(() => {
+      capturedActions!.updateTree([
+        { path: [], spec: { children: { $set: ['c', 'b', 'a'] } } },
+      ]);
+    });
+
+    expect(capturedActions!.getRoot()).toMatchObject({
+      children: ['c', 'b', 'a'],
+    });
+    expect(mountCounts).toEqual({ a: 1, b: 1, c: 1 });
+    expect(getByTestId('tile-a')).toBe(nodeA);
+    expect(watch.flush()).toEqual([]);
+  });
+
+  it('moving a tile into another split keeps it mounted and in place', () => {
+    const { getByTestId, watch } = renderTree(NESTED_TREE);
+    const nodeA = getByTestId('tile-a');
+
+    drag([0], [1, 0], 'bottom');
+
+    expect(capturedActions!.getRoot()).toMatchObject({
+      children: [
+        { children: ['b', 'c'] },
+        { direction: 'column', children: ['d', 'a'] },
+      ],
+    });
+    expect(mountCounts).toEqual({ a: 1, b: 1, c: 1, d: 1 });
+    expect(getByTestId('tile-a')).toBe(nodeA);
+    expect(watch.flush()).toEqual([]);
+  });
+
+  it('moving a tile to a deeper level keeps it mounted and in place', () => {
+    const { getByTestId, watch } = renderTree({
+      type: 'split',
+      direction: 'row',
+      children: ['a', 'b', 'c'],
+    });
+    const nodeC = getByTestId('tile-c');
+
+    drag([2], [0], 'bottom');
+
+    expect(capturedActions!.getRoot()).toMatchObject({
+      children: [{ direction: 'column', children: ['a', 'c'] }, 'b'],
+    });
+    expect(mountCounts).toEqual({ a: 1, b: 1, c: 1 });
+    expect(getByTestId('tile-c')).toBe(nodeC);
+    expect(watch.flush()).toEqual([]);
+  });
+
+  it('collapsing the root to a single leaf keeps the survivor mounted', () => {
+    const { getByTestId, watch } = renderTree(NESTED_TREE);
+    const nodeB = getByTestId('tile-b');
+
+    for (const path of [[2], [0], [1]]) {
+      act(() => {
+        capturedActions!.updateTree([
+          createRemoveUpdate(capturedActions!.getRoot(), path),
+        ]);
+      });
+    }
+
+    expect(capturedActions!.getRoot()).toBe('b');
+    expect(mountCounts['b']).toBe(1);
+    expect(getByTestId('tile-b')).toBe(nodeB);
+    expect(watch.flush().filter((id) => id === 'tile-b')).toEqual([]);
   });
 });
