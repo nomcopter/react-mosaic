@@ -110,6 +110,62 @@ function WholeTileDragExample() {
 If your tiles have inputs or selectable text, wrap a smaller area (a grip
 icon, a header) instead of the whole body so those keep working.
 
+## Swap tiles instead of splitting
+
+By default, dropping a window on another one splits it along the edge you drop
+on. Set `dropBehavior` to change that:
+
+- `'swap'`: the two windows trade places. Every pane keeps its size, and the
+  only drop target is the whole window.
+- `'split-and-swap'`: the edges still split, and the centre of a window swaps.
+
+```tsx live
+function SwapExample() {
+  const [dropBehavior, setDropBehavior] = React.useState('swap');
+
+  return (
+    <>
+      <select
+        value={dropBehavior}
+        onChange={(event) => setDropBehavior(event.target.value)}
+        style={{ marginBottom: 8 }}
+      >
+        <option value="swap">swap</option>
+        <option value="split-and-swap">split-and-swap</option>
+        <option value="split">split (default)</option>
+      </select>
+      <div className="live-mosaic-frame">
+        <Mosaic
+          dropBehavior={dropBehavior}
+          renderTile={(id, path) => (
+            <MosaicWindow path={path} title={`Panel ${id}`}>
+              <div style={{ padding: 20 }}>Drag my title onto another panel</div>
+            </MosaicWindow>
+          )}
+          initialValue={{
+            type: 'split',
+            direction: 'row',
+            splitPercentages: [30, 70],
+            children: [
+              'a',
+              {
+                type: 'split',
+                direction: 'column',
+                splitPercentages: [60, 40],
+                children: ['b', 'c'],
+              },
+            ],
+          }}
+        />
+      </div>
+    </>
+  );
+}
+```
+
+To swap nodes from your own code, `createSwapUpdates(tree, pathA, pathB)`
+returns the updates for `updateTree`.
+
 ## Know which panel was removed
 
 `onChange` gets a second `meta` argument that says what changed. Panels leave
