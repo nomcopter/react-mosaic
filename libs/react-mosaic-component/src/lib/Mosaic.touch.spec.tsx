@@ -299,4 +299,27 @@ describe('Mosaic touch interactions', () => {
       expect.objectContaining({ tabs: ['a', 'b', 'c'], activeTabIndex: 1 }),
     );
   });
+
+  // The close button is enabled when no canClose prop is given, so tapping it
+  // has to close the tab.
+  it('closes a tab on tap', async () => {
+    const { container, latest } = renderControlled({
+      type: 'tabs',
+      tabs: ['a', 'b', 'c'],
+      activeTabIndex: 0,
+    });
+    await flush();
+
+    const closeC = query(
+      container,
+      '.mosaic-tabs-container > .mosaic-tab-bar .mosaic-tab-button[title="c"] .mosaic-tab-close-button',
+    );
+    elementUnderFinger = closeC;
+    fireEvent.touchStart(closeC, touchAt(5, 5));
+    fireEvent.touchEnd(closeC, liftAt(5, 5));
+    fireEvent.click(closeC);
+    await flush();
+
+    expect(latest()).toEqual(expect.objectContaining({ tabs: ['a', 'b'] }));
+  });
 });
