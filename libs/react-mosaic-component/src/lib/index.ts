@@ -116,3 +116,4 @@ export {
   DEFAULT_PANEL_CONTROLS_WITHOUT_CREATION as DEFAULT_CONTROLS_WITHOUT_CREATION,
   createDefaultTabsControls,
 } from './buttons/defaultToolbarControls';
+export { type ResizeValueByDirection } from './types';

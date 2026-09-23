@@ -191,3 +191,108 @@ describe('Split resizing class', () => {
     expect(onRelease).not.toHaveBeenCalled();
   });
 });
+
+// Drives a real drag against a mocked parent size and returns what the split
+// reports on release.
+function dragSplit(
+  props: Partial<SplitProps>,
+  to: { clientX?: number; clientY?: number },
+  parentSize = { width: 1000, height: 500 },
+): number[] {
+  const onRelease = vi.fn();
+  const { container } = render(
+    React.createElement(
+      'div',
+      null,
+      React.createElement(Split, {
+        direction: 'row',
+        boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+        splitPercentages: [50, 50],
+        splitIndex: 0,
+        onRelease,
+        ...props,
+      }),
+    ),
+  );
+  const parent = container.firstElementChild as HTMLElement;
+  vi.spyOn(parent, 'getBoundingClientRect').mockReturnValue({
+    left: 0,
+    top: 0,
+    ...parentSize,
+  } as DOMRect);
+  const splitElement = container.querySelector('.mosaic-split') as HTMLElement;
+
+  fireEvent.mouseDown(splitElement, { button: 0 });
+  fireEvent.mouseUp(document, { clientX: 0, clientY: 0, ...to });
+  cleanup();
+  return onRelease.mock.calls[0][0];
+}
+
+describe('Split minimum pane size', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('clamps to 10% by default', () => {
+    expect(dragSplit({}, { clientX: 20 })).toEqual([10, 90]);
+    expect(dragSplit({}, { clientX: 990 })).toEqual([90, 10]);
+  });
+
+  it('uses a plain number for both directions', () => {
+    expect(dragSplit({ minimumPaneSizePercentage: 0 }, { clientX: 0 })).toEqual(
+      [0, 100],
+    );
+    expect(
+      dragSplit(
+        { direction: 'column', minimumPaneSizePercentage: 25 },
+        { clientY: 10 },
+      ),
+    ).toEqual([25, 75]);
+  });
+
+  it('uses per-direction values and falls back to 10% for a missing one', () => {
+    const minimumPaneSizePercentage = { row: 0, column: 30 };
+    expect(dragSplit({ minimumPaneSizePercentage }, { clientX: 0 })).toEqual([
+      0, 100,
+    ]);
+    expect(
+      dragSplit(
+        { direction: 'column', minimumPaneSizePercentage },
+        { clientY: 0 },
+      ),
+    ).toEqual([30, 70]);
+    expect(
+      dragSplit(
+        { direction: 'column', minimumPaneSizePercentage: { row: 0 } },
+        { clientY: 0 },
+      ),
+    ).toEqual([10, 90]);
+  });
+
+  it('only affects the two panes next to the divider in a 3-way split', () => {
+    expect(
+      dragSplit(
+        {
+          splitPercentages: [20, 30, 50],
+          splitIndex: 1,
+          minimumPaneSizePercentage: 5,
+        },
+        { clientX: 1000 },
+      ),
+    ).toEqual([20, 75, 5]);
+  });
+
+  it('works inside a nested bounding box', () => {
+    // The split covers the right half of the root, so the pointer at 60% of
+    // the root is 20% into this split.
+    expect(
+      dragSplit(
+        {
+          boundingBox: { top: 0, right: 0, bottom: 0, left: 50 },
+          minimumPaneSizePercentage: 0,
+        },
+        { clientX: 600 },
+      ),
+    ).toEqual([20, 80]);
+  });
+});

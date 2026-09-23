@@ -3,7 +3,11 @@ import { clamp, sum } from 'lodash-es';
 import { throttle } from 'lodash-es';
 import React from 'react';
 
-import { EnabledResizeOptions, MosaicDirection } from './types';
+import {
+  EnabledResizeOptions,
+  MosaicDirection,
+  ResizeValueByDirection,
+} from './types';
 import {
   BoundingBox,
   boundingBoxAsStyles,
@@ -22,6 +26,8 @@ const TOUCH_EVENT_OPTIONS = {
 // events on tiles, so iframes and nested apps inside them can't swallow the
 // mousemove/mouseup the drag depends on.
 export const RESIZING_CLASS = 'mosaic-resizing';
+
+export const DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE = 10;
 
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
@@ -45,7 +51,6 @@ export class Split extends React.PureComponent<SplitProps> {
   static defaultProps = {
     onChange: () => void 0,
     onRelease: () => void 0,
-    minimumPaneSizePercentage: 10, // Updated default
   };
 
   render() {
@@ -204,10 +209,16 @@ export class Split extends React.PureComponent<SplitProps> {
 
     let newLeftPaneSize = mouseRelativePercentage - startPercentage;
 
+    const minimumPaneSize = resolveByDirection(
+      minimumPaneSizePercentage,
+      direction,
+      DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE,
+    );
+
     newLeftPaneSize = clamp(
       newLeftPaneSize,
-      minimumPaneSizePercentage!,
-      totalSizeOfPanes - minimumPaneSizePercentage!,
+      minimumPaneSize,
+      totalSizeOfPanes - minimumPaneSize,
     );
 
     const newRightPaneSize = totalSizeOfPanes - newLeftPaneSize;
@@ -260,6 +271,17 @@ export class Split extends React.PureComponent<SplitProps> {
       this.boundDocument = null;
     }
   }
+}
+
+export function resolveByDirection(
+  value: ResizeValueByDirection | undefined,
+  direction: MosaicDirection,
+  fallback: number,
+): number {
+  if (typeof value === 'number') {
+    return value;
+  }
+  return value?.[direction] ?? fallback;
 }
 
 function isTouchEvent(
