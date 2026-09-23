@@ -420,9 +420,15 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       // TODO: Actually just delete instead of hiding
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(props.path));
+      const node = getNodeAtPath(mosaicActions.getRoot(), props.path);
       return {
         mosaicId,
         hideTimer,
+        path: props.path,
+        nodeKey:
+          typeof node === 'string' || typeof node === 'number'
+            ? node
+            : undefined,
       };
     },
     end: ({ hideTimer }, monitor) => {
@@ -433,6 +439,15 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       const dropResult: MosaicDropData = (monitor.getDropResult() ||
         {}) as MosaicDropData;
       const { position, path: destinationPath } = dropResult;
+
+      // An external drop target asked for the window to be taken out of the layout
+      if (dropResult.remove) {
+        mosaicActions.remove(ownPath);
+        if (props.onDragEnd) {
+          props.onDragEnd('drop');
+        }
+        return;
+      }
 
       // A drop is successful if we have a destination path
       // Position can be undefined for tab container drops
