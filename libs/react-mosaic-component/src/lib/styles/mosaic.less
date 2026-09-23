@@ -65,6 +65,20 @@
   }
 }
 
+// Set on <html> by Split while a divider is dragged (see RESIZING_CLASS).
+// Tiles ignore the pointer so iframes inside them can't swallow the drag.
+.mosaic-resizing .mosaic-tile {
+  pointer-events: none;
+}
+
+.mosaic-resizing-row {
+  cursor: ew-resize;
+}
+
+.mosaic-resizing-column {
+  cursor: ns-resize;
+}
+
 .mosaic-tile {
   position: absolute;
   margin: @split-size / 2;
