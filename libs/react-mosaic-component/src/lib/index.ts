@@ -61,6 +61,7 @@ export {
   type MosaicWindowActions,
   MosaicWindowContext,
 } from './contextTypes';
+export { useMosaic, useMosaicWindow } from './contextHooks';
 export {
   buildSpecFromUpdate,
   createDragToUpdates,
