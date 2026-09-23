@@ -93,7 +93,7 @@ describe('Split resizing class', () => {
     expect(html.classList.contains(RESIZING_CLASS)).toBe(true);
     expect(html.classList.contains(`${RESIZING_CLASS}-column`)).toBe(true);
 
-    fireEvent.mouseMove(document, { clientY: 10 });
+    fireEvent.mouseMove(document, { buttons: 1, clientY: 10 });
     fireEvent.mouseUp(document, { clientY: 10 });
     expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
     expect(html.classList.contains(`${RESIZING_CLASS}-column`)).toBe(false);
@@ -190,7 +190,7 @@ describe('Split resizing class', () => {
     unmount();
 
     expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
-    fireEvent.mouseMove(document, { clientX: 10 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 10 });
     fireEvent.mouseUp(document);
     expect(onChange).not.toHaveBeenCalled();
     expect(onRelease).not.toHaveBeenCalled();
@@ -250,7 +250,7 @@ function dragSplit(
   const release = { ...press, ...to };
 
   fireEvent.mouseDown(splitElement, { button: 0, ...press });
-  fireEvent.mouseMove(document, release);
+  fireEvent.mouseMove(document, { buttons: 1, ...release });
   fireEvent.mouseUp(document, release);
   cleanup();
   return onRelease.mock.calls[0][0];
@@ -479,7 +479,7 @@ describe('Split renderSplitHandle', () => {
     expect(document.documentElement.classList.contains(RESIZING_CLASS)).toBe(
       true,
     );
-    fireEvent.mouseMove(document, { clientX: 300 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 300 });
     fireEvent.mouseUp(document, { clientX: 300 });
 
     expect(onRelease).toHaveBeenCalledWith([30, 70]);
@@ -571,7 +571,7 @@ describe('Split preview', () => {
     const { splitElement, onChange, onRelease } = renderPreviewSplit(true);
 
     fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
-    fireEvent.mouseMove(document, { clientX: 300 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 300 });
 
     expect(onChange).not.toHaveBeenCalled();
     expect(splitElement.classList.contains('-preview')).toBe(true);
@@ -591,7 +591,7 @@ describe('Split preview', () => {
     const { splitElement, onChange } = renderPreviewSplit(false);
 
     fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
-    fireEvent.mouseMove(document, { clientX: 300 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 300 });
 
     expect(onChange).toHaveBeenCalledWith([30, 70]);
     expect(splitElement.classList.contains('-preview')).toBe(false);
@@ -619,8 +619,8 @@ describe('Split preview', () => {
     ) as HTMLElement;
 
     fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
-    fireEvent.mouseMove(document, { clientX: 200 });
-    fireEvent.mouseMove(document, { clientX: 400 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 200 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 400 });
     fireEvent.mouseUp(document, { clientX: 400 });
 
     expect(onChange).toHaveBeenCalledTimes(1);
@@ -682,7 +682,7 @@ describe('Split grab offset', () => {
   it('moves the divider by how far the pointer moved, not to the pointer', () => {
     const { onChange, onRelease } = renderGrabbedSplit();
 
-    fireEvent.mouseMove(document, { clientX: 615 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 615 });
     expect(onChange).toHaveBeenLastCalledWith([60, 40]);
 
     fireEvent.mouseUp(document, { clientX: 615 });
@@ -692,7 +692,7 @@ describe('Split grab offset', () => {
   it('keeps the offset in preview mode too', () => {
     const { splitElement, onRelease } = renderGrabbedSplit({ preview: true });
 
-    fireEvent.mouseMove(document, { clientX: 615 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 615 });
     expect(splitElement.style.left).toBe('60%');
 
     fireEvent.mouseUp(document, { clientX: 615 });
@@ -702,7 +702,7 @@ describe('Split grab offset', () => {
   it('still resizes when the pointer moved and came back', () => {
     const { onRelease } = renderGrabbedSplit();
 
-    fireEvent.mouseMove(document, { clientX: 700 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 700 });
     fireEvent.mouseUp(document, { clientX: 515 });
 
     expect(onRelease).toHaveBeenCalledWith([50, 50]);
