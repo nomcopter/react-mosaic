@@ -29,6 +29,11 @@ export const RESIZING_CLASS = 'mosaic-resizing';
 
 export const DEFAULT_MINIMUM_PANE_SIZE_PERCENTAGE = 10;
 
+// Tiles have a margin of half this on every side, so a pane's visible tile is
+// this much smaller than the space the split gives it. Keep in sync with
+// @split-size in styles/mosaic.less.
+export const SPLIT_SIZE_PX = 6;
+
 // z-index of a root-level divider with a handle; deeper ones get one less
 const HANDLE_MAX_Z_INDEX = 9;
 
@@ -57,6 +62,13 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
   private boundDocument: Document | null = null;
   // Last percentages reported through onChange during the current drag
   private lastPercentages: number[] | null = null;
+  // How far from the divider the pointer grabbed it, in percent of the split.
+  // Subtracted while dragging so the divider doesn't jump to the cursor when a
+  // wide handle is grabbed off-centre.
+  private grabOffsetPercentage = 0;
+  // Pointer position along the split direction when the drag started
+  private pressPosition: number | null = null;
+  private hasMoved = false;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -158,6 +170,14 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
   ) => {
     if (!isTouchEvent(event) && event.button !== 0) return;
     event.preventDefault();
+    const { splitPercentages, splitIndex } = this.props;
+    const pointer = this.getPointerPercentage(getPointerLocation(event));
+    this.grabOffsetPercentage =
+      pointer === null
+        ? 0
+        : pointer.relative - sum(splitPercentages.slice(0, splitIndex + 1));
+    this.pressPosition = this.getPositionAlongSplit(event);
+    this.hasMoved = false;
     this.bindListeners();
   };
 
@@ -166,8 +186,12 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
     // A queued trailing call would otherwise deliver onChange after onRelease.
     this.throttledUpdatePercentage.cancel();
     this.lastPercentages = null;
-    const newPercentages = this.calculateNewPercentages(event);
-    this.props.onRelease!(newPercentages);
+    // A click that never moved the pointer isn't a resize
+    const moved =
+      this.hasMoved || this.getPositionAlongSplit(event) !== this.pressPosition;
+    if (moved) {
+      this.props.onRelease!(this.calculateNewPercentages(event));
+    }
     // Cleared after onRelease so the divider doesn't jump back to its old
     // position for a frame before the new tree arrives
     if (this.state.previewPercentages !== null) {
@@ -183,6 +207,7 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
       return;
     }
     event.preventDefault();
+    this.hasMoved = true;
     this.throttledUpdatePercentage(event);
   };
 
@@ -228,38 +253,15 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
       splitIndex,
     } = this.props;
 
-    // The split can be unmounted or detached from the DOM mid-drag (e.g. the
-    // layout changed under us). Bail out with the current percentages rather
-    // than throwing on a missing rootElement/parentElement.
-    if (!this.rootElement.current || !this.rootElement.current.parentElement) {
+    // Null when the split is detached mid-drag or the root has no size; keep
+    // the current percentages then
+    const pointer = this.getPointerPercentage(getPointerLocation(event));
+    if (pointer === null) {
       return splitPercentages;
     }
-
-    // We need the parent element that this split is rendered into, which is `.mosaic-root`
-    const parentBBox =
-      this.rootElement.current.parentElement.getBoundingClientRect();
-    const location = isTouchEvent(event) ? event.changedTouches[0] : event;
-
-    // A root with no size (e.g. hidden) would turn the maths below into NaN
-    if (parentBBox.width === 0 || parentBBox.height === 0) {
-      return splitPercentages;
-    }
-
-    let mouseAbsolutePercentage: number;
-    if (direction === 'column') {
-      mouseAbsolutePercentage =
-        ((location.clientY - parentBBox.top) / parentBBox.height) * 100.0;
-    } else {
-      mouseAbsolutePercentage =
-        ((location.clientX - parentBBox.left) / parentBBox.width) * 100.0;
-    }
-
-    // Convert the absolute mouse percentage to one relative to this split's bounding box
-    const mouseRelativePercentage = getRelativeSplitPercentage(
-      boundingBox,
-      mouseAbsolutePercentage,
-      direction,
-    );
+    const { parentBBox } = pointer;
+    const mouseRelativePercentage =
+      pointer.relative - this.grabOffsetPercentage;
 
     const startPercentage = sum(splitPercentages.slice(0, splitIndex));
     const totalSizeOfPanes =
@@ -274,9 +276,12 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
       direction === 'column'
         ? (parentBBox.height * (100 - top - bottom)) / 100
         : (parentBBox.width * (100 - left - right)) / 100;
+    // The pixel minimum is the visible tile size, so add the tile margins
     const minimumPx = resolveByDirection(minimumPaneSizePx, direction, 0);
+    const minimumPaneSizeWithGutterPx =
+      minimumPx > 0 ? minimumPx + SPLIT_SIZE_PX : 0;
     const minimumPxAsPercentage =
-      splitSizePx > 0 ? (minimumPx / splitSizePx) * 100 : 0;
+      splitSizePx > 0 ? (minimumPaneSizeWithGutterPx / splitSizePx) * 100 : 0;
 
     // The larger minimum wins. It can't exceed half of the two panes, or
     // they couldn't both satisfy it and one would end up negative.
@@ -305,6 +310,55 @@ export class Split extends React.PureComponent<SplitProps, SplitState> {
     newSplitPercentages[splitIndex + 1] = newRightPaneSize;
 
     return newSplitPercentages;
+  }
+
+  // Where the pointer is, in percent of this split (`relative`), along with
+  // the size of `.mosaic-root`. Null when that can't be measured.
+  private getPointerPercentage(location: {
+    clientX: number;
+    clientY: number;
+  }): { relative: number; parentBBox: DOMRect } | null {
+    const { direction, boundingBox } = this.props;
+
+    // The split can be unmounted or detached from the DOM mid-drag (e.g. the
+    // layout changed under us). Bail out rather than throwing on a missing
+    // rootElement/parentElement.
+    if (!this.rootElement.current || !this.rootElement.current.parentElement) {
+      return null;
+    }
+
+    // We need the parent element that this split is rendered into, which is `.mosaic-root`
+    const parentBBox =
+      this.rootElement.current.parentElement.getBoundingClientRect();
+
+    // A root with no size (e.g. hidden) would turn the maths below into NaN
+    if (parentBBox.width === 0 || parentBBox.height === 0) {
+      return null;
+    }
+
+    const mouseAbsolutePercentage =
+      direction === 'column'
+        ? ((location.clientY - parentBBox.top) / parentBBox.height) * 100.0
+        : ((location.clientX - parentBBox.left) / parentBBox.width) * 100.0;
+
+    // Convert the absolute mouse percentage to one relative to this split's bounding box
+    return {
+      relative: getRelativeSplitPercentage(
+        boundingBox,
+        mouseAbsolutePercentage,
+        direction,
+      ),
+      parentBBox,
+    };
+  }
+
+  private getPositionAlongSplit(
+    event: MouseEvent | TouchEvent | React.MouseEvent<HTMLDivElement>,
+  ): number {
+    const location = getPointerLocation(event);
+    return this.props.direction === 'column'
+      ? location.clientY
+      : location.clientX;
   }
 
   private bindListeners() {
@@ -359,6 +413,12 @@ export function resolveByDirection(
     return value;
   }
   return value?.[direction] ?? fallback;
+}
+
+function getPointerLocation(
+  event: MouseEvent | TouchEvent | React.MouseEvent<HTMLDivElement>,
+): { clientX: number; clientY: number } {
+  return isTouchEvent(event) ? event.changedTouches[0] : event;
 }
 
 function isTouchEvent(
