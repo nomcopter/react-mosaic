@@ -46,6 +46,8 @@ export const DraggableTab = <T extends MosaicKey>({
         tabIndex,
         tabKey,
         tabContainerPath,
+        path: tabPath,
+        nodeKey: tabKey,
       };
     },
     end: (_, monitor: DragSourceMonitor) => {
@@ -78,6 +80,12 @@ export const DraggableTab = <T extends MosaicKey>({
         dropResult?.path &&
         dropResult.path.length > ownPath.length &&
         isEqual(dropResult.path.slice(0, ownPath.length), ownPath);
+
+      // An external drop target asked for the tab to be taken out of the layout
+      if (didDrop && dropResult?.remove) {
+        mosaicActions.removeTab(tabContainerPath, tabIndex);
+        return;
+      }
 
       if (!didDrop || !dropResult || isChildDrop) {
         // Re-show the window if the drop was cancelled or invalid

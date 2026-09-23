@@ -248,6 +248,7 @@ export const MosaicTabs = <T extends MosaicKey>({
       return {
         mosaicId,
         hideTimer,
+        path,
       };
     },
     end: ({ hideTimer }, monitor) => {
@@ -258,6 +259,12 @@ export const MosaicTabs = <T extends MosaicKey>({
       const dropResult: MosaicDropData = (monitor.getDropResult() ||
         {}) as MosaicDropData;
       const { position, path: destinationPath } = dropResult;
+
+      // An external drop target asked for the tab group to be taken out of the layout
+      if (dropResult.remove) {
+        mosaicActions.remove(ownPath);
+        return;
+      }
 
       // A drop is successful if we have a destination path
       const dropped = destinationPath != null;
