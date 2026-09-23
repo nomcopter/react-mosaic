@@ -50,6 +50,24 @@ export function App() {
 }
 ```
 
+To render it, mount `App` from your entry file as usual:
+
+```tsx
+// main.tsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { App } from './App';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+The wrapper `div` needs a real height; `Mosaic` fills its parent, so a parent
+with no height gives you an empty page.
+
 That's a two-panel layout with a draggable divider, drag handles on each window title bar, and default toolbar buttons — in 15 lines.
 
 For live editable examples, the n-ary tree model, custom toolbars, tabs, theming, and the full API reference, see the **[documentation site](https://nomcopter.github.io/react-mosaic/)**.
@@ -62,6 +80,13 @@ For live editable examples, the n-ary tree model, custom toolbars, tabs, theming
 - **Drag-and-drop.** Built on `react-dnd` with HTML5 and touch backends.
 - **Theming.** Works with or without Blueprint; ships a default CSS theme plus CSS variables you can override.
 - **Zero-config migration.** Legacy v6 binary trees are auto-converted at render time. `convertLegacyToNary` is available for explicit upgrades.
+
+## Browser support
+
+Current versions of Chrome, Edge, Firefox and Safari, on desktop and mobile
+(touch drag and drop is built in). Internet Explorer is not supported. The
+package is published as modern JavaScript, so if you target older browsers,
+let your bundler transpile `react-mosaic-component` too.
 
 ## Contributing
 

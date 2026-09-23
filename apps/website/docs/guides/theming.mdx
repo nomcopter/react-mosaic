@@ -87,17 +87,46 @@ When writing a theme, these are the selectors you'll most often target:
 | `.mosaic-window` | Individual panel |
 | `.mosaic-window-title` | Title bar area |
 | `.mosaic-window-body` | Panel content area |
-| `.mosaic-window-toolbar` | Right-hand button cluster |
+| `.mosaic-window-toolbar` | Whole title bar (title + controls) |
+| `.mosaic-window-controls` | Right-hand button cluster |
 | `.mosaic-split` | Draggable divider between siblings |
 | `.mosaic-split.-row` / `.-column` | Direction-specific divider |
+| `.mosaic-split-line` | The visible line inside a divider |
 | `.mosaic-drop-target` | Hover target shown during drag |
-| `.mosaic-tab` | Single tab header |
-| `.mosaic-tab.-active` | The currently-selected tab header |
+| `.mosaic-tab-bar` | Tab strip of a tab group |
+| `.mosaic-tab-button` | Single tab header |
+| `.mosaic-tab-button.-active` | The currently-selected tab header |
 | `.mosaic-zero-state` | Empty-state placeholder |
 
-The BEM-ish pattern (`block__element--modifier`) is consistent across the
-whole library, so if you can't find a class, inspect a running demo in
-DevTools — the names are stable.
+Class names are `mosaic-<element>`, and states are separate `-modifier`
+classes (`-row`, `-active`, `-dragging`). If you can't find a class, inspect a
+running demo in DevTools; the names are stable.
+
+## Styling the split bar
+
+A `row` split has a vertical divider and a `column` split has a horizontal
+one. Style the divider itself for hover effects. Note there is no space before
+`:hover`:
+
+```css
+.my-theme .mosaic-split.-row:hover {
+  background: #4c90f0;
+}
+```
+
+With the Blueprint theme, the theme already sets the hover background, so
+match its specificity to override it, or style the inner line instead:
+
+```css
+.mosaic.mosaic-blueprint-theme .mosaic-split.-row:hover {
+  background: #4c90f0;
+}
+
+/* or keep the background and recolor the line */
+.mosaic.mosaic-blueprint-theme .mosaic-split:hover .mosaic-split-line {
+  box-shadow: 0 0 0 2px #4c90f0;
+}
+```
 
 ## Live example
 

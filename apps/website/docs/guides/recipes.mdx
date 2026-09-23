@@ -1,0 +1,159 @@
+---
+id: recipes
+title: Recipes
+sidebar_position: 5
+---
+
+# Recipes
+
+Small patterns that come up a lot and don't need anything beyond the public
+API.
+
+## Maximize a panel
+
+To show a single panel on its own, keep the full layout in state, replace
+`value` with the panel's key, and put the saved layout back when restoring.
+A bare key is a valid tree, so Mosaic renders it as one full-size window.
+
+```tsx live
+function MaximizeExample() {
+  const [tree, setTree] = React.useState({
+    type: 'split',
+    direction: 'row',
+    children: ['a', { type: 'split', direction: 'column', children: ['b', 'c'] }],
+  });
+  const [savedTree, setSavedTree] = React.useState(null);
+  const isMaximized = savedTree !== null;
+
+  const toggleMaximize = (id) => {
+    if (isMaximized) {
+      setTree(savedTree);
+      setSavedTree(null);
+    } else {
+      setSavedTree(tree);
+      setTree(id);
+    }
+  };
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        value={tree}
+        onChange={setTree}
+        renderTile={(id, path) => (
+          <MosaicWindow
+            path={path}
+            title={`Panel ${id}`}
+            toolbarControls={
+              <DefaultToolbarButton
+                title={isMaximized ? 'Restore' : 'Maximize'}
+                text={isMaximized ? 'Restore' : 'Maximize'}
+                className=""
+                onClick={() => toggleMaximize(id)}
+              />
+            }
+          >
+            <div style={{ padding: 20 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+      />
+    </div>
+  );
+}
+```
+
+Because you own the maximized state, you also decide what else is allowed in
+it. The example only shows a Restore button, so the user can't remove or
+split the panel while the rest of the layout is stashed away.
+
+If you only want the panel to take most of the space and keep the others
+visible, `mosaicActions.expand(path, percentage)` from `MosaicContext` does
+that without swapping the tree.
+
+## Drag the whole tile, without a toolbar
+
+`MosaicWindowContext` exposes `connectDragSource`, the same connector the title
+bar uses. Wrap any element inside the window with it and that element becomes a
+drag handle. Here it's the whole body, and the toolbar is hidden with CSS:
+
+```tsx live
+function WholeTileDragExample() {
+  function DragAnywhere({ children }) {
+    const { mosaicWindowActions } = React.useContext(MosaicWindowContext);
+    return mosaicWindowActions.connectDragSource(
+      <div style={{ height: '100%', padding: 20, cursor: 'move' }}>{children}</div>,
+    );
+  }
+
+  return (
+    <div className="live-mosaic-frame no-toolbar">
+      <style>{'.no-toolbar .mosaic-window-toolbar { display: none; }'}</style>
+      <Mosaic
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={id} draggable={false} renderToolbar={() => <div />}>
+            <DragAnywhere>Drag me anywhere: {id}</DragAnywhere>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          children: ['a', { type: 'split', direction: 'column', children: ['b', 'c'] }],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+`draggable={false}` stops the (now hidden) toolbar from being a drag handle.
+`renderToolbar` replaces the default title and buttons with an empty element.
+If your tiles have inputs or selectable text, wrap a smaller area (a grip
+icon, a header) instead of the whole body so those keep working.
+
+## Know which panel was removed
+
+`onChange` receives only the new tree. To find out what disappeared, compare
+leaves before and after:
+
+```tsx
+import { getLeaves, MosaicNode } from 'react-mosaic-component';
+
+const handleChange = (next: MosaicNode<string> | null) => {
+  const before = new Set(getLeaves(tree));
+  const after = new Set(getLeaves(next));
+  const removed = [...before].filter((id) => !after.has(id));
+  if (removed.length > 0) {
+    onPanelsRemoved(removed);
+  }
+  setTree(next);
+};
+```
+
+If you only care about the remove button, pass your own `RemoveButton` in
+`toolbarControls`. Its `onClick` runs right after the panel is removed, and
+you already know the `id` from `renderTile`:
+
+```tsx
+renderTile={(id, path) => (
+  <MosaicWindow
+    path={path}
+    title={id}
+    toolbarControls={<RemoveButton onClick={() => onPanelRemoved(id)} />}
+  >
+    ...
+  </MosaicWindow>
+)}
+```
+
+## A layout bigger than the screen
+
+`Mosaic` fills its parent. To get a scrollable canvas, give it a larger parent
+inside a scroll container:
+
+```tsx
+<div style={{ height: '100vh', overflow: 'auto' }}>
+  <div style={{ width: 2000, height: 1500 }}>
+    <Mosaic renderTile={/* ... */} initialValue={/* ... */} />
+  </div>
+</div>
+```
