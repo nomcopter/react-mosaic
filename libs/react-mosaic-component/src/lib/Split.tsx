@@ -18,6 +18,11 @@ const TOUCH_EVENT_OPTIONS = {
   passive: false,
 };
 
+// Set on <html> while a split is dragged. The stylesheet turns off pointer
+// events on tiles, so iframes and nested apps inside them can't swallow the
+// mousemove/mouseup the drag depends on.
+export const RESIZING_CLASS = 'mosaic-resizing';
+
 export interface SplitProps extends EnabledResizeOptions {
   direction: MosaicDirection;
   // BoundingBox of the parent split container
@@ -33,7 +38,7 @@ export interface SplitProps extends EnabledResizeOptions {
 
 export class Split extends React.PureComponent<SplitProps> {
   private rootElement = React.createRef<HTMLDivElement>();
-  private listenersBound = false;
+  private boundDocument: Document | null = null;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -189,21 +194,27 @@ export class Split extends React.PureComponent<SplitProps> {
     return newSplitPercentages;
   }
 
-  // These bindings can remain as they were
   private bindListeners() {
-    if (!this.listenersBound) {
-      const doc = this.rootElement.current!.ownerDocument!;
+    if (!this.boundDocument && this.rootElement.current) {
+      const doc = this.rootElement.current.ownerDocument;
       doc.addEventListener('mousemove', this.onMouseMove, true);
       doc.addEventListener('touchmove', this.onMouseMove, TOUCH_EVENT_OPTIONS);
       doc.addEventListener('mouseup', this.onMouseUp, true);
       doc.addEventListener('touchend', this.onMouseUp, true);
-      this.listenersBound = true;
+      doc.addEventListener('touchcancel', this.onMouseUp, true);
+      doc.documentElement.classList.add(
+        RESIZING_CLASS,
+        `${RESIZING_CLASS}-${this.props.direction}`,
+      );
+      this.boundDocument = doc;
     }
   }
 
+  // Uses the document captured at bind time, so cleanup still happens when
+  // the root element is already gone.
   private unbindListeners() {
-    if (this.listenersBound && this.rootElement.current) {
-      const doc = this.rootElement.current.ownerDocument!;
+    const doc = this.boundDocument;
+    if (doc) {
       doc.removeEventListener('mousemove', this.onMouseMove, true);
       doc.removeEventListener(
         'touchmove',
@@ -212,7 +223,13 @@ export class Split extends React.PureComponent<SplitProps> {
       );
       doc.removeEventListener('mouseup', this.onMouseUp, true);
       doc.removeEventListener('touchend', this.onMouseUp, true);
-      this.listenersBound = false;
+      doc.removeEventListener('touchcancel', this.onMouseUp, true);
+      doc.documentElement.classList.remove(
+        RESIZING_CLASS,
+        `${RESIZING_CLASS}-row`,
+        `${RESIZING_CLASS}-column`,
+      );
+      this.boundDocument = null;
     }
   }
 }
