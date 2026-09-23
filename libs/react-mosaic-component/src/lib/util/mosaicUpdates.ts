@@ -634,31 +634,24 @@ export function createAddChildUpdate<T extends MosaicKey>(
   return {
     path,
     spec: {
-      children: {
-        $apply: (currentChildren: MosaicNode<T>[]) => {
-          const newChildren = [...currentChildren];
-          const index =
-            insertIndex !== undefined ? insertIndex : newChildren.length;
-          newChildren.splice(index, 0, newChild);
-          return newChildren;
-        },
-      },
-      splitPercentages: {
-        $apply: (currentPercentages: number[] | undefined) => {
-          const currentLength = currentPercentages
-            ? currentPercentages.length
-            : 0;
-          const newLength = currentLength + 1;
-          const equalPercentage = 100 / newLength;
+      // Works on the whole node: `splitPercentages` is optional, so its new
+      // length has to come from the children, not from the old percentages.
+      $apply: (node: MosaicNode<T>): MosaicNode<T> => {
+        if (!isSplitNode(node)) {
+          throw new Error('Cannot add child: node at path is not a split');
+        }
 
-          if (!currentPercentages) {
-            return Array(newLength).fill(equalPercentage);
-          }
+        const children = [...node.children];
+        const index = insertIndex !== undefined ? insertIndex : children.length;
+        children.splice(index, 0, newChild);
 
-          // Redistribute percentages equally
-          const newPercentages = Array(newLength).fill(equalPercentage);
-          return newPercentages;
-        },
+        // Redistribute percentages equally
+        const equalPercentage = 100 / children.length;
+        return {
+          ...node,
+          children,
+          splitPercentages: children.map(() => equalPercentage),
+        };
       },
     },
   };

@@ -6,6 +6,7 @@ import {
   createRemoveUpdate,
   createDragToUpdates,
   createExpandUpdate,
+  createAddChildUpdate,
 } from './mosaicUpdates';
 import { getLeaves, getNodeAtPath } from './mosaicUtilities';
 import { MosaicDropTargetPosition } from '../internalTypes';
@@ -158,6 +159,58 @@ describe('mosaicUpdates', () => {
     });
   });
 
+  describe('createAddChildUpdate', () => {
+    it('adds a child to a split without splitPercentages', () => {
+      const tree: MosaicNode<string> = {
+        type: 'split',
+        direction: 'row',
+        children: ['a', 'b', 'c'],
+      };
+
+      expect(updateTree(tree, [createAddChildUpdate([], 'd', 1)])).toEqual({
+        type: 'split',
+        direction: 'row',
+        children: ['a', 'd', 'b', 'c'],
+        splitPercentages: [25, 25, 25, 25],
+      });
+    });
+
+    it('appends by default and rebalances existing splitPercentages', () => {
+      const tree: MosaicNode<string> = {
+        type: 'split',
+        direction: 'column',
+        children: ['a', 'b'],
+        splitPercentages: [80, 20],
+      };
+
+      expect(updateTree(tree, [createAddChildUpdate([], 'c')])).toEqual({
+        type: 'split',
+        direction: 'column',
+        children: ['a', 'b', 'c'],
+        splitPercentages: [100 / 3, 100 / 3, 100 / 3],
+      });
+    });
+
+    it('adds a child to a deeply nested split', () => {
+      const updated = updateTree(NARY_MEDIUM_TREE, [
+        createAddChildUpdate([1, 0], 5),
+      ]);
+
+      expect(getNodeAtPath(updated, [1, 0])).toEqual({
+        type: 'split',
+        direction: 'column',
+        children: [2, 3, 5],
+        splitPercentages: [100 / 3, 100 / 3, 100 / 3],
+      });
+    });
+
+    it('throws when the path does not point at a split', () => {
+      expect(() =>
+        updateTree(NARY_MEDIUM_TREE, [createAddChildUpdate([0], 5)]),
+      ).toThrow('Cannot add child: node at path is not a split');
+    });
+  });
+
   describe('createDragToUpdates', () => {
     describe('drag leaf to unrelated leaf to create a SPLIT', () => {
       const updatedTree = updateTree(
@@ -220,6 +273,15 @@ describe('mosaicUpdates', () => {
         // The dragged node '4' is added as a new child to the existing root split
         // Since we're dropping to the RIGHT, it should be the last child
         expect(getNodeAtPath(updatedTree, [2])).to.equal(4);
+      });
+
+      it('should give every root child a split percentage', () => {
+        // The root had no splitPercentages; it now has three children
+        const root = updatedTree as MosaicSplitNode<number>;
+        expect(root.splitPercentages).toHaveLength(3);
+        for (const percentage of root.splitPercentages ?? []) {
+          expect(percentage).toBeCloseTo(100 / 3);
+        }
       });
 
       it('should place the original tree (pruned) as siblings', () => {
