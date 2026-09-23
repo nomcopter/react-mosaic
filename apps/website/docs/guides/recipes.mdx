@@ -122,6 +122,21 @@ on. Set `dropBehavior` to change that:
 ```tsx live
 function SwapExample() {
   const [dropBehavior, setDropBehavior] = React.useState('swap');
+  // Keep one layout object, so switching modes doesn't reset your swaps
+  const [initialLayout] = React.useState({
+    type: 'split',
+    direction: 'row',
+    splitPercentages: [30, 70],
+    children: [
+      'a',
+      {
+        type: 'split',
+        direction: 'column',
+        splitPercentages: [60, 40],
+        children: ['b', 'c'],
+      },
+    ],
+  });
 
   return (
     <>
@@ -142,20 +157,7 @@ function SwapExample() {
               <div style={{ padding: 20 }}>Drag my title onto another panel</div>
             </MosaicWindow>
           )}
-          initialValue={{
-            type: 'split',
-            direction: 'row',
-            splitPercentages: [30, 70],
-            children: [
-              'a',
-              {
-                type: 'split',
-                direction: 'column',
-                splitPercentages: [60, 40],
-                children: ['b', 'c'],
-              },
-            ],
-          }}
+          initialValue={initialLayout}
         />
       </div>
     </>
