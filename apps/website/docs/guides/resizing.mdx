@@ -1,0 +1,119 @@
+---
+id: resizing
+title: Resizing
+sidebar_position: 7
+---
+
+# Resizing
+
+Users resize panes by dragging the dividers between them. The `resize` prop on
+`Mosaic` controls how that works. Every option is optional, and leaving `resize`
+out keeps the defaults.
+
+```tsx
+<Mosaic
+  resize={{
+    minimumPaneSizePercentage: 10,
+    minimumPaneSizePx: { column: 30 },
+    renderSplitHandle: (direction) => <Grip direction={direction} />,
+    preview: true,
+  }}
+  renderTile={/* ... */}
+  initialValue={/* ... */}
+/>
+```
+
+To turn resizing off completely, pass `resize="DISABLED"`. The dividers are
+then not rendered at all.
+
+## Try it
+
+This layout keeps panes at least 80px wide or tall, shows a grip on every
+divider, and only moves the divider while you drag. The panes resize when you
+let go.
+
+```tsx live
+function ResizingExample() {
+  const grip = (direction) => (
+    <span
+      style={{
+        width: direction === 'row' ? 4 : 28,
+        height: direction === 'row' ? 28 : 4,
+        borderRadius: 2,
+        background: '#8f99a8',
+      }}
+    />
+  );
+
+  return (
+    <div className="live-mosaic-frame">
+      <Mosaic
+        resize={{
+          minimumPaneSizePx: 80,
+          renderSplitHandle: grip,
+          preview: true,
+        }}
+        renderTile={(id, path) => (
+          <MosaicWindow path={path} title={`Panel ${id}`}>
+            <div style={{ padding: 20 }}>Panel {id}</div>
+          </MosaicWindow>
+        )}
+        initialValue={{
+          type: 'split',
+          direction: 'row',
+          children: [
+            'a',
+            { type: 'split', direction: 'column', children: ['b', 'c'] },
+          ],
+        }}
+      />
+    </div>
+  );
+}
+```
+
+## Minimum pane size
+
+Two options limit how small a pane can get. Both apply at the same time and the
+larger one wins.
+
+- `minimumPaneSizePercentage` is a percentage of the split the pane is in.
+  Default: `10`.
+- `minimumPaneSizePx` is in pixels. Default: `0`.
+
+Either one also takes `{ row, column }` to use different values per split
+direction. `row` splits put panes side by side, `column` splits stack them. For
+example, to let side-by-side panes shrink all the way while stacked panes always
+keep room for their title bar:
+
+```tsx
+<Mosaic
+  resize={{
+    minimumPaneSizePercentage: { row: 0, column: 0 },
+    minimumPaneSizePx: { column: 30 },
+  }}
+  // ...
+/>
+```
+
+A direction you leave out of the object falls back to the default. The minimums
+only apply while dragging a divider. They don't change a layout you pass in, and
+they aren't re-applied when the container itself gets smaller.
+
+## Custom divider handles
+
+`renderSplitHandle(direction)` renders your content centered on every divider,
+inside a `.mosaic-split-handle` element. Pressing it drags the divider like the
+rest of the bar. Use `direction` to draw a vertical grip on `row` dividers and a
+horizontal one on `column` dividers.
+
+## Preview while dragging
+
+By default the panes resize live, and `onChange` fires as the divider moves.
+With `preview: true`, only the divider moves while dragging. It gets a
+`-preview` class and the same look as on hover. The panes resize once, when the
+divider is released, so `onChange` and `onRelease` fire a single time per drag.
+That helps when tiles are expensive to re-render.
+
+While any divider is being dragged, the tiles don't receive pointer events, so
+iframes and other apps inside them can't interrupt the drag.

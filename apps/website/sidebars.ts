@@ -31,6 +31,7 @@ const sidebars: SidebarsConfig = {
         'guides/zero-state',
         'guides/recipes',
         'guides/drag-and-drop',
+        'guides/resizing',
       ],
     },
     {
