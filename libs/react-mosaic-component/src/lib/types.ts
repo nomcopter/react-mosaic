@@ -1,6 +1,6 @@
 import { type Spec } from 'immutability-helper';
 
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { MosaicRootActions } from './contextTypes';
 
 // ================================================================================================
@@ -315,6 +315,12 @@ export interface EnabledResizeOptions {
    * Default: 0
    */
   minimumPaneSizePx?: ResizeValueByDirection;
+  /**
+   * Renders extra content (a grip, dots, an icon) centered on every divider,
+   * inside `.mosaic-split-handle`. Pressing it drags the divider like the rest
+   * of the split bar.
+   */
+  renderSplitHandle?: (direction: MosaicDirection) => ReactNode;
 }
 
 /**
