@@ -79,12 +79,13 @@ larger one wins.
 
 - `minimumPaneSizePercentage` is a percentage of the split the pane is in.
   Default: `10`.
-- `minimumPaneSizePx` is in pixels. Default: `0`.
+- `minimumPaneSizePx` is the visible size of the tile in pixels. The 6px gutter
+  around each tile is added for you. Default: `0`.
 
 Either one also takes `{ row, column }` to use different values per split
 direction. `row` splits put panes side by side, `column` splits stack them. For
-example, to let side-by-side panes shrink all the way while stacked panes always
-keep room for their title bar:
+example, to let side-by-side panes shrink all the way while stacked panes keep
+room for a 30px title bar:
 
 ```tsx
 <Mosaic
@@ -97,15 +98,25 @@ keep room for their title bar:
 ```
 
 A direction you leave out of the object falls back to the default. The minimums
-only apply while dragging a divider. They don't change a layout you pass in, and
-they aren't re-applied when the container itself gets smaller.
+apply to the two panes next to the divider you drag, not to panes nested inside
+them: dragging a divider can still squeeze a nested split's panes below the
+minimum. They also only apply while dragging. They don't change a layout you
+pass in, and they aren't re-applied when the container itself gets smaller.
 
 ## Custom divider handles
 
 `renderSplitHandle(direction)` renders your content centered on every divider,
 inside a `.mosaic-split-handle` element. Pressing it drags the divider like the
-rest of the bar. Use `direction` to draw a vertical grip on `row` dividers and a
-horizontal one on `column` dividers.
+rest of the bar, and the divider keeps its position relative to where you
+grabbed it, so a wide grip doesn't jump to the cursor. Use `direction` to draw a
+vertical grip on `row` dividers and a horizontal one on `column` dividers.
+
+Dividers with a handle are stacked above tile content, including the window
+toolbar and the drop targets shown while dragging a window, so a grip that is
+larger than the 6px bar covers whatever is under it. Outer dividers stack above
+inner ones so their grips stay grabbable where dividers meet. That ordering goes
+eight levels deep; below that, dividers share the same level and a nested one
+can cover an outer grip.
 
 ## Preview while dragging
 

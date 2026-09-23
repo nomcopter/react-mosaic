@@ -304,21 +304,28 @@ export interface EnabledResizeOptions {
   /**
    * Smallest size a pane can be dragged to, as a percentage of its split.
    * Pass `{ row, column }` to use different values per split direction.
+   * Applies to the two panes next to the divider being dragged, not to panes
+   * nested inside them.
    * Default: 10
    */
   minimumPaneSizePercentage?: ResizeValueByDirection;
   /**
-   * Smallest size a pane can be dragged to, in pixels, measured between the
-   * dividers around it. Applies together with `minimumPaneSizePercentage`;
-   * the larger one wins. Pass `{ row, column }` to use different values per
-   * split direction, e.g. `{ column: 30 }` to always keep a title bar visible.
+   * Smallest visible size of a pane, in pixels. This is the tile itself; the
+   * gutter around it is added for you. Applies together with
+   * `minimumPaneSizePercentage`; the larger one wins. Pass `{ row, column }`
+   * to use different values per split direction, e.g. `{ column: 30 }` to keep
+   * a 30px title bar visible on stacked panes. Like the percentage, it only
+   * applies to the two panes next to the divider being dragged, and it isn't
+   * re-applied when the container itself shrinks.
    * Default: 0
    */
   minimumPaneSizePx?: ResizeValueByDirection;
   /**
    * Renders extra content (a grip, dots, an icon) centered on every divider,
    * inside `.mosaic-split-handle`. Pressing it drags the divider like the rest
-   * of the split bar.
+   * of the split bar, and grabbing it off-centre doesn't make the divider
+   * jump. Dividers with a handle sit above tile content, including toolbars
+   * and drop targets, so a grip larger than the bar covers what's under it.
    */
   renderSplitHandle?: (direction: MosaicDirection) => ReactNode;
   /**
