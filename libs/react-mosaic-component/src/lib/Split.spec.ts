@@ -128,6 +128,56 @@ describe('Split resizing class', () => {
     expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
   });
 
+  // A lost mouseup (alt-tab, alert, context menu) used to leave the class on
+  // <html>, so every tile stayed unclickable until the next click.
+  it('ends the drag on window blur, releasing at the last reported position', () => {
+    const { splitElement, onChange, onRelease } = renderSplit();
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 10 });
+    expect(onChange).toHaveBeenCalledTimes(1);
+
+    fireEvent.blur(window);
+
+    expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
+    expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenLastCalledWith(onChange.mock.calls[0][0]);
+
+    // Listeners are gone: later events don't reach the split
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 20 });
+    fireEvent.mouseUp(document);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenCalledTimes(1);
+  });
+
+  it('ends the drag on window blur without onRelease when nothing moved', () => {
+    const { splitElement, onChange, onRelease } = renderSplit();
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.blur(window);
+
+    expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(onRelease).not.toHaveBeenCalled();
+  });
+
+  it('ends the drag when the mouse moves with no button pressed', () => {
+    const { splitElement, onChange, onRelease } = renderSplit();
+
+    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 10 });
+    fireEvent.mouseMove(document, { buttons: 0, clientX: 30 });
+
+    expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
+    // The buttonless move itself is not applied
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onRelease).toHaveBeenLastCalledWith(onChange.mock.calls[0][0]);
+
+    fireEvent.mouseUp(document);
+    expect(onRelease).toHaveBeenCalledTimes(1);
+  });
+
   it('cleans up the class and document listeners when unmounted mid-drag', () => {
     const { splitElement, unmount, onChange, onRelease } = renderSplit();
 

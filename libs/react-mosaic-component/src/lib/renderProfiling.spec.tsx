@@ -154,7 +154,7 @@ describe('baseline: full-tree rendering on every update', () => {
     fireEvent.mouseDown(splitter, { button: 0 });
     // The 30fps throttle is leading-edge, so the first move commits a tree
     // update synchronously.
-    fireEvent.mouseMove(document, { clientX: 450, clientY: 100 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 450, clientY: 100 });
 
     expect(onChange).toHaveBeenCalledTimes(1);
     // Baseline: one mouse-move = one full-tree render. 'd' is at the same
@@ -369,9 +369,9 @@ describe('Split resize callback ordering', () => {
 
     fireEvent.mouseDown(splitter!, { button: 0 });
     // Leading edge fires immediately…
-    fireEvent.mouseMove(document, { clientX: 600, clientY: 100 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 600, clientY: 100 });
     // …second move inside the 33ms window queues a trailing call…
-    fireEvent.mouseMove(document, { clientX: 610, clientY: 100 });
+    fireEvent.mouseMove(document, { buttons: 1, clientX: 610, clientY: 100 });
     // …which releasing must cancel.
     fireEvent.mouseUp(document, { clientX: 620, clientY: 100 });
 

@@ -71,6 +71,11 @@
   pointer-events: none;
 }
 
+// An iframe that sets pointer-events itself would still swallow the drag.
+.mosaic-resizing .mosaic-tile iframe {
+  pointer-events: none !important;
+}
+
 .mosaic-resizing-row {
   cursor: ew-resize;
 }
