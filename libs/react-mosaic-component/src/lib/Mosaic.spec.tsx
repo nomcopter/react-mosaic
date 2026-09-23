@@ -154,9 +154,9 @@ describe('Mosaic expand', () => {
 
     fireEvent.click(expandButtons[0]);
 
-    expect(onChange).toHaveBeenLastCalledWith({
-      ...TWO_LEAF_TREE,
-      splitPercentages: [70, 30],
-    });
+    expect(onChange).toHaveBeenLastCalledWith(
+      { ...TWO_LEAF_TREE, splitPercentages: [70, 30] },
+      { type: 'expand', path: [0], percentage: 70 },
+    );
   });
 });
