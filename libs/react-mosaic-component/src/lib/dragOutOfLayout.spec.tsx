@@ -210,9 +210,10 @@ describe('dragging windows out of the layout', () => {
       direction: 'row',
       children: ['a', 'b'],
     });
+    const meta = { type: 'remove', path: [1, 1], node: 'c' };
     expect(onChange).toHaveBeenLastCalledWith(expected);
     expect(onRelease).toHaveBeenCalledTimes(1);
-    expect(onRelease).toHaveBeenLastCalledWith(expected);
+    expect(onRelease).toHaveBeenLastCalledWith(expected, meta);
     expect(onDragEnd).toHaveBeenCalledWith('drop');
     expect(renderedTitles(container)).toEqual(['a', 'b']);
   });
@@ -233,6 +234,7 @@ describe('dragging windows out of the layout', () => {
         direction: 'column',
         children: ['b', 'c'],
       }),
+      { type: 'remove', path: [0], node: 'a' },
     );
     expect(renderedTitles(container)).toEqual(['b', 'c']);
   });
