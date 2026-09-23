@@ -418,9 +418,11 @@ export const MosaicTabs = <T extends MosaicKey>({
   };
 
   const onTabClose = (tabKey: T, index: number) => {
+    // Without a canClose prop the default tab button shows an enabled close
+    // button, so treat a missing prop the same way.
     const closeState = canClose
       ? canClose(tabKey, tabs, index, path)
-      : 'noClose';
+      : 'canClose';
     if (closeState !== 'canClose') return;
     if (tabs.length <= 1) return;
     mosaicActions.removeTab(path, index);
