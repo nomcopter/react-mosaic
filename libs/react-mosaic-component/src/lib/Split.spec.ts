@@ -1,10 +1,12 @@
+import { sum } from 'lodash-es';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 
 import { Mosaic } from './Mosaic';
-import { RESIZING_CLASS, Split, SplitProps } from './Split';
+import { RESIZING_CLASS, SPLIT_SIZE_PX, Split, SplitProps } from './Split';
 import { EnabledResizeOptions } from './types';
+import { getAbsoluteSplitPercentage } from './util/BoundingBox';
 
 describe('Split resize resilience', () => {
   function makeSplit(splitPercentages: number[]): Split {
@@ -91,7 +93,8 @@ describe('Split resizing class', () => {
     expect(html.classList.contains(RESIZING_CLASS)).toBe(true);
     expect(html.classList.contains(`${RESIZING_CLASS}-column`)).toBe(true);
 
-    fireEvent.mouseUp(document);
+    fireEvent.mouseMove(document, { clientY: 10 });
+    fireEvent.mouseUp(document, { clientY: 10 });
     expect(html.classList.contains(RESIZING_CLASS)).toBe(false);
     expect(html.classList.contains(`${RESIZING_CLASS}-column`)).toBe(false);
     expect(onRelease).toHaveBeenCalledTimes(1);
@@ -195,7 +198,7 @@ describe('Split resizing class', () => {
 });
 
 // Drives a real drag against a mocked parent size and returns what the split
-// reports on release.
+// reports on release. The press lands on the divider itself.
 function dragSplit(
   props: Partial<SplitProps>,
   to: { clientX?: number; clientY?: number },
@@ -223,9 +226,32 @@ function dragSplit(
     ...parentSize,
   } as DOMRect);
   const splitElement = container.querySelector('.mosaic-split') as HTMLElement;
+  const {
+    direction = 'row',
+    boundingBox = { top: 0, right: 0, bottom: 0, left: 0 },
+    splitPercentages = [50, 50],
+    splitIndex = 0,
+  } = props;
+  const dividerAbsolutePercentage = getAbsoluteSplitPercentage(
+    boundingBox,
+    sum(splitPercentages.slice(0, splitIndex + 1)),
+    direction,
+  );
+  const press =
+    direction === 'column'
+      ? {
+          clientX: 0,
+          clientY: (parentSize.height * dividerAbsolutePercentage) / 100,
+        }
+      : {
+          clientX: (parentSize.width * dividerAbsolutePercentage) / 100,
+          clientY: 0,
+        };
+  const release = { ...press, ...to };
 
-  fireEvent.mouseDown(splitElement, { button: 0 });
-  fireEvent.mouseUp(document, { clientX: 0, clientY: 0, ...to });
+  fireEvent.mouseDown(splitElement, { button: 0, ...press });
+  fireEvent.mouseMove(document, release);
+  fireEvent.mouseUp(document, release);
   cleanup();
   return onRelease.mock.calls[0][0];
 }
@@ -295,27 +321,27 @@ describe('Split minimum pane size', () => {
   });
 
   it('applies a pixel minimum when it is larger than the percentage', () => {
-    // 1000px wide: 300px is 30%, larger than the default 10%
-    expect(dragSplit({ minimumPaneSizePx: 300 }, { clientX: 0 })).toEqual([
+    // 1000px wide: 294px plus the 6px gutter is 30%, larger than the default 10%
+    expect(dragSplit({ minimumPaneSizePx: 294 }, { clientX: 0 })).toEqual([
       30, 70,
     ]);
-    expect(dragSplit({ minimumPaneSizePx: 300 }, { clientX: 1000 })).toEqual([
+    expect(dragSplit({ minimumPaneSizePx: 294 }, { clientX: 1000 })).toEqual([
       70, 30,
     ]);
-    // 50px is 5%, so the 10% default still wins
+    // 50px plus the gutter is 5.6%, so the 10% default still wins
     expect(dragSplit({ minimumPaneSizePx: 50 }, { clientX: 0 })).toEqual([
       10, 90,
     ]);
   });
 
   it('measures the pixel minimum against the split, not the whole root', () => {
-    // The split is the right half (500px), so 100px is 20% of it
+    // The split is the right half (500px), so 94px plus the gutter is 20% of it
     expect(
       dragSplit(
         {
           boundingBox: { top: 0, right: 0, bottom: 0, left: 50 },
           minimumPaneSizePercentage: 0,
-          minimumPaneSizePx: 100,
+          minimumPaneSizePx: 94,
         },
         { clientX: 500 },
       ),
@@ -323,8 +349,8 @@ describe('Split minimum pane size', () => {
   });
 
   it('uses per-direction pixel minimums', () => {
-    const minimumPaneSizePx = { column: 100 };
-    // 500px tall: 100px is 20%
+    const minimumPaneSizePx = { column: 94 };
+    // 500px tall: 94px plus the gutter is 20%
     expect(
       dragSplit(
         {
@@ -341,6 +367,21 @@ describe('Split minimum pane size', () => {
         { clientX: 0 },
       ),
     ).toEqual([0, 100]);
+  });
+
+  it('adds the tile margins so the visible tile keeps the pixel minimum', () => {
+    // 500px tall: a 30px title bar needs 30px + 6px of the split, 7.2%
+    const [top, bottom] = dragSplit(
+      {
+        direction: 'column',
+        minimumPaneSizePercentage: 0,
+        minimumPaneSizePx: { column: 30 },
+      },
+      { clientY: 0 },
+    );
+    expect(top).toBeCloseTo(7.2);
+    expect(bottom).toBeCloseTo(92.8);
+    expect((top / 100) * 500 - SPLIT_SIZE_PX).toBeCloseTo(30);
   });
 
   it('keeps the current percentages when the root has no size', () => {
@@ -433,10 +474,12 @@ describe('Split renderSplitHandle', () => {
 
     fireEvent.mouseDown(container.querySelector('.grip') as HTMLElement, {
       button: 0,
+      clientX: 500,
     });
     expect(document.documentElement.classList.contains(RESIZING_CLASS)).toBe(
       true,
     );
+    fireEvent.mouseMove(document, { clientX: 300 });
     fireEvent.mouseUp(document, { clientX: 300 });
 
     expect(onRelease).toHaveBeenCalledWith([30, 70]);
@@ -527,7 +570,7 @@ describe('Split preview', () => {
   it('moves only the divider while dragging, then reports once on release', () => {
     const { splitElement, onChange, onRelease } = renderPreviewSplit(true);
 
-    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
     fireEvent.mouseMove(document, { clientX: 300 });
 
     expect(onChange).not.toHaveBeenCalled();
@@ -547,7 +590,7 @@ describe('Split preview', () => {
   it('keeps live updates when preview is off', () => {
     const { splitElement, onChange } = renderPreviewSplit(false);
 
-    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
     fireEvent.mouseMove(document, { clientX: 300 });
 
     expect(onChange).toHaveBeenCalledWith([30, 70]);
@@ -575,7 +618,7 @@ describe('Split preview', () => {
       '.mosaic-split',
     ) as HTMLElement;
 
-    fireEvent.mouseDown(splitElement, { button: 0 });
+    fireEvent.mouseDown(splitElement, { button: 0, clientX: 500 });
     fireEvent.mouseMove(document, { clientX: 200 });
     fireEvent.mouseMove(document, { clientX: 400 });
     fireEvent.mouseUp(document, { clientX: 400 });
@@ -588,5 +631,106 @@ describe('Split preview', () => {
       children: ['a', 'b'],
       splitPercentages: [40, 60],
     });
+  });
+});
+
+describe('Split grab offset', () => {
+  // 1000px wide root, divider at 50% (500px), grabbed 15px right of it
+  function renderGrabbedSplit(resize: Partial<SplitProps> = {}) {
+    const onChange = vi.fn();
+    const onRelease = vi.fn();
+    const { container } = render(
+      React.createElement(
+        'div',
+        null,
+        React.createElement(Split, {
+          direction: 'row',
+          boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+          splitPercentages: [50, 50],
+          splitIndex: 0,
+          onChange,
+          onRelease,
+          ...resize,
+        }),
+      ),
+    );
+    vi.spyOn(
+      container.firstElementChild as HTMLElement,
+      'getBoundingClientRect',
+    ).mockReturnValue({ left: 0, top: 0, width: 1000, height: 500 } as DOMRect);
+    const splitElement = container.querySelector(
+      '.mosaic-split',
+    ) as HTMLElement;
+    fireEvent.mouseDown(splitElement, { button: 0, clientX: 515 });
+    return { splitElement, onChange, onRelease };
+  }
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('does not resize on a click that never moves', () => {
+    const { onChange, onRelease } = renderGrabbedSplit();
+
+    fireEvent.mouseUp(document, { clientX: 515 });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(onRelease).not.toHaveBeenCalled();
+  });
+
+  it('moves the divider by how far the pointer moved, not to the pointer', () => {
+    const { onChange, onRelease } = renderGrabbedSplit();
+
+    fireEvent.mouseMove(document, { clientX: 615 });
+    expect(onChange).toHaveBeenLastCalledWith([60, 40]);
+
+    fireEvent.mouseUp(document, { clientX: 615 });
+    expect(onRelease).toHaveBeenCalledWith([60, 40]);
+  });
+
+  it('keeps the offset in preview mode too', () => {
+    const { splitElement, onRelease } = renderGrabbedSplit({ preview: true });
+
+    fireEvent.mouseMove(document, { clientX: 615 });
+    expect(splitElement.style.left).toBe('60%');
+
+    fireEvent.mouseUp(document, { clientX: 615 });
+    expect(onRelease).toHaveBeenCalledWith([60, 40]);
+  });
+
+  it('still resizes when the pointer moved and came back', () => {
+    const { onRelease } = renderGrabbedSplit();
+
+    fireEvent.mouseMove(document, { clientX: 700 });
+    fireEvent.mouseUp(document, { clientX: 515 });
+
+    expect(onRelease).toHaveBeenCalledWith([50, 50]);
+  });
+
+  it('fires no Mosaic onChange or onRelease for a click on a divider', () => {
+    const onChange = vi.fn();
+    const onRelease = vi.fn();
+    const { container } = render(
+      React.createElement(Mosaic<string>, {
+        initialValue: { type: 'split', direction: 'row', children: ['a', 'b'] },
+        renderTile: (id: string) => React.createElement('div', null, id),
+        onChange,
+        onRelease,
+      }),
+    );
+    vi.spyOn(
+      container.querySelector('.mosaic-root') as HTMLElement,
+      'getBoundingClientRect',
+    ).mockReturnValue({ left: 0, top: 0, width: 1000, height: 500 } as DOMRect);
+    const splitElement = container.querySelector(
+      '.mosaic-split',
+    ) as HTMLElement;
+
+    fireEvent.mouseDown(splitElement, { button: 0, clientX: 503 });
+    fireEvent.mouseUp(document, { clientX: 503 });
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(onRelease).not.toHaveBeenCalled();
   });
 });
