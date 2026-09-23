@@ -33,7 +33,7 @@ import {
   MosaicSplitNode,
 } from './types';
 import { resolveLeafPath } from './util/dragSource';
-import { createDragToUpdates, createDropMeta, updateTree } from './util/mosaicUpdates';
+import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import {
   getNodeAtPath,
   getParentNode,
