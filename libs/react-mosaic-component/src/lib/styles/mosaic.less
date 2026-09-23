@@ -30,8 +30,15 @@
   z-index: 1;
   touch-action: none;
 
-  &:hover {
+  &:hover,
+  &.-preview {
     background: black;
+  }
+
+  // resize.preview: the divider moves over the tiles until release, so it
+  // has to stack above their toolbars and bodies
+  &.-preview {
+    z-index: 10;
   }
 
   .mosaic-split-line {

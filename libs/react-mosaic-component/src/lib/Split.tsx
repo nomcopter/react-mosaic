@@ -42,7 +42,12 @@ export interface SplitProps extends EnabledResizeOptions {
   onRelease?: (percentages: number[]) => void;
 }
 
-export class Split extends React.PureComponent<SplitProps> {
+interface SplitState {
+  // Where the divider is drawn during a `preview` drag, before the tree changes
+  previewPercentages: number[] | null;
+}
+
+export class Split extends React.PureComponent<SplitProps, SplitState> {
   private rootElement = React.createRef<HTMLDivElement>();
   private boundDocument: Document | null = null;
   // Last percentages reported through onChange during the current drag
@@ -53,6 +58,10 @@ export class Split extends React.PureComponent<SplitProps> {
     onRelease: () => void 0,
   };
 
+  state: SplitState = {
+    previewPercentages: null,
+  };
+
   render() {
     const { direction, renderSplitHandle } = this.props;
     return (
@@ -60,6 +69,7 @@ export class Split extends React.PureComponent<SplitProps> {
         className={classNames('mosaic-split', {
           '-row': direction === 'row',
           '-column': direction === 'column',
+          '-preview': this.state.previewPercentages !== null,
         })}
         ref={this.rootElement}
         onMouseDown={this.onMouseDown}
@@ -98,7 +108,9 @@ export class Split extends React.PureComponent<SplitProps> {
   }
 
   private computeStyle() {
-    const { boundingBox, direction, splitPercentages, splitIndex } = this.props;
+    const { boundingBox, direction, splitIndex } = this.props;
+    const splitPercentages =
+      this.state.previewPercentages ?? this.props.splitPercentages;
 
     // The position is the sum of all pane percentages before this splitter
     const relativeSplitterPosition = sum(
@@ -134,6 +146,11 @@ export class Split extends React.PureComponent<SplitProps> {
     this.lastPercentages = null;
     const newPercentages = this.calculateNewPercentages(event);
     this.props.onRelease!(newPercentages);
+    // Cleared after onRelease so the divider doesn't jump back to its old
+    // position for a frame before the new tree arrives
+    if (this.state.previewPercentages !== null) {
+      this.setState({ previewPercentages: null });
+    }
   };
 
   private onMouseMove = (event: MouseEvent | TouchEvent) => {
@@ -160,13 +177,21 @@ export class Split extends React.PureComponent<SplitProps> {
     if (lastPercentages) {
       this.props.onRelease?.(lastPercentages);
     }
+    if (this.state.previewPercentages !== null) {
+      this.setState({ previewPercentages: null });
+    }
   };
 
   private throttledUpdatePercentage = throttle(
     (event: MouseEvent | TouchEvent) => {
       const newPercentages = this.calculateNewPercentages(event);
       this.lastPercentages = newPercentages;
-      this.props.onChange!(newPercentages);
+      if (this.props.preview) {
+        // Only the divider moves; the tree changes once, on release
+        this.setState({ previewPercentages: newPercentages });
+      } else {
+        this.props.onChange!(newPercentages);
+      }
     },
     RESIZE_THROTTLE_MS,
   );
