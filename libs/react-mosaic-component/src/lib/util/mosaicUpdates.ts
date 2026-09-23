@@ -1,8 +1,13 @@
 import update, { Spec } from 'immutability-helper';
 import { dropRight, isEqual, set } from 'lodash-es';
-import { DropInfo, MosaicDropTargetPosition } from '../internalTypes';
+import {
+  DropInfo,
+  MosaicDropData,
+  MosaicDropTargetPosition,
+} from '../internalTypes';
 
 import type {
+  MosaicChangeMeta,
   MosaicDirection,
   MosaicKey,
   MosaicNode,
@@ -669,4 +674,30 @@ export function convertToDropInfo(
   } else {
     return { type: 'split', position };
   }
+}
+
+/**
+ * Builds the `onChange` meta for a drag-and-drop move. Must be called with the
+ * tree from before the drop is applied, so `sourcePath` still resolves.
+ */
+export function createDropMeta<T extends MosaicKey>(
+  root: MosaicNode<T> | null,
+  sourcePath: MosaicPath,
+  destinationPath: MosaicPath,
+  dropData: MosaicDropData,
+): MosaicChangeMeta<T> {
+  const node = getNodeAtPath(root, sourcePath);
+  if (node == null) {
+    return { type: 'update' };
+  }
+  return {
+    type: 'drop',
+    node,
+    sourcePath,
+    destinationPath,
+    ...(dropData.position !== undefined && { position: dropData.position }),
+    ...(dropData.tabReorderIndex !== undefined && {
+      tabIndex: dropData.tabReorderIndex,
+    }),
+  };
 }

@@ -115,6 +115,48 @@ export interface MosaicUpdate<T extends MosaicKey> {
 }
 
 /**
+ * Describes what caused a tree change. Passed as the second argument of
+ * `onChange` and `onRelease`. Paths refer to the tree *before* the change.
+ */
+export type MosaicChangeMeta<T extends MosaicKey> =
+  /** A node was removed (remove button, `mosaicActions.remove`). `node` is the removed subtree. */
+  | { type: 'remove'; path: MosaicPath; node: MosaicNode<T> }
+  /** The node at `path` was expanded to `percentage` (expand button, `mosaicActions.expand`). */
+  | { type: 'expand'; path: MosaicPath; percentage: number }
+  /** A split bar was dragged. `path` is the split node; fires on every move and on release. */
+  | { type: 'resize'; path: MosaicPath; splitPercentages: number[] }
+  /** The node at `path` was split, `node` is the newly created one (split buttons). */
+  | { type: 'split'; path: MosaicPath; node: MosaicNode<T> }
+  /** The node at `path` was replaced by `node` (replace button, zero state, `mosaicActions.replaceWith`). */
+  | { type: 'replace'; path: MosaicPath; node: MosaicNode<T> }
+  /**
+   * A window, tab group or tab was dropped. `position` is set for edge drops;
+   * `tabIndex` is set for drops at a position in a tab bar.
+   */
+  | {
+      type: 'drop';
+      node: MosaicNode<T>;
+      sourcePath: MosaicPath;
+      destinationPath: MosaicPath;
+      position?: 'top' | 'bottom' | 'left' | 'right';
+      tabIndex?: number;
+    }
+  /** A drag started and the dragged node at `path` was temporarily hidden. No `onRelease`. */
+  | { type: 'drag-start'; path: MosaicPath }
+  /** A cancelled drag restored the node at `path`. No `onRelease`. */
+  | { type: 'drag-cancel'; path: MosaicPath }
+  /** `tab` was added to the tab group at `path` (created from a leaf if needed). */
+  | { type: 'tab-add'; path: MosaicPath; tab: T }
+  /** The tab at `index` (`tab`) was closed in the tab group at `path`. */
+  | { type: 'tab-remove'; path: MosaicPath; index: number; tab: T }
+  /** The tab at `index` became active in the tab group at `path`. */
+  | { type: 'tab-select'; path: MosaicPath; index: number }
+  /** A legacy (v6 binary) controlled `value` was converted to the n-ary format. No `onRelease`. */
+  | { type: 'migrate' }
+  /** Any other change, e.g. `mosaicActions.updateTree` called without a `meta`. */
+  | { type: 'update' };
+
+/**
  * A function that renders a panel's content, given its key and path.
  */
 export type TileRenderer<T extends MosaicKey> = (

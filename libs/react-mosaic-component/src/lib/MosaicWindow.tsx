@@ -32,7 +32,7 @@ import {
   MosaicPath,
   MosaicSplitNode,
 } from './types';
-import { createDragToUpdates } from './util/mosaicUpdates';
+import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import {
   getNodeAtPath,
   getParentNode,
@@ -333,7 +333,11 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           children: [currentNode, second as MosaicNode<T>],
           splitPercentages: [50, 50],
         };
-        mosaicActions.replaceWith(path, newSplitNode);
+        mosaicActions.replaceWith(path, newSplitNode, {
+          type: 'split',
+          path,
+          node: second as MosaicNode<T>,
+        });
       },
     );
   };
@@ -481,6 +485,12 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
         );
         mosaicActions.updateTree(updates, {
           shouldNormalize: true,
+          meta: createDropMeta(
+            mosaicActions.getRoot(),
+            ownPath,
+            destinationPath,
+            dropResult,
+          ),
         });
         if (props.onDragEnd) {
           props.onDragEnd('drop');

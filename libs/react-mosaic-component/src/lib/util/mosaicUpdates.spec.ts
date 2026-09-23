@@ -7,6 +7,7 @@ import {
   createDragToUpdates,
   createExpandUpdate,
   createAddChildUpdate,
+  createDropMeta,
 } from './mosaicUpdates';
 import { getLeaves, getNodeAtPath } from './mosaicUtilities';
 import { MosaicDropTargetPosition } from '../internalTypes';
@@ -296,6 +297,47 @@ describe('mosaicUpdates', () => {
           children: [2, 3],
         });
       });
+    });
+  });
+});
+
+describe('createDropMeta', () => {
+  const tree: MosaicNode<string> = {
+    type: 'split',
+    direction: 'row',
+    children: ['a', { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 }],
+  };
+
+  it('describes an edge drop with its position', () => {
+    expect(
+      createDropMeta(tree, [0], [1], { path: [1], position: 'left' }),
+    ).toEqual({
+      type: 'drop',
+      node: 'a',
+      sourcePath: [0],
+      destinationPath: [1],
+      position: 'left',
+    });
+  });
+
+  it('describes a tab bar drop with its tab index', () => {
+    expect(
+      createDropMeta(tree, [1, 1], [1], { path: [1], tabReorderIndex: 0 }),
+    ).toEqual({
+      type: 'drop',
+      node: 'c',
+      sourcePath: [1, 1],
+      destinationPath: [1],
+      tabIndex: 0,
+    });
+  });
+
+  it('falls back to update when the source is missing', () => {
+    expect(createDropMeta(tree, [5], [0], { path: [0] })).toEqual({
+      type: 'update',
+    });
+    expect(createDropMeta<string>(null, [0], [0], { path: [0] })).toEqual({
+      type: 'update',
     });
   });
 });
