@@ -58,6 +58,9 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
     // Rendering them as one flat list sorted by key means moving a panel
     // anywhere in the tree neither remounts it nor moves its DOM node (which
     // would reload an <iframe>). Splits come last so they stay on top.
+    // Trade-off: DOM order, and so Tab focus and screen reader order, follows
+    // the keys rather than the layout. Consumers who need layout order can set
+    // `tabindex` or `aria-flowto` on their tile content.
     tiles.sort(compareByKey);
 
     return (
@@ -80,7 +83,7 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
     if (typeof node === 'string' || typeof node === 'number') {
       tiles.push(
         <div
-          key={node}
+          key={`${LEAF_KEY_PREFIX}${node}`}
           className="mosaic-tile"
           style={{ ...boundingBoxAsStyles(boundingBox) }}
         >
@@ -131,10 +134,11 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
         // Key the group by its smallest tab key rather than its position:
         // sibling insertions/removals and in-group reorders then keep the key
         // stable, so the group (and its active tile's DOM and state) survives.
-        // Unique among tiles because leaf IDs are unique tree-wide.
+        // Unique among tiles because leaf IDs are unique tree-wide, and the
+        // prefixes keep a leaf ID like `tabs:a` from matching a group key.
         tiles.push(
           <MosaicTabs<T>
-            key={`tabs-${[...node.tabs].sort()[0]}`}
+            key={`${TABS_KEY_PREFIX}${[...node.tabs].sort()[0]}`}
             node={node}
             path={path}
             renderTile={this.props.renderTile}
@@ -208,6 +212,11 @@ export class MosaicRoot<T extends MosaicKey> extends React.PureComponent<
     );
   };
 }
+
+// Every tile key starts with one of these, so a leaf key can never equal a
+// tab group key whatever the user's panel IDs are.
+const LEAF_KEY_PREFIX = 'leaf:';
+const TABS_KEY_PREFIX = 'tabs:';
 
 function compareByKey(a: JSX.Element, b: JSX.Element): number {
   const keyA = String(a.key);

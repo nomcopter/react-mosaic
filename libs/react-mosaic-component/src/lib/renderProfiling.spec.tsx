@@ -520,4 +520,31 @@ describe('stable tile mounts across rearrangement', () => {
     expect(getByTestId('tile-b')).toBe(nodeB);
     expect(watch.flush().filter((id) => id === 'tile-b')).toEqual([]);
   });
+
+  it('keeps leaf and tab group keys apart', () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    // Before namespacing, the leaf `tabs-a` and the group keyed by its
+    // smallest tab `a` both got the key `tabs-a`.
+    const { getByTestId } = renderTree({
+      type: 'split',
+      direction: 'row',
+      children: [
+        { type: 'split', direction: 'column', children: ['tabs-a', 'x'] },
+        { type: 'tabs', tabs: ['a', 'b'], activeTabIndex: 0 },
+      ],
+    });
+    const leaf = getByTestId('tile-tabs-a');
+
+    drag([0, 1], [1], 'right');
+
+    const duplicateKeyErrors = consoleError.mock.calls.filter((args) =>
+      args.some((arg) => String(arg).includes('same key')),
+    );
+    expect(duplicateKeyErrors).toEqual([]);
+    expect(mountCounts['tabs-a']).toBe(1);
+    expect(getByTestId('tile-tabs-a')).toBe(leaf);
+    consoleError.mockRestore();
+  });
 });
