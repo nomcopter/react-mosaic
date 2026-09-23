@@ -34,10 +34,19 @@ export const DraggableTab = <T extends MosaicKey>({
   children,
 }: DraggableTabProps<T>) => {
   const tabPath = tabContainerPath.concat(tabIndex);
+  // Active tab before the drag-start hide switched it away
+  const preDragActiveTabIndex = React.useRef<number | undefined>(undefined);
 
   const [{ isDragging }, connectDragSource, connectDragPreview] = useDrag({
     type: MosaicDragType.WINDOW,
     item: (): MosaicDragItem => {
+      const container = getNodeAtPath(
+        mosaicActions.getRoot(),
+        tabContainerPath,
+      );
+      preDragActiveTabIndex.current = isTabsNode(container)
+        ? container.activeTabIndex
+        : undefined;
         mosaicActions.hide(tabPath, true);
     
       return {
@@ -234,15 +243,19 @@ export const DraggableTab = <T extends MosaicKey>({
       const root = mosaicActions.getRoot();
       if (dropResult.swap && root) {
         // The tab and the dropped-on window trade places. Hiding the tab at
-        // drag start switched the active tab away, so point it back at the
-        // slot that now holds the swapped-in panel.
+        // drag start switched the active tab away, so restore the one that was
+        // active before (tab positions don't change in a swap).
         mosaicActions.updateTree([
           ...createDragToUpdates(root, ownPath, dropResult.path, {
             type: 'swap',
           }),
           {
             path: tabContainerPath,
-            spec: { activeTabIndex: { $set: tabIndex } },
+            spec: {
+              activeTabIndex: {
+                $set: preDragActiveTabIndex.current ?? tabIndex,
+              },
+            },
           },
         ]);
         return;

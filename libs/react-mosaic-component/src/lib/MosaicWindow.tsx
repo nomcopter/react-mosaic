@@ -31,16 +31,20 @@ import {
   MosaicNode,
   MosaicPath,
   MosaicSplitNode,
-  MosaicUpdate,
 } from './types';
 import { resolveLeafPath } from './util/dragSource';
 import { createDragToUpdates, createDropMeta, updateTree } from './util/mosaicUpdates';
 import {
   getNodeAtPath,
   getParentNode,
-  isSplitNode,
   isTabsNode,
 } from './util/mosaicUtilities';
+import {
+  applySwapDrop,
+  PreDragParentSnapshot,
+  restoreAfterCancelledDrag,
+  snapshotParentBeforeDrag,
+} from './util/dragRestore';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
 
 export interface MosaicWindowProps<T extends MosaicKey> {
@@ -420,9 +424,9 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
   props: InternalMosaicWindowProps<T>,
 ) {
   const { mosaicActions, mosaicId } = useContext(MosaicContext);
-  // Parent split percentages from before the drag hid this window, so a swap
-  // can put every pane back at its original size.
-  const preDragParentPercentages = useRef<number[] | undefined>(undefined);
+  // Parent split sizes from before the drag hid this window, so a swap or a
+  // cancelled drop can put every pane back at its original size.
+  const preDragParent = useRef<PreDragParentSnapshot | undefined>(undefined);
 
   const [, connectDragSource, connectDragPreview] = useDrag<
     MosaicDragItem,
@@ -434,13 +438,10 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       if (props.onDragStart) {
         props.onDragStart();
       }
-      const parent = getNodeAtPath(
+      preDragParent.current = snapshotParentBeforeDrag(
         mosaicActions.getRoot(),
-        props.path.slice(0, -1),
+        props.path,
       );
-      preDragParentPercentages.current = isSplitNode(parent)
-        ? parent.splitPercentages
-        : undefined;
       // TODO: Actually just delete instead of hiding
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(props.path));
@@ -513,33 +514,14 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
           drop(destinationPath, destinationPath.length - ownPath.length),
         );
 
-      const currentRoot = mosaicActions.getRoot();
-      if (dropped && !isSelfDrop && dropResult.swap && currentRoot) {
-        // Undo the drag-start hide first, so every pane keeps its size and
-        // only the two windows trade places. A swap changes no structure, so
-        // skip normalizing (it would fill in splitPercentages the tree lacked).
-        const parentPath = ownPath.slice(0, -1);
-        const original = preDragParentPercentages.current;
-        const restore: MosaicUpdate<MosaicKey>[] = isSplitNode(
-          getNodeAtPath(currentRoot, parentPath),
-        )
-          ? [
-            {
-              path: parentPath,
-              spec:
-                original === undefined
-                  ? { $unset: ['splitPercentages'] }
-                  : { splitPercentages: { $set: original } },
-            },
-          ]
-          : [];
-        const restored = updateTree(currentRoot, restore);
-        mosaicActions.updateTree([
-          ...restore,
-          ...createDragToUpdates(restored, ownPath, destinationPath, {
-            type: 'swap',
-          }),
-        ]);
+      if (dropped && !isSelfDrop && dropResult.swap) {
+        // Every pane keeps its size and only the two windows trade places
+        applySwapDrop(
+          mosaicActions,
+          ownPath,
+          destinationPath,
+          preDragParent.current,
+        );
         if (props.onDragEnd) {
           props.onDragEnd('drop');
         }
@@ -578,10 +560,9 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
           props.onDragEnd('drop');
         }
       } else {
-        // Canceled or invalid drop, restore the original component by showing it again.
-        // Not suppressed: the drag-start hide reached onChange, so the restore must
-        // too (as `drag-cancel`), or a controlled parent keeps the hidden tree.
-        mosaicActions.show(ownPath);
+        // Canceled or invalid drop: put the sizes back as they were before the
+        // drag, and let a controlled parent know (it got the hidden tree).
+        restoreAfterCancelledDrag(mosaicActions, ownPath, preDragParent.current);
         if (props.onDragEnd) {
           props.onDragEnd('reset');
         }

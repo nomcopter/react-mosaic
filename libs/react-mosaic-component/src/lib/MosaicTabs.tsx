@@ -19,6 +19,7 @@ import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { findPathToLeaf } from './util/dragSource';
+import { applySwapDrop, PreDragParentSnapshot, restoreAfterCancelledDrag, snapshotParentBeforeDrag } from './util/dragRestore';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
@@ -234,6 +235,10 @@ export const MosaicTabs = <T extends MosaicKey>({
     MosaicContext as any,
   );
   const { tabs, activeTabIndex } = node;
+  // Parent split sizes from before the drag hid this group (see MosaicWindow)
+  const preDragParent = React.useRef<PreDragParentSnapshot | undefined>(
+    undefined,
+  );
 
   // A tab of the dragged group, used to find the group again at drop time
   const dragAnchorTab = React.useRef<T | undefined>(undefined);
@@ -246,6 +251,10 @@ export const MosaicTabs = <T extends MosaicKey>({
   >({
     type: MosaicDragType.WINDOW,
     item: (): MosaicDragItem => {
+      preDragParent.current = snapshotParentBeforeDrag(
+        mosaicActions.getRoot(),
+        path,
+      );
       // Hide the tab container when dragging starts
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(path));
@@ -307,6 +316,17 @@ export const MosaicTabs = <T extends MosaicKey>({
           _drop(destinationPath, destinationPath.length - ownPath.length),
         );
 
+      if (dropped && !isSelfDrop && !isChildDrop && dropResult.swap) {
+        // Swap target: the group trades places with the window, sizes stay put
+        applySwapDrop(
+          mosaicActions,
+          ownPath,
+          destinationPath,
+          preDragParent.current,
+        );
+        return;
+      }
+
       if (dropped && !isSelfDrop && !isChildDrop && !isTabContainerSelfDrop) {
         // Successful drop, let createDragToUpdates handle the logic
         const updates = createDragToUpdates(
@@ -335,10 +355,8 @@ export const MosaicTabs = <T extends MosaicKey>({
           ),
         });
       } else {
-        // Canceled or invalid drop, restore the component by showing it again
-        // Not suppressed: the drag-start hide reached onChange, so the restore must
-        // too (as `drag-cancel`), or a controlled parent keeps the hidden tree.
-        mosaicActions.show(ownPath);
+        // Canceled or invalid drop: put the pre-drag sizes back
+        restoreAfterCancelledDrag(mosaicActions, ownPath, preDragParent.current);
       }
     },
   });
