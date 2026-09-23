@@ -39,6 +39,8 @@ export interface SplitProps extends EnabledResizeOptions {
 export class Split extends React.PureComponent<SplitProps> {
   private rootElement = React.createRef<HTMLDivElement>();
   private boundDocument: Document | null = null;
+  // Last percentages reported through onChange during the current drag
+  private lastPercentages: number[] | null = null;
 
   static defaultProps = {
     onChange: () => void 0,
@@ -119,18 +121,41 @@ export class Split extends React.PureComponent<SplitProps> {
     this.unbindListeners();
     // A queued trailing call would otherwise deliver onChange after onRelease.
     this.throttledUpdatePercentage.cancel();
+    this.lastPercentages = null;
     const newPercentages = this.calculateNewPercentages(event);
     this.props.onRelease!(newPercentages);
   };
 
   private onMouseMove = (event: MouseEvent | TouchEvent) => {
+    // No button held means the mouseup never reached us (e.g. it happened
+    // outside the window), so the drag is already over.
+    if (!isTouchEvent(event) && event.buttons === 0) {
+      this.abortDrag();
+      return;
+    }
     event.preventDefault();
     this.throttledUpdatePercentage(event);
+  };
+
+  // Ends a drag whose mouseup was lost (window blur, alert, context menu), so
+  // the resizing class doesn't leave every tile unclickable. The divider stays
+  // where it was last drawn: a pending move is flushed, and if the drag already
+  // reported onChange, onRelease follows with the same percentages so every
+  // onChange is still followed by an onRelease.
+  private abortDrag = () => {
+    this.unbindListeners();
+    this.throttledUpdatePercentage.flush();
+    const lastPercentages = this.lastPercentages;
+    this.lastPercentages = null;
+    if (lastPercentages) {
+      this.props.onRelease?.(lastPercentages);
+    }
   };
 
   private throttledUpdatePercentage = throttle(
     (event: MouseEvent | TouchEvent) => {
       const newPercentages = this.calculateNewPercentages(event);
+      this.lastPercentages = newPercentages;
       this.props.onChange!(newPercentages);
     },
     RESIZE_THROTTLE_MS,
@@ -202,11 +227,13 @@ export class Split extends React.PureComponent<SplitProps> {
       doc.addEventListener('mouseup', this.onMouseUp, true);
       doc.addEventListener('touchend', this.onMouseUp, true);
       doc.addEventListener('touchcancel', this.onMouseUp, true);
+      doc.defaultView?.addEventListener('blur', this.abortDrag);
       doc.documentElement.classList.add(
         RESIZING_CLASS,
         `${RESIZING_CLASS}-${this.props.direction}`,
       );
       this.boundDocument = doc;
+      this.lastPercentages = null;
     }
   }
 
@@ -224,6 +251,7 @@ export class Split extends React.PureComponent<SplitProps> {
       doc.removeEventListener('mouseup', this.onMouseUp, true);
       doc.removeEventListener('touchend', this.onMouseUp, true);
       doc.removeEventListener('touchcancel', this.onMouseUp, true);
+      doc.defaultView?.removeEventListener('blur', this.abortDrag);
       doc.documentElement.classList.remove(
         RESIZING_CLASS,
         `${RESIZING_CLASS}-row`,
