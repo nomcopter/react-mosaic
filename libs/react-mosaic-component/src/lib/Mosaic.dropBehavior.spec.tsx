@@ -136,7 +136,11 @@ describe('Mosaic dropBehavior', () => {
         </MosaicWindow>
       );
       const { rerender } = render(
-        <Mosaic<string> initialValue={ROW} dropBehavior="swap" renderTile={tile} />,
+        <Mosaic<string>
+          initialValue={ROW}
+          dropBehavior="swap"
+          renderTile={tile}
+        />,
       );
       rerender(
         <Mosaic<string>
@@ -300,6 +304,201 @@ describe('Mosaic dropBehavior', () => {
       // b now sits in the 30% slot on the left, a in the 70% slot
       expect(tileOf('b').style.left).toBe('0%');
       expect(tileOf('a').style.right).toBe('0%');
+    });
+  });
+});
+
+async function dragAndCancel(source: Element) {
+  const dataTransfer = createDataTransfer();
+  fireEvent.dragStart(source, { dataTransfer });
+  await flush();
+  fireEvent.dragEnd(source, { dataTransfer });
+  await flush();
+}
+
+describe('Mosaic dropBehavior: tab groups, cancels and active tabs', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const titleOf = (container: HTMLElement, title: string) =>
+    query(
+      windowTitled(container, title),
+      '.mosaic-window-title[draggable="true"]',
+    );
+
+  const WITH_GROUP: MosaicNode<string> = {
+    type: 'split',
+    direction: 'row',
+    splitPercentages: [20, 30, 50],
+    children: ['a', 'd', { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 }],
+  };
+
+  it.each<[MosaicDropBehavior, string]>([
+    ['swap', '.drop-target.swap.-fill'],
+    ['split-and-swap', '.drop-target.swap:not(.-fill)'],
+  ])(
+    "swaps a whole tab group with a window in '%s' mode",
+    async (mode, target) => {
+      const { container, onRelease } = renderControlled(WITH_GROUP, mode);
+      await flush();
+
+      await dragAndDrop(
+        query(container, '.mosaic-tab-drag-button'),
+        query(windowTitled(container, 'a'), target),
+      );
+
+      const group = { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 };
+      expect(onRelease).toHaveBeenCalledTimes(1);
+      expect(onRelease).toHaveBeenLastCalledWith({
+        ...WITH_GROUP,
+        children: [group, 'd', 'a'],
+      });
+
+      // The next drag still works
+      await dragAndDrop(
+        titleOf(container, 'd'),
+        query(windowTitled(container, 'a'), target),
+      );
+      expect(onRelease).toHaveBeenCalledTimes(2);
+      expect(onRelease).toHaveBeenLastCalledWith({
+        ...WITH_GROUP,
+        children: [group, 'a', 'd'],
+      });
+    },
+  );
+
+  it.each<[MosaicDropBehavior | undefined]>([[undefined], ['swap']])(
+    'a cancelled window drag gives a controlled parent its sizes back (%s)',
+    async (mode) => {
+      const { container, onChange, onRelease } = renderControlled(ROW, mode);
+      await flush();
+
+      await dragAndCancel(titleOf(container, 'b'));
+
+      expect(onChange).toHaveBeenLastCalledWith(ROW);
+      expect(onRelease).not.toHaveBeenCalled();
+    },
+  );
+
+  it('a cancelled tab group drag gives a controlled parent its sizes back', async () => {
+    const { container, onChange, onRelease } = renderControlled(
+      WITH_GROUP,
+      'swap',
+    );
+    await flush();
+
+    await dragAndCancel(query(container, '.mosaic-tab-drag-button'));
+
+    expect(onChange).toHaveBeenLastCalledWith(WITH_GROUP);
+    expect(onRelease).not.toHaveBeenCalled();
+  });
+
+  it('a cancelled drag keeps the sizes in uncontrolled mode', async () => {
+    const { container } = render(
+      <Mosaic<string>
+        initialValue={ROW}
+        renderTile={(id, path) => (
+          <MosaicWindow<string> title={id} path={path}>
+            {id}
+          </MosaicWindow>
+        )}
+      />,
+    );
+    await flush();
+
+    await dragAndCancel(titleOf(container, 'b'));
+
+    const tileA = Array.from(
+      container.querySelectorAll<HTMLElement>('.mosaic-root > .mosaic-tile'),
+    ).find((t) => t.querySelector('.mosaic-window-title')?.textContent === 'a');
+    // a still takes the left 30%
+    expect(tileA?.style.right).toBe('70%');
+  });
+
+  it('falls back to equal sizes when the parent changed during the drag', async () => {
+    const onRelease = vi.fn();
+    let setValue: (tree: MosaicNode<string>) => void = () => undefined;
+
+    function App() {
+      const [value, set] = useState<MosaicNode<string> | null>(ROW);
+      setValue = set;
+      return (
+        <Mosaic<string>
+          value={value}
+          dropBehavior="swap"
+          onChange={set}
+          onRelease={onRelease}
+          renderTile={(id, path) => (
+            <MosaicWindow<string> title={id} path={path}>
+              {id}
+            </MosaicWindow>
+          )}
+        />
+      );
+    }
+
+    const { container } = render(<App />);
+    await flush();
+
+    const dataTransfer = createDataTransfer();
+    fireEvent.dragStart(titleOf(container, 'b'), { dataTransfer });
+    await flush();
+    // A controlled parent adds a pane while the drag is running
+    act(() => {
+      setValue({
+        type: 'split',
+        direction: 'row',
+        splitPercentages: [30, 0, 70],
+        children: ['a', 'b', 'e'],
+      });
+    });
+    await flush();
+    const target = query(windowTitled(container, 'a'), '.drop-target.swap');
+    fireEvent.dragEnter(target, { dataTransfer });
+    fireEvent.dragOver(target, { dataTransfer });
+    fireEvent.drop(target, { dataTransfer });
+    fireEvent.dragEnd(titleOf(container, 'b'), { dataTransfer });
+    await flush();
+
+    expect(onRelease).toHaveBeenLastCalledWith({
+      type: 'split',
+      direction: 'row',
+      children: ['b', 'a', 'e'],
+    });
+  });
+
+  it('keeps the active tab when a background tab is swapped out', async () => {
+    const tree: MosaicNode<string> = {
+      type: 'split',
+      direction: 'row',
+      children: [
+        'a',
+        { type: 'tabs', tabs: ['b', 'c', 'd'], activeTabIndex: 0 },
+      ],
+    };
+    const { container, onRelease } = renderControlled(tree, 'swap');
+    await flush();
+
+    const tab = Array.from(
+      container.querySelectorAll('.mosaic-tab-button'),
+    ).find((t) => t.textContent?.includes('d'));
+    if (tab == null) {
+      throw new Error('No tab d');
+    }
+
+    await dragAndDrop(
+      tab,
+      query(windowTitled(container, 'a'), '.drop-target.swap'),
+    );
+
+    expect(onRelease).toHaveBeenLastCalledWith({
+      type: 'split',
+      direction: 'row',
+      children: [
+        'd',
+        { type: 'tabs', tabs: ['b', 'c', 'a'], activeTabIndex: 0 },
+      ],
     });
   });
 });
