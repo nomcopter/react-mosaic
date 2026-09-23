@@ -112,14 +112,18 @@ icon, a header) instead of the whole body so those keep working.
 
 ## Know which panel was removed
 
-`onChange` gets a second `meta` argument that says what changed. A removal
-carries the removed node (a panel key, or a whole subtree), and closing a tab
-carries the tab:
+`onChange` gets a second `meta` argument that says what changed. Panels leave
+the layout in three ways: a removal carries the removed node (a panel key, or a
+whole subtree), closing a tab carries the tab, and a replace carries what was
+there before:
 
 ```tsx
 onChange={(next, meta) => {
   if (meta?.type === 'remove') onPanelsRemoved(getLeaves(meta.node));
   if (meta?.type === 'tab-remove') onPanelsRemoved([meta.tab]);
+  if (meta?.type === 'replace' && meta.previous != null) {
+    onPanelsRemoved(getLeaves(meta.previous));
+  }
   setTree(next);
 }}
 ```
