@@ -1,4 +1,5 @@
 import React from 'react';
+import { useColorMode } from '@docusaurus/theme-common';
 import {
   Mosaic,
   MosaicWindow,
@@ -38,13 +39,31 @@ import {
   createDefaultTabsControls,
 } from 'react-mosaic-component';
 
+// Live examples render with the Blueprint theme matching the site's color
+// mode, so they don't show a light mosaic on a dark page. Snippets keep the
+// plain `<Mosaic>` API; this wrapper only fills in the theme props.
+function ThemedMosaic(props: React.ComponentProps<typeof Mosaic>) {
+  const { colorMode } = useColorMode();
+  const themeClass =
+    colorMode === 'dark'
+      ? 'mosaic-blueprint-theme bp5-dark'
+      : 'mosaic-blueprint-theme';
+  return (
+    <Mosaic
+      blueprintNamespace="bp5"
+      {...props}
+      className={[themeClass, props.className].filter(Boolean).join(' ')}
+    />
+  );
+}
+
 // Add default React imports here so snippets can destructure useState etc.
 // Anything referenced by a ```tsx live fence must live in this object.
 const ReactLiveScope: Record<string, unknown> = {
   React,
   ...React,
   // Components
-  Mosaic,
+  Mosaic: ThemedMosaic,
   MosaicWindow,
   MosaicZeroState,
   MosaicTabs,

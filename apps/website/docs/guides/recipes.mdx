@@ -112,37 +112,14 @@ icon, a header) instead of the whole body so those keep working.
 
 ## Know which panel was removed
 
-`onChange` receives only the new tree. To find out what disappeared, compare
-leaves before and after:
+Dragging only moves panels around, so a key that's missing from the new tree
+was removed. Compare leaves in `onChange`:
 
 ```tsx
-import { getLeaves, MosaicNode } from 'react-mosaic-component';
-
-const handleChange = (next: MosaicNode<string> | null) => {
-  const before = new Set(getLeaves(tree));
-  const after = new Set(getLeaves(next));
-  const removed = [...before].filter((id) => !after.has(id));
-  if (removed.length > 0) {
-    onPanelsRemoved(removed);
-  }
+onChange={(next) => {
+  const removed = getLeaves(tree).filter((id) => !getLeaves(next).includes(id));
   setTree(next);
-};
-```
-
-If you only care about the remove button, pass your own `RemoveButton` in
-`toolbarControls`. Its `onClick` runs right after the panel is removed, and
-you already know the `id` from `renderTile`:
-
-```tsx
-renderTile={(id, path) => (
-  <MosaicWindow
-    path={path}
-    title={id}
-    toolbarControls={<RemoveButton onClick={() => onPanelRemoved(id)} />}
-  >
-    ...
-  </MosaicWindow>
-)}
+}}
 ```
 
 ## A layout bigger than the screen
