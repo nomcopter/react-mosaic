@@ -39,13 +39,6 @@
       box-shadow: 0 1px 1px @pt-divider-black;
       border-top-right-radius: @pt-border-radius;
       border-top-left-radius: @pt-border-radius;
-
-      &.draggable:hover {
-        .mosaic-window-title {
-          color: @black;
-        }
-        background: linear-gradient(to bottom, @white, @light-gray5);
-      }
     }
 
     .mosaic-window-title {
@@ -164,8 +157,34 @@
     }
   }
 
+  // The root has `-dragging` for the whole window drag. Without this guard,
+  // :hover highlights whichever toolbar happens to be under the cursor.
+  &:not(.-dragging) {
+    .mosaic-window,
+    .mosaic-preview {
+      .mosaic-window-toolbar.draggable:hover {
+        .mosaic-window-title {
+          color: @black;
+        }
+        background: linear-gradient(to bottom, @white, @light-gray5);
+      }
+    }
+  }
+
   &.@{ns}-dark {
     background: @dark-gray2;
+
+    &:not(.-dragging) {
+      .mosaic-window,
+      .mosaic-preview {
+        .mosaic-window-toolbar.draggable:hover {
+          .mosaic-window-title {
+            color: @white;
+          }
+          background: linear-gradient(to bottom, @dark-gray5, @dark-gray4);
+        }
+      }
+    }
 
     .mosaic-zero-state {
       background: @dark-gray4;
@@ -193,13 +212,6 @@
     .mosaic-window,
     .mosaic-preview {
       box-shadow: @pt-dark-elevation-shadow-0;
-
-      .mosaic-window-toolbar.draggable:hover {
-        .mosaic-window-title {
-          color: @white;
-        }
-        background: linear-gradient(to bottom, @dark-gray5, @dark-gray4);
-      }
 
       .mosaic-window-title {
         color: @light-gray2;
