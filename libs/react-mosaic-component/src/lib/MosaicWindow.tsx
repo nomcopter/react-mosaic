@@ -32,6 +32,7 @@ import {
   MosaicPath,
   MosaicSplitNode,
 } from './types';
+import { resolveLeafPath } from './util/dragSource';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import {
   getNodeAtPath,
@@ -431,7 +432,7 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
             : undefined,
       };
     },
-    end: ({ hideTimer }, monitor) => {
+    end: ({ hideTimer, path: dragStartPath, nodeKey }, monitor) => {
       // If the hide call hasn't happened yet, cancel it
       window.clearTimeout(hideTimer);
 
@@ -440,11 +441,21 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
         {}) as MosaicDropData;
       const { position, path: destinationPath } = dropResult;
 
-      // An external drop target asked for the window to be taken out of the layout
+      // An external drop target asked for the window to be taken out of the
+      // layout. `props.path` can be stale by now (the tree may have changed
+      // mid-drag), so remove the node that holds the dragged key, never a
+      // neighbour.
       if (dropResult.remove) {
-        mosaicActions.remove(ownPath);
+        const removePath = resolveLeafPath(
+          mosaicActions.getRoot(),
+          nodeKey as T | undefined,
+          [ownPath, dragStartPath],
+        );
+        if (removePath) {
+          mosaicActions.remove(removePath);
+        }
         if (props.onDragEnd) {
-          props.onDragEnd('drop');
+          props.onDragEnd(removePath ? 'drop' : 'reset');
         }
         return;
       }

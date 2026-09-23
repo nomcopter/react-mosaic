@@ -18,6 +18,7 @@ import {
 import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
+import { findPathToLeaf } from './util/dragSource';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
@@ -234,6 +235,9 @@ export const MosaicTabs = <T extends MosaicKey>({
   );
   const { tabs, activeTabIndex } = node;
 
+  // A tab of the dragged group, used to find the group again at drop time
+  const dragAnchorTab = React.useRef<T | undefined>(undefined);
+
   // Add drag functionality for the entire tab container
   const [, connectDragSource, connectDragPreview] = useDrag<
     MosaicDragItem,
@@ -245,6 +249,7 @@ export const MosaicTabs = <T extends MosaicKey>({
       // Hide the tab container when dragging starts
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(path));
+      dragAnchorTab.current = tabs[0];
       return {
         mosaicId,
         hideTimer,
@@ -260,9 +265,20 @@ export const MosaicTabs = <T extends MosaicKey>({
         {}) as MosaicDropData;
       const { position, path: destinationPath } = dropResult;
 
-      // An external drop target asked for the tab group to be taken out of the layout
+      // An external drop target asked for the tab group to be taken out of
+      // the layout. Find the group by one of its tabs, the tree may have
+      // changed mid-drag.
       if (dropResult.remove) {
-        mosaicActions.remove(ownPath);
+        const root = mosaicActions.getRoot();
+        const anchor = dragAnchorTab.current;
+        const anchorPath =
+          anchor === undefined ? null : findPathToLeaf(root, anchor);
+        if (anchorPath && anchorPath.length > 0) {
+          const groupPath = anchorPath.slice(0, -1);
+          if (isTabsNode(getNodeAtPath(root, groupPath))) {
+            mosaicActions.remove(groupPath);
+          }
+        }
         return;
       }
 
