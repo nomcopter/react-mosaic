@@ -1,8 +1,9 @@
 import React from 'react';
 import { useDrag, DragSourceMonitor, ConnectDragSource, ConnectDragPreview } from 'react-dnd';
-import { isEqual } from 'lodash-es';
+import { dropRight, isEqual } from 'lodash-es';
 import { MosaicKey, MosaicTabsNode, MosaicPath, MosaicDragType } from './types';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
+import { resolveLeafPath } from './util/dragSource';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { MosaicRootActions } from './contextTypes';
@@ -81,9 +82,23 @@ export const DraggableTab = <T extends MosaicKey>({
         dropResult.path.length > ownPath.length &&
         isEqual(dropResult.path.slice(0, ownPath.length), ownPath);
 
-      // An external drop target asked for the tab to be taken out of the layout
+      // An external drop target asked for the tab to be taken out of the
+      // layout. Remove wherever the tab is now, the tree may have changed.
       if (didDrop && dropResult?.remove) {
-        mosaicActions.removeTab(tabContainerPath, tabIndex);
+        const root = mosaicActions.getRoot();
+        const removePath = resolveLeafPath(root, tabKey, [ownPath]);
+        if (removePath) {
+          const parentPath = dropRight(removePath);
+          if (
+            removePath.length > 0 &&
+            isTabsNode(getNodeAtPath(root, parentPath))
+          ) {
+            const index = removePath[removePath.length - 1];
+            mosaicActions.removeTab(parentPath, index);
+          } else {
+            mosaicActions.remove(removePath);
+          }
+        }
         return;
       }
 

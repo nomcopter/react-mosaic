@@ -5,10 +5,11 @@ import { HTML5toTouch } from 'rdndmb-html5-to-touch';
 import { DndProvider, useDrop } from 'react-dnd';
 import { MultiBackend } from 'react-dnd-multi-backend';
 
+import { useMosaicWindow } from './contextHooks';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { MosaicWithoutDragDropContext } from './Mosaic';
 import { MosaicWindow } from './MosaicWindow';
-import { MosaicDragType, MosaicNode } from './types';
+import { MosaicDragType, MosaicNode, TileRenderer } from './types';
 
 // Minimal DataTransfer stand-in: jsdom doesn't implement one and the HTML5
 // drag-and-drop backend reads/writes it on every drag event.
@@ -72,18 +73,22 @@ interface SetupOptions {
   initial: MosaicNode<string>;
   controlled: boolean;
   result: MosaicDropData | undefined;
+  renderTile?: TileRenderer<string>;
 }
 
-function setup({ initial, controlled, result }: SetupOptions) {
+function setup({ initial, controlled, result, renderTile }: SetupOptions) {
   const onChange = vi.fn();
   const onRelease = vi.fn();
   const onDragEnd = vi.fn();
   const droppedItems: MosaicDragItem[] = [];
+  // Lets a test change the controlled value from outside, e.g. mid-drag
+  const parent: { setValue?: (next: MosaicNode<string> | null) => void } = {};
 
   function App() {
     const [value, setValue] = React.useState<MosaicNode<string> | null>(
       initial,
     );
+    parent.setValue = setValue;
     const valueProps = controlled
       ? {
           value,
@@ -102,21 +107,32 @@ function setup({ initial, controlled, result }: SetupOptions) {
         <MosaicWithoutDragDropContext<string>
           {...valueProps}
           onRelease={onRelease}
-          renderTile={(id, path) => (
-            <MosaicWindow<string> title={id} path={path} onDragEnd={onDragEnd}>
-              {id}
-            </MosaicWindow>
-          )}
+          renderTile={
+            renderTile ??
+            ((id, path) => (
+              <MosaicWindow<string>
+                title={id}
+                path={path}
+                onDragEnd={onDragEnd}
+              >
+                {id}
+              </MosaicWindow>
+            ))
+          }
         />
       </DndProvider>
     );
   }
 
   const utils = render(<App />);
-  return { ...utils, onChange, onRelease, onDragEnd, droppedItems };
+  return { ...utils, onChange, onRelease, onDragEnd, droppedItems, parent };
 }
 
-async function dragToOutside(container: HTMLElement, source: Element) {
+async function dragToOutside(
+  container: HTMLElement,
+  source: Element,
+  duringDrag?: () => void,
+) {
   const target = container.querySelector('[data-testid="outside"]');
   if (target == null) {
     throw new Error('Outside drop target is not rendered');
@@ -124,6 +140,10 @@ async function dragToOutside(container: HTMLElement, source: Element) {
   const dataTransfer = createDataTransfer();
   fireEvent.dragStart(source, { dataTransfer });
   await flush();
+  if (duringDrag) {
+    act(duringDrag);
+    await flush();
+  }
   fireEvent.dragEnter(target, { dataTransfer });
   fireEvent.dragOver(target, { dataTransfer });
   fireEvent.drop(target, { dataTransfer });
@@ -265,5 +285,138 @@ describe('dragging windows out of the layout', () => {
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ type: 'tabs', tabs: ['a', 'c'] }),
     );
+  });
+  it('removes a whole tab group when the drop result is { remove: true }', async () => {
+    const { container, onChange } = setup({
+      initial: {
+        type: 'split',
+        direction: 'row',
+        children: ['a', { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 }],
+      },
+      controlled: true,
+      result: { remove: true },
+    });
+    await flush();
+
+    const handle = container.querySelector('.mosaic-tab-drag-button');
+    if (handle == null) {
+      throw new Error('No tab group drag handle');
+    }
+    await dragToOutside(container, handle);
+
+    expect(onChange).toHaveBeenLastCalledWith('a');
+  });
+
+  describe('when the tree changed during the drag', () => {
+    // Drags the whole tile via the window context, which also works for a
+    // window shown inside a tab group
+    function GripWindow({ id, path }: { id: string; path: number[] }) {
+      function Grip() {
+        const { mosaicWindowActions } = useMosaicWindow();
+        return mosaicWindowActions.connectDragSource(
+          <div data-testid={`grip-${id}`}>{id}</div>,
+        );
+      }
+      return (
+        <MosaicWindow<string> title={id} path={path}>
+          <Grip />
+        </MosaicWindow>
+      );
+    }
+
+    function grip(container: HTMLElement, id: string): Element {
+      const element = container.querySelector(`[data-testid="grip-${id}"]`);
+      if (element == null) {
+        throw new Error(`No grip for ${id}`);
+      }
+      return element;
+    }
+
+    it('removes the dragged tab window, not the tab that became active', async () => {
+      const { container, onChange } = setup({
+        initial: {
+          type: 'split',
+          direction: 'row',
+          children: [
+            'a',
+            { type: 'tabs', tabs: ['b', 'c', 'd'], activeTabIndex: 1 },
+          ],
+        },
+        controlled: true,
+        result: { remove: true },
+        renderTile: (id, path) => <GripWindow id={id} path={path} />,
+      });
+      await flush();
+
+      await dragToOutside(container, grip(container, 'c'));
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          children: [
+            'a',
+            expect.objectContaining({ type: 'tabs', tabs: ['b', 'd'] }),
+          ],
+        }),
+      );
+    });
+
+    it('removes the dragged window after the parent restructured the tree', async () => {
+      const { container, onChange, parent } = setup({
+        initial: {
+          type: 'split',
+          direction: 'row',
+          children: [
+            'x',
+            { type: 'split', direction: 'column', children: ['b', 'c'] },
+          ],
+        },
+        controlled: true,
+        result: { remove: true },
+      });
+      await flush();
+
+      await dragToOutside(container, windowTitle(container, 'c'), () =>
+        parent.setValue?.({
+          type: 'split',
+          direction: 'row',
+          children: [
+            'c',
+            { type: 'split', direction: 'column', children: ['x', 'b'] },
+          ],
+        }),
+      );
+
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({ type: 'split', children: ['x', 'b'] }),
+      );
+      expect(renderedTitles(container)).toEqual(['b', 'x']);
+    });
+
+    it("doesn't throw when the drag-start path no longer exists", async () => {
+      const { container, onChange, parent } = setup({
+        initial: {
+          type: 'split',
+          direction: 'row',
+          children: [
+            'x',
+            { type: 'split', direction: 'column', children: ['b', 'c'] },
+          ],
+        },
+        controlled: true,
+        result: { remove: true },
+      });
+      await flush();
+
+      await dragToOutside(container, windowTitle(container, 'c'), () =>
+        parent.setValue?.({
+          type: 'split',
+          direction: 'row',
+          children: ['c', 'x'],
+        }),
+      );
+
+      expect(onChange).toHaveBeenLastCalledWith('x');
+      expect(renderedTitles(container)).toEqual(['x']);
+    });
   });
 });
