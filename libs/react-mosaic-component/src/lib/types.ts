@@ -127,11 +127,21 @@ export type MosaicChangeMeta<T extends MosaicKey> =
   | { type: 'resize'; path: MosaicPath; splitPercentages: number[] }
   /** The node at `path` was split, `node` is the newly created one (split buttons). */
   | { type: 'split'; path: MosaicPath; node: MosaicNode<T> }
-  /** The node at `path` was replaced by `node` (replace button, zero state, `mosaicActions.replaceWith`). */
-  | { type: 'replace'; path: MosaicPath; node: MosaicNode<T> }
   /**
-   * A window, tab group or tab was dropped. `position` is set for edge drops;
-   * `tabIndex` is set for drops at a position in a tab bar.
+   * The node at `path` was replaced by `node` (replace button, zero state,
+   * `mosaicActions.replaceWith`). `previous` is what was there before, `null`
+   * for an empty layout.
+   */
+  | {
+      type: 'replace';
+      path: MosaicPath;
+      node: MosaicNode<T>;
+      previous: MosaicNode<T> | null;
+    }
+  /**
+   * A window, tab group or tab was dropped. `position` is set for edge drops.
+   * `tabIndex` is set for drops at a position in a tab bar: it is the insertion
+   * slot in the tab list *before* the move, not the tab's resulting index.
    */
   | {
       type: 'drop';
@@ -141,9 +151,17 @@ export type MosaicChangeMeta<T extends MosaicKey> =
       position?: 'top' | 'bottom' | 'left' | 'right';
       tabIndex?: number;
     }
-  /** A drag started and the dragged node at `path` was temporarily hidden. No `onRelease`. */
+  /**
+   * A window or tab group drag started and the node at `path` was temporarily
+   * hidden. No `onRelease`. Always followed by a `drop` or a `drag-cancel`.
+   * Dragging a single tab out of a tab bar emits neither `drag-start` nor
+   * `drag-cancel`, only the final `drop`.
+   */
   | { type: 'drag-start'; path: MosaicPath }
-  /** A cancelled drag restored the node at `path`. No `onRelease`. */
+  /**
+   * A window or tab group drag was cancelled and the node at `path` was shown
+   * again. No `onRelease`. Also emitted by `mosaicActions.show(path)`.
+   */
   | { type: 'drag-cancel'; path: MosaicPath }
   /** `tab` was added to the tab group at `path` (created from a leaf if needed). */
   | { type: 'tab-add'; path: MosaicPath; tab: T }
