@@ -195,7 +195,9 @@ describe('onChange / onRelease meta', () => {
     );
 
     const splitter = container.querySelectorAll('.mosaic-split')[0];
-    fireEvent.mouseDown(splitter, { button: 0 });
+    // Press on the divider itself (at 50%): the drag moves it by the distance
+    // travelled, not to the pointer
+    fireEvent.mouseDown(splitter, { button: 0, clientX: 500, clientY: 100 });
     fireEvent.mouseMove(document, { buttons: 1, clientX: 400, clientY: 100 });
     expect(lastMeta(onChange)).toEqual({
       type: 'resize',

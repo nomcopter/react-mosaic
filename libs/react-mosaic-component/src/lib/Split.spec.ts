@@ -625,12 +625,15 @@ describe('Split preview', () => {
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onRelease).toHaveBeenCalledTimes(1);
-    expect(onRelease).toHaveBeenCalledWith({
-      type: 'split',
-      direction: 'row',
-      children: ['a', 'b'],
-      splitPercentages: [40, 60],
-    });
+    expect(onRelease).toHaveBeenCalledWith(
+      {
+        type: 'split',
+        direction: 'row',
+        children: ['a', 'b'],
+        splitPercentages: [40, 60],
+      },
+      expect.objectContaining({ type: 'resize' }),
+    );
   });
 });
 
