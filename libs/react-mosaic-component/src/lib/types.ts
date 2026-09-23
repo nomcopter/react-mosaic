@@ -295,9 +295,7 @@ export const MosaicDragType = {
  * A resize value that can differ by split direction: `row` for side-by-side
  * panes, `column` for stacked panes. A plain number applies to both.
  */
-export type ResizeValueByDirection =
-  | number
-  | { row?: number; column?: number };
+export type ResizeValueByDirection = number | { row?: number; column?: number };
 
 /**
  * Options for resizing split panes.
@@ -309,6 +307,14 @@ export interface EnabledResizeOptions {
    * Default: 10
    */
   minimumPaneSizePercentage?: ResizeValueByDirection;
+  /**
+   * Smallest size a pane can be dragged to, in pixels, measured between the
+   * dividers around it. Applies together with `minimumPaneSizePercentage`;
+   * the larger one wins. Pass `{ row, column }` to use different values per
+   * split direction, e.g. `{ column: 30 }` to always keep a title bar visible.
+   * Default: 0
+   */
+  minimumPaneSizePx?: ResizeValueByDirection;
 }
 
 /**
