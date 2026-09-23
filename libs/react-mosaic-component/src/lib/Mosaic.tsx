@@ -495,7 +495,7 @@ export class MosaicWithoutDragDropContext<
     replaceWith: (
       path: MosaicPath,
       newNode: MosaicNode<T>,
-      meta: MosaicChangeMeta<T> = { type: 'replace', path, node: newNode },
+      meta?: MosaicChangeMeta<T>,
     ) =>
       this.updateRoot(
         [
@@ -506,7 +506,14 @@ export class MosaicWithoutDragDropContext<
             },
           },
         ],
-        { meta },
+        {
+          meta: meta ?? {
+            type: 'replace',
+            path,
+            node: newNode,
+            previous: getNodeAtPath(this.getRoot(), path),
+          },
+        },
       ),
   };
 

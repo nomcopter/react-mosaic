@@ -497,7 +497,9 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
         }
       } else {
         // Canceled or invalid drop, restore the original component by showing it again.
-        mosaicActions.show(ownPath, true); // suppressOnChange = true for drag operations
+        // Not suppressed: the drag-start hide reached onChange, so the restore must
+        // too (as `drag-cancel`), or a controlled parent keeps the hidden tree.
+        mosaicActions.show(ownPath);
         if (props.onDragEnd) {
           props.onDragEnd('reset');
         }

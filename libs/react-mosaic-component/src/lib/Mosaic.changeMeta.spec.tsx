@@ -148,6 +148,7 @@ describe('onChange / onRelease meta', () => {
       type: 'replace',
       path: [],
       node: 'first',
+      previous: null,
     });
   });
 
@@ -324,6 +325,7 @@ describe('onChange / onRelease meta', () => {
       type: 'replace',
       path: [0],
       node: 'z',
+      previous: 'a',
     };
     act(() =>
       actions!.updateTree([{ path: [0], spec: { $set: 'z' } }], {

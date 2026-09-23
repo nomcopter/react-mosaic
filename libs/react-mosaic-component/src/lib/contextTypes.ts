@@ -83,7 +83,7 @@ export interface MosaicRootActions<T extends MosaicKey> {
    * Replace currentNode at `path` with `node`
    * @param path
    * @param node
-   * @param meta (default: `{ type: 'replace', path, node }`) - passed to `onChange` / `onRelease`
+   * @param meta (default: `{ type: 'replace', path, node, previous }`) - passed to `onChange` / `onRelease`
    */
   replaceWith: (
     path: MosaicPath,
