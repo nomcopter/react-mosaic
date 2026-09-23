@@ -229,8 +229,15 @@ export const MosaicDragType = {
   WINDOW: 'MosaicWindow',
 };
 
+/**
+ * Options for resizing split panes.
+ */
 export interface EnabledResizeOptions {
-  minimumPaneSizePercentage?: number; // Default: 10
+  /** Smallest size a pane can be dragged to, as a percentage of its split. Default: 10 */
+  minimumPaneSizePercentage?: number;
 }
 
+/**
+ * Value of the `resize` prop on `Mosaic`: `'DISABLED'` turns resizing off.
+ */
 export type ResizeOptions = 'DISABLED' | EnabledResizeOptions;
