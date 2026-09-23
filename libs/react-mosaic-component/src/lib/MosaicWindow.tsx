@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { defer, drop, isEqual, values } from 'lodash-es';
-import React, { useContext, ReactElement, createRef } from 'react';
+import React, { useContext, useRef, ReactElement, createRef } from 'react';
 import {
   ConnectDragPreview,
   ConnectDragSource,
@@ -31,12 +31,14 @@ import {
   MosaicNode,
   MosaicPath,
   MosaicSplitNode,
+  MosaicUpdate,
 } from './types';
 import { resolveLeafPath } from './util/dragSource';
-import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
+import { createDragToUpdates, createDropMeta, updateTree } from './util/mosaicUpdates';
 import {
   getNodeAtPath,
   getParentNode,
+  isSplitNode,
   isTabsNode,
 } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
@@ -168,9 +170,7 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
           {/* Only render individual drop targets if NOT inside a tab container */}
           {!isInTabContainer && (
             <div className={classNames('drop-target-container', {})}>
-              {values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(
-                this.renderDropTarget,
-              )}
+              {this.renderDropTargets()}
             </div>
           )}
         </div>
@@ -287,10 +287,23 @@ export class InternalMosaicWindow<T extends MosaicKey> extends React.Component<
     );
   }
 
-  private renderDropTarget = (position: MosaicDropTargetPosition) => {
+  private renderDropTargets() {
     const { path } = this.props;
-    return <MosaicDropTarget position={position} path={path} key={position} />;
-  };
+    const dropBehavior = this.context.dropBehavior ?? 'split';
+
+    if (dropBehavior === 'swap') {
+      return <MosaicDropTarget position="swap" path={path} fill />;
+    }
+
+    const edges = values<MosaicDropTargetPosition>(MosaicDropTargetPosition).map(
+      (position) => (
+        <MosaicDropTarget position={position} path={path} key={position} />
+      ),
+    );
+    return dropBehavior === 'split-and-swap'
+      ? [...edges, <MosaicDropTarget position="swap" path={path} key="swap" />]
+      : edges;
+  }
 
   private checkCreateNode() {
     if (this.props.createNode == null) {
@@ -407,6 +420,9 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
   props: InternalMosaicWindowProps<T>,
 ) {
   const { mosaicActions, mosaicId } = useContext(MosaicContext);
+  // Parent split percentages from before the drag hid this window, so a swap
+  // can put every pane back at its original size.
+  const preDragParentPercentages = useRef<number[] | undefined>(undefined);
 
   const [, connectDragSource, connectDragPreview] = useDrag<
     MosaicDragItem,
@@ -418,6 +434,13 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       if (props.onDragStart) {
         props.onDragStart();
       }
+      const parent = getNodeAtPath(
+        mosaicActions.getRoot(),
+        props.path.slice(0, -1),
+      );
+      preDragParentPercentages.current = isSplitNode(parent)
+        ? parent.splitPercentages
+        : undefined;
       // TODO: Actually just delete instead of hiding
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(props.path));
@@ -489,6 +512,39 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
           ownPath,
           drop(destinationPath, destinationPath.length - ownPath.length),
         );
+
+      const currentRoot = mosaicActions.getRoot();
+      if (dropped && !isSelfDrop && dropResult.swap && currentRoot) {
+        // Undo the drag-start hide first, so every pane keeps its size and
+        // only the two windows trade places. A swap changes no structure, so
+        // skip normalizing (it would fill in splitPercentages the tree lacked).
+        const parentPath = ownPath.slice(0, -1);
+        const original = preDragParentPercentages.current;
+        const restore: MosaicUpdate<MosaicKey>[] = isSplitNode(
+          getNodeAtPath(currentRoot, parentPath),
+        )
+          ? [
+            {
+              path: parentPath,
+              spec:
+                original === undefined
+                  ? { $unset: ['splitPercentages'] }
+                  : { splitPercentages: { $set: original } },
+            },
+          ]
+          : [];
+        const restored = updateTree(currentRoot, restore);
+        mosaicActions.updateTree([
+          ...restore,
+          ...createDragToUpdates(restored, ownPath, destinationPath, {
+            type: 'swap',
+          }),
+        ]);
+        if (props.onDragEnd) {
+          props.onDragEnd('drop');
+        }
+        return;
+      }
 
       if (dropped && !isSelfDrop && !isChildDrop && !isTabContainerSelfDrop) {
         // Successful drop, let createDragToUpdates and the reducer handle the logic.

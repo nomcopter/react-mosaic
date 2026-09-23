@@ -27,6 +27,11 @@
       border: 2px solid @blue4;
       transition: opacity 100ms;
       border-radius: @pt-border-radius;
+
+      // Swap target in the centre of a window (dark mode only recolours it)
+      &.swap:not(.-fill) {
+        border-style: dashed;
+      }
     }
   }
 

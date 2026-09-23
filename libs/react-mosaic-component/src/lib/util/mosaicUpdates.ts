@@ -435,9 +435,53 @@ export function createDragToUpdates<T extends MosaicKey>(
       return updates;
     }
 
+    case 'swap':
+      return createSwapUpdates(root, sourcePath, destinationPath);
+
     default:
       assertNever(dropInfo);
   }
+}
+
+/**
+ * Creates the updates that make the nodes at `pathA` and `pathB` trade places.
+ * Split percentages belong to positions, not nodes, so every pane keeps its
+ * size and only the contents move. Swapping a node with itself is a no-op.
+ * @param root
+ * @param pathA
+ * @param pathB
+ * @returns {MosaicUpdate<T>[]}
+ */
+export function createSwapUpdates<T extends MosaicKey>(
+  root: MosaicNode<T>,
+  pathA: MosaicPath,
+  pathB: MosaicPath,
+): MosaicUpdate<T>[] {
+  if (isEqual(pathA, pathB)) {
+    return [];
+  }
+
+  const shorter = pathA.length < pathB.length ? pathA : pathB;
+  const longer = shorter === pathA ? pathB : pathA;
+  if (isEqual(longer.slice(0, shorter.length), shorter)) {
+    throw new Error('Cannot swap a node with its own ancestor or descendant');
+  }
+
+  const nodeA = getAndAssertNodeAtPathExists(root, pathA);
+  const nodeB = getAndAssertNodeAtPathExists(root, pathB);
+
+  // Tab groups can only hold leaves
+  const isTabSlot = (path: MosaicPath) =>
+    isTabsNode(getNodeAtPath(root, dropRight(path)));
+  const isLeaf = (node: MosaicNode<T>) => typeof node !== 'object';
+  if ((isTabSlot(pathA) && !isLeaf(nodeB)) || (isTabSlot(pathB) && !isLeaf(nodeA))) {
+    throw new Error('Cannot swap a split or tab group into a tab group');
+  }
+
+  return [
+    { path: pathA, spec: { $set: nodeB } },
+    { path: pathB, spec: { $set: nodeA } },
+  ];
 }
 
 /**

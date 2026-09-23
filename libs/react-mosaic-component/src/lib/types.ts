@@ -301,3 +301,11 @@ export interface EnabledResizeOptions {
  * Value of the `resize` prop on `Mosaic`: `'DISABLED'` turns resizing off.
  */
 export type ResizeOptions = 'DISABLED' | EnabledResizeOptions;
+
+/**
+ * What happens when a window is dropped on another window.
+ * - `'split'`: split the target along the edge it was dropped on (default)
+ * - `'swap'`: the two windows trade places; no edge targets are shown
+ * - `'split-and-swap'`: edges split, the centre of the target swaps
+ */
+export type MosaicDropBehavior = 'split' | 'swap' | 'split-and-swap';
