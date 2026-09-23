@@ -54,7 +54,7 @@ export class Split extends React.PureComponent<SplitProps> {
   };
 
   render() {
-    const { direction } = this.props;
+    const { direction, renderSplitHandle } = this.props;
     return (
       <div
         className={classNames('mosaic-split', {
@@ -66,6 +66,11 @@ export class Split extends React.PureComponent<SplitProps> {
         style={this.computeStyle()}
       >
         <div className="mosaic-split-line" />
+        {renderSplitHandle && (
+          <div className="mosaic-split-handle">
+            {renderSplitHandle(direction)}
+          </div>
+        )}
       </div>
     );
   }

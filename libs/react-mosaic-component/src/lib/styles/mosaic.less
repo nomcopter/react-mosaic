@@ -38,6 +38,17 @@
     position: absolute;
   }
 
+  // Content from resize.renderSplitHandle, centered on the divider
+  .mosaic-split-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   &.-row {
     margin-left: -@split-size / 2;
     width: @split-size;

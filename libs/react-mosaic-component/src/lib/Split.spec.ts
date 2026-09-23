@@ -365,3 +365,78 @@ describe('Split minimum pane size', () => {
     ).toEqual([20, 80]);
   });
 });
+
+describe('Split renderSplitHandle', () => {
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('renders nothing extra by default', () => {
+    const { container } = render(
+      React.createElement(Split, {
+        direction: 'row',
+        boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+        splitPercentages: [50, 50],
+        splitIndex: 0,
+      }),
+    );
+    expect(container.querySelector('.mosaic-split-handle')).toBeNull();
+  });
+
+  it('renders the handle for the split direction', () => {
+    const renderSplitHandle = vi.fn((direction: string) =>
+      React.createElement('span', { className: 'grip' }, direction),
+    );
+    const { container } = render(
+      React.createElement(Split, {
+        direction: 'column',
+        boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+        splitPercentages: [50, 50],
+        splitIndex: 0,
+        renderSplitHandle,
+      }),
+    );
+    const handle = container.querySelector(
+      '.mosaic-split .mosaic-split-handle',
+    );
+    expect(handle?.textContent).toBe('column');
+    expect(renderSplitHandle).toHaveBeenCalledWith('column');
+  });
+
+  it('drags the divider when pressed on the handle', () => {
+    const onRelease = vi.fn();
+    const { container } = render(
+      React.createElement(
+        'div',
+        null,
+        React.createElement(Split, {
+          direction: 'row',
+          boundingBox: { top: 0, right: 0, bottom: 0, left: 0 },
+          splitPercentages: [50, 50],
+          splitIndex: 0,
+          onRelease,
+          renderSplitHandle: () =>
+            React.createElement('span', { className: 'grip' }, '⋮'),
+        }),
+      ),
+    );
+    const parent = container.firstElementChild as HTMLElement;
+    vi.spyOn(parent, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 1000,
+      height: 500,
+    } as DOMRect);
+
+    fireEvent.mouseDown(container.querySelector('.grip') as HTMLElement, {
+      button: 0,
+    });
+    expect(document.documentElement.classList.contains(RESIZING_CLASS)).toBe(
+      true,
+    );
+    fireEvent.mouseUp(document, { clientX: 300 });
+
+    expect(onRelease).toHaveBeenCalledWith([30, 70]);
+  });
+});
