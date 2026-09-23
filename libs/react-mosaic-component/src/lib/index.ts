@@ -32,6 +32,7 @@ export {
   type MosaicPath,
   type MosaicUpdate,
   type MosaicUpdateSpec,
+  type MosaicChangeMeta,
   type TileRenderer,
   type TabTitleRenderer,
   type TabButtonRenderer,

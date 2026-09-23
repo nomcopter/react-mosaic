@@ -15,6 +15,7 @@ import { RootDropTargets } from './RootDropTargets';
 import {
   CreateNode,
   LegacyMosaicNode,
+  MosaicChangeMeta,
   MosaicKey,
   MosaicNode,
   MosaicPath,
@@ -79,12 +80,20 @@ export interface MosaicBaseProps<T extends MosaicKey> {
   createNode?: CreateNode<T>;
   /**
    * Called when a user initiates any change to the tree (removing, adding, moving, resizing, etc.)
+   * `meta` describes what caused the change, see [[MosaicChangeMeta]].
    */
-  onChange?: (newNode: MosaicNode<T> | null) => void;
+  onChange?: (
+    newNode: MosaicNode<T> | null,
+    meta?: MosaicChangeMeta<T>,
+  ) => void;
   /**
    * Called when a user completes a change (fires like above except for the interpolation during resizing)
+   * `meta` describes what caused the change, see [[MosaicChangeMeta]].
    */
-  onRelease?: (newNode: MosaicNode<T> | null) => void;
+  onRelease?: (
+    newNode: MosaicNode<T> | null,
+    meta?: MosaicChangeMeta<T>,
+  ) => void;
   /**
    * Additional classes to affix to the root element
    * Default: 'mosaic-blueprint-theme'
@@ -127,7 +136,7 @@ export interface MosaicControlledProps<T extends MosaicKey>
    * so the caller can store and pass back the modern n-ary format.
    */
   value: LegacyMosaicNode<T> | MosaicNode<T> | null;
-  onChange: (newNode: MosaicNode<T> | null) => void;
+  onChange: (newNode: MosaicNode<T> | null, meta?: MosaicChangeMeta<T>) => void;
 }
 
 export interface MosaicUncontrolledProps<T extends MosaicKey>
@@ -262,7 +271,7 @@ export class MosaicWithoutDragDropContext<
     // identity means exactly "the input was legacy".
     if (converted !== value && this.lastMigratedLegacyValue !== value) {
       this.lastMigratedLegacyValue = value;
-      this.props.onChange!(converted);
+      this.props.onChange!(converted, { type: 'migrate' });
     }
   }
 
@@ -272,8 +281,10 @@ export class MosaicWithoutDragDropContext<
       suppressOnRelease?: boolean;
       suppressOnChange?: boolean;
       shouldNormalize?: boolean;
+      meta?: MosaicChangeMeta<T>;
     },
   ) => {
+    const meta = modifiers?.meta ?? { type: 'update' };
     modifiers = {
       shouldNormalize: modifiers?.shouldNormalize ?? false,
       suppressOnRelease: modifiers?.suppressOnRelease ?? false,
@@ -287,6 +298,7 @@ export class MosaicWithoutDragDropContext<
 
     this.replaceRoot(
       updatedNode,
+      meta,
       modifiers.suppressOnRelease,
       modifiers.suppressOnChange,
     );
@@ -294,14 +306,15 @@ export class MosaicWithoutDragDropContext<
 
   private replaceRoot = (
     currentNode: MosaicNode<T> | null,
+    meta: MosaicChangeMeta<T>,
     suppressOnRelease = false,
     suppressOnChange = false,
   ) => {
     if (!suppressOnChange) {
-      this.props.onChange!(currentNode);
+      this.props.onChange!(currentNode, meta);
     }
     if (!suppressOnRelease && this.props.onRelease) {
-      this.props.onRelease(currentNode);
+      this.props.onRelease(currentNode, meta);
     }
 
     if (isUncontrolled(this.props)) {
@@ -312,18 +325,26 @@ export class MosaicWithoutDragDropContext<
   private actions: MosaicRootActions<T> = {
     updateTree: this.updateRoot,
     remove: (path: MosaicPath) => {
+      const root = this.getRoot();
+      const node = getNodeAtPath(root, path);
+      const meta: MosaicChangeMeta<T> =
+        node == null ? { type: 'update' } : { type: 'remove', path, node };
       if (path.length === 0) {
-        this.replaceRoot(null);
+        this.replaceRoot(null, meta);
       } else {
-        this.updateRoot([createRemoveUpdate(this.getRoot(), path)], {
+        this.updateRoot([createRemoveUpdate(root, path)], {
           shouldNormalize: true,
+          meta,
         });
       }
     },
     expand: (
       path: MosaicPath,
       percentage: number = DEFAULT_EXPAND_PERCENTAGE,
-    ) => this.updateRoot([createExpandUpdate<T>(path, percentage)]),
+    ) =>
+      this.updateRoot([createExpandUpdate<T>(path, percentage)], {
+        meta: { type: 'expand', path, percentage },
+      }),
     getRoot: () => this.getRoot()!,
     hide: (path: MosaicPath, suppressOnChange = false) => {
       // `hide` fires at the start of a drag to collapse the source tile. It is a
@@ -332,6 +353,7 @@ export class MosaicWithoutDragDropContext<
       this.updateRoot([createHideUpdate<T>(this.getRoot(), path)], {
         suppressOnChange,
         suppressOnRelease: true,
+        meta: { type: 'drag-start', path },
       });
     },
     show: (path: MosaicPath, suppressOnChange = false) => {
@@ -369,7 +391,11 @@ export class MosaicWithoutDragDropContext<
               },
             },
           ],
-          { suppressOnChange, suppressOnRelease: true },
+          {
+            suppressOnChange,
+            suppressOnRelease: true,
+            meta: { type: 'drag-cancel', path },
+          },
         );
       }
       // For tab nodes, the hide operation just changes active tab, so no need to restore
@@ -407,7 +433,10 @@ export class MosaicWithoutDragDropContext<
                 },
               },
             ],
-            { shouldNormalize: true },
+            {
+              shouldNormalize: true,
+              meta: { type: 'tab-add', path, tab: newNode },
+            },
           );
           return;
         }
@@ -417,11 +446,15 @@ export class MosaicWithoutDragDropContext<
           );
           return;
         }
-        this.actions.replaceWith(path, {
-          type: 'tabs',
-          tabs: [node, newNode],
-          activeTabIndex: 1,
-        });
+        this.actions.replaceWith(
+          path,
+          {
+            type: 'tabs',
+            tabs: [node, newNode],
+            activeTabIndex: 1,
+          },
+          { type: 'tab-add', path, tab: newNode },
+        );
       });
     },
     removeTab: (path: MosaicPath, index: number): void => {
@@ -453,18 +486,28 @@ export class MosaicWithoutDragDropContext<
             },
           },
         ],
-        { shouldNormalize: true },
+        {
+          shouldNormalize: true,
+          meta: { type: 'tab-remove', path, index, tab: node.tabs[index] },
+        },
       );
     },
-    replaceWith: (path: MosaicPath, newNode: MosaicNode<T>) =>
-      this.updateRoot([
-        {
-          path,
-          spec: {
-            $set: newNode,
+    replaceWith: (
+      path: MosaicPath,
+      newNode: MosaicNode<T>,
+      meta: MosaicChangeMeta<T> = { type: 'replace', path, node: newNode },
+    ) =>
+      this.updateRoot(
+        [
+          {
+            path,
+            spec: {
+              $set: newNode,
+            },
           },
-        },
-      ]),
+        ],
+        { meta },
+      ),
   };
 
   private readonly childContext: MosaicContext<T> = {

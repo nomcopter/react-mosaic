@@ -2,6 +2,7 @@ import React from 'react';
 
 import {
   CreateNode,
+  MosaicChangeMeta,
   MosaicKey,
   MosaicNode,
   MosaicPath,
@@ -82,12 +83,18 @@ export interface MosaicRootActions<T extends MosaicKey> {
    * Replace currentNode at `path` with `node`
    * @param path
    * @param node
+   * @param meta (default: `{ type: 'replace', path, node }`) - passed to `onChange` / `onRelease`
    */
-  replaceWith: (path: MosaicPath, node: MosaicNode<T>) => void;
+  replaceWith: (
+    path: MosaicPath,
+    node: MosaicNode<T>,
+    meta?: MosaicChangeMeta<T>,
+  ) => void;
   /**
    * Atomically applies all updates to the current tree
    * @param updates
-   * @param suppressOnRelease (default: false)
+   * @param modifiers.suppressOnRelease (default: false)
+   * @param modifiers.meta (default: `{ type: 'update' }`) - passed to `onChange` / `onRelease`
    */
   updateTree: (
     updates: MosaicUpdate<T>[],
@@ -95,6 +102,7 @@ export interface MosaicRootActions<T extends MosaicKey> {
       suppressOnRelease?: boolean;
       suppressOnChange?: boolean;
       shouldNormalize?: boolean;
+      meta?: MosaicChangeMeta<T>;
     },
   ) => void;
   /**

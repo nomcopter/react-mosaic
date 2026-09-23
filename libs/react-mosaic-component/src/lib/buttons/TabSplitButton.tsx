@@ -59,7 +59,11 @@ export class TabSplitButton extends React.PureComponent<TabSplitButtonProps> {
         };
 
         // Replace the tabs node with the new split
-        mosaicActions.replaceWith(path, newSplitNode);
+        mosaicActions.replaceWith(path, newSplitNode, {
+          type: 'split',
+          path,
+          node: newNode,
+        });
 
         if (this.props.onClick) {
           this.props.onClick();

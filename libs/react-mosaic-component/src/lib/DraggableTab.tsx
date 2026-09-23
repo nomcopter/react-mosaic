@@ -3,7 +3,7 @@ import { useDrag, DragSourceMonitor, ConnectDragSource, ConnectDragPreview } fro
 import { isEqual } from 'lodash-es';
 import { MosaicKey, MosaicTabsNode, MosaicPath, MosaicDragType } from './types';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
-import { createDragToUpdates } from './util/mosaicUpdates';
+import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { MosaicRootActions } from './contextTypes';
 
@@ -122,15 +122,20 @@ export const DraggableTab = <T extends MosaicKey>({
             newActiveTabIndex = currentActiveTabIndex + 1;
           }
 
-          mosaicActions.updateTree([
-            {
-              path: tabContainerPath,
-              spec: {
-                tabs: { $set: currentTabs },
-                activeTabIndex: { $set: newActiveTabIndex },
+          mosaicActions.updateTree(
+            [
+              {
+                path: tabContainerPath,
+                spec: {
+                  tabs: { $set: currentTabs },
+                  activeTabIndex: { $set: newActiveTabIndex },
+                },
               },
+            ],
+            {
+              meta: createDropMeta(root, ownPath, tabContainerPath, dropResult),
             },
-          ]);
+          );
         } else {
           console.warn('Could not find tabs node at path:', tabContainerPath);
         }
@@ -185,7 +190,9 @@ export const DraggableTab = <T extends MosaicKey>({
           ];
 
           // Apply both updates
-          mosaicActions.updateTree([...removeUpdates, ...insertUpdates]);
+          mosaicActions.updateTree([...removeUpdates, ...insertUpdates], {
+            meta: createDropMeta(root, ownPath, dropResult.path!, dropResult),
+          });
         } else {
           console.warn(
             'Could not find destination tabs node at path:',
@@ -213,7 +220,13 @@ export const DraggableTab = <T extends MosaicKey>({
           : { type: 'split', position: dropResult.position },
       );
       mosaicActions.updateTree(updates, {
-        shouldNormalize: true
+        shouldNormalize: true,
+        meta: createDropMeta(
+          mosaicActions.getRoot(),
+          ownPath,
+          dropResult.path,
+          dropResult,
+        ),
       });
     },
     collect: (monitor: DragSourceMonitor) => ({

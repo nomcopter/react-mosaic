@@ -18,7 +18,7 @@ import {
 import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
-import { createDragToUpdates } from './util/mosaicUpdates';
+import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
 import { DraggableTab, DraggableTabProps } from './DraggableTab';
@@ -304,6 +304,12 @@ export const MosaicTabs = <T extends MosaicKey>({
         );
         mosaicActions.updateTree(updates, {
           shouldNormalize: true,
+          meta: createDropMeta(
+            mosaicActions.getRoot(),
+            ownPath,
+            destinationPath,
+            dropResult,
+          ),
         });
       } else {
         // Canceled or invalid drop, restore the component by showing it again
@@ -352,12 +358,15 @@ export const MosaicTabs = <T extends MosaicKey>({
     if (index === activeTabIndex) {
       return;
     }
-    mosaicActions.updateTree([
-      {
-        path,
-        spec: { activeTabIndex: { $set: index } },
-      },
-    ]);
+    mosaicActions.updateTree(
+      [
+        {
+          path,
+          spec: { activeTabIndex: { $set: index } },
+        },
+      ],
+      { meta: { type: 'tab-select', path, index } },
+    );
   };
 
   const onTabClose = (tabKey: T, index: number) => {
