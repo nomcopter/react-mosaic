@@ -150,6 +150,8 @@ export type MosaicChangeMeta<T extends MosaicKey> =
       destinationPath: MosaicPath;
       position?: 'top' | 'bottom' | 'left' | 'right';
       tabIndex?: number;
+      /** `true` when the drop swapped the two nodes (see `dropBehavior`) */
+      swap?: true;
     }
   /**
    * A window or tab group drag started and the node at `path` was temporarily

@@ -2,7 +2,11 @@ import { isEqual } from 'lodash-es';
 
 import { MosaicRootActions } from '../contextTypes';
 import { MosaicKey, MosaicNode, MosaicPath, MosaicUpdate } from '../types';
-import { createDragToUpdates, updateTree } from './mosaicUpdates';
+import {
+  createDragToUpdates,
+  createDropMeta,
+  updateTree,
+} from './mosaicUpdates';
 import { getNodeAtPath, isSplitNode } from './mosaicUtilities';
 
 /**
@@ -81,12 +85,20 @@ export function applySwapDrop<T extends MosaicKey>(
   }
   const restore = createRestoreParentUpdates(root, snapshot) ?? [];
   const restored = updateTree(root, restore);
-  mosaicActions.updateTree([
-    ...restore,
-    ...createDragToUpdates(restored, sourcePath, destinationPath, {
-      type: 'swap',
-    }),
-  ]);
+  mosaicActions.updateTree(
+    [
+      ...restore,
+      ...createDragToUpdates(restored, sourcePath, destinationPath, {
+        type: 'swap',
+      }),
+    ],
+    {
+      meta: createDropMeta(restored, sourcePath, destinationPath, {
+        path: destinationPath,
+        swap: true,
+      }),
+    },
+  );
 }
 
 /**
@@ -102,12 +114,17 @@ export function restoreAfterCancelledDrag<T extends MosaicKey>(
   const restore =
     root == null ? null : createRestoreParentUpdates(root, snapshot);
   if (root == null || restore === null) {
-    mosaicActions.show(sourcePath, true);
+    // Not suppressed: the drag-start hide reached onChange, so the restore
+    // must too (as `drag-cancel`)
+    mosaicActions.show(sourcePath);
     return;
   }
   // The drag can end before the deferred hide ran; nothing to undo then
   if (isEqual(updateTree(root, restore), root)) {
     return;
   }
-  mosaicActions.updateTree(restore, { suppressOnRelease: true });
+  mosaicActions.updateTree(restore, {
+    suppressOnRelease: true,
+    meta: { type: 'drag-cancel', path: sourcePath },
+  });
 }
