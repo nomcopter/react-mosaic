@@ -19,7 +19,12 @@ import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { findPathToLeaf } from './util/dragSource';
-import { applySwapDrop, PreDragParentSnapshot, restoreAfterCancelledDrag, snapshotParentBeforeDrag } from './util/dragRestore';
+import {
+  applySwapDrop,
+  PreDragParentSnapshot,
+  restoreAfterCancelledDrag,
+  snapshotParentBeforeDrag,
+} from './util/dragRestore';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
