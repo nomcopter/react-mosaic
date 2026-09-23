@@ -24,6 +24,7 @@ import {
   TabToolbarRenderer,
   TileRenderer,
   MosaicDragType,
+  MosaicDropBehavior,
   TabTitleRenderer,
   TabButtonRenderer,
   TabCanCloseFunction,
@@ -125,6 +126,12 @@ export interface MosaicBaseProps<T extends MosaicKey> {
    * Override the react-dnd provider to allow applications to inject an existing drag and drop context
    */
   dragAndDropManager?: DragDropManager | undefined;
+  /**
+   * What dropping a window on another window does: `'split'` it along the
+   * edge (default), `'swap'` the two windows, or `'split-and-swap'` (edges
+   * split, the centre swaps). Windows inside tab groups are not affected.
+   */
+  dropBehavior?: MosaicDropBehavior;
 }
 
 export interface MosaicControlledProps<T extends MosaicKey>
@@ -210,10 +217,10 @@ export class MosaicWithoutDragDropContext<
     const { className } = this.props;
 
     return (
-      <MosaicContext.Provider value={this.childContext as MosaicContext<any>}>
+      <MosaicContext.Provider value={this.getContextValue() as MosaicContext<any>}>
         <MosaicRootWithDragDetection className={className}>
           {this.renderTree()}
-          <RootDropTargets />
+          {this.props.dropBehavior !== 'swap' && <RootDropTargets />}
         </MosaicRootWithDragDetection>
       </MosaicContext.Provider>
     );
@@ -517,11 +524,24 @@ export class MosaicWithoutDragDropContext<
       ),
   };
 
-  private readonly childContext: MosaicContext<T> = {
+  private childContext: MosaicContext<T> = {
     mosaicActions: this.actions,
     mosaicId: this.state.mosaicId,
     blueprintNamespace: this.props.blueprintNamespace!,
+    dropBehavior: this.props.dropBehavior,
   };
+
+  // Keeps the context object stable unless `dropBehavior` changes, so
+  // consumers only re-render when there is something new to read.
+  private getContextValue(): MosaicContext<T> {
+    if (this.childContext.dropBehavior !== this.props.dropBehavior) {
+      this.childContext = {
+        ...this.childContext,
+        dropBehavior: this.props.dropBehavior,
+      };
+    }
+    return this.childContext;
+  }
 
   private renderTree() {
     const root = this.getRoot();

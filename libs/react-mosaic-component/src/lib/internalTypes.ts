@@ -26,6 +26,7 @@ export interface MosaicDropData {
   position?: MosaicDropTargetPosition;
   tabReorderIndex?: number; // For tab reordering within the same container
   remove?: boolean;
+  swap?: boolean; // Dropped on a window's swap target: trade places with `path`
 }
 
 /**
@@ -51,4 +52,5 @@ export interface MosaicDragItem {
 export type DropInfo =
   | { type: 'split', position: MosaicDropTargetPosition }
   | { type: 'tab-container' }
-  | { type: 'tab-reorder', insertIndex: number };
+  | { type: 'tab-reorder', insertIndex: number }
+  | { type: 'swap' };

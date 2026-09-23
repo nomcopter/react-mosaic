@@ -28,6 +28,7 @@ export {
   type MosaicTabsNode,
   MosaicDragType,
   type MosaicDirection,
+  type MosaicDropBehavior,
   type CreateNode,
   type MosaicPath,
   type MosaicUpdate,
@@ -69,6 +70,7 @@ export {
   createExpandUpdate,
   createHideUpdate,
   createRemoveUpdate,
+  createSwapUpdates,
   updateTree,
 } from './util/mosaicUpdates';
 export {

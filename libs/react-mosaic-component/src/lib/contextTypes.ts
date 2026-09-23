@@ -3,6 +3,7 @@ import React from 'react';
 import {
   CreateNode,
   MosaicChangeMeta,
+  MosaicDropBehavior,
   MosaicKey,
   MosaicNode,
   MosaicPath,
@@ -21,6 +22,8 @@ export interface MosaicContext<T extends MosaicKey> {
   mosaicActions: MosaicRootActions<T>;
   mosaicId: string;
   blueprintNamespace: string;
+  /** The `dropBehavior` prop of the enclosing `Mosaic`; `undefined` means `'split'` */
+  dropBehavior?: MosaicDropBehavior;
 }
 
 /**

@@ -141,6 +141,19 @@
         opacity: 1;
         .split-percentages(50%);
       }
+
+      // Swap target: the middle of the window left free by the edge targets,
+      // above them so it still wins once a hovered edge grows over it.
+      &.swap {
+        inset: 30%;
+        z-index: 6;
+        border-style: dashed;
+
+        &.-fill {
+          inset: 0;
+          border-style: solid;
+        }
+      }
     }
   }
 }

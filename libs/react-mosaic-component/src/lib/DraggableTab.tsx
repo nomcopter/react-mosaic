@@ -231,6 +231,23 @@ export const DraggableTab = <T extends MosaicKey>({
         return;
       }
 
+      const root = mosaicActions.getRoot();
+      if (dropResult.swap && root) {
+        // The tab and the dropped-on window trade places. Hiding the tab at
+        // drag start switched the active tab away, so point it back at the
+        // slot that now holds the swapped-in panel.
+        mosaicActions.updateTree([
+          ...createDragToUpdates(root, ownPath, dropResult.path, {
+            type: 'swap',
+          }),
+          {
+            path: tabContainerPath,
+            spec: { activeTabIndex: { $set: tabIndex } },
+          },
+        ]);
+        return;
+      }
+
       // Handle normal drops (moving to different containers)
       const updates = createDragToUpdates(
         mosaicActions.getRoot()!,
