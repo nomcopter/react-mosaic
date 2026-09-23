@@ -580,45 +580,35 @@ export function createExpandUpdate<T extends MosaicKey>(
   for (let i = path.length - 1; i >= 0; i--) {
     const childIndex: number =
       typeof path[i] === 'number' ? (path[i] as number) : Number(path[i]);
+    const childSpec = spec;
 
-    // For n-ary structure, we need to set the splitPercentages array
-    // This is more complex than the binary case
-
+    // Works on the whole node rather than on `splitPercentages` alone, because
+    // that field is optional and the new percentages depend on the number of
+    // children. Tabs nodes have no percentages and only hold leaves, so the
+    // walk stops there.
     spec = {
-      splitPercentages: {
-        $apply: (currentPercentages: number[] | undefined) => {
-          if (!currentPercentages) {
-            // If no current percentages, we can't easily determine the structure
-            throw new Error(
-              'Cannot expand: parent node has no splitPercentages defined',
-            );
-          }
+      $apply: (node: MosaicNode<T>): MosaicNode<T> => {
+        if (!isSplitNode(node)) {
+          return node;
+        }
 
-          const newPercentages = [...currentPercentages];
-          const targetChildPercentage = percentage;
-          const otherChildrenCount = newPercentages.length - 1;
+        const otherChildrenCount = node.children.length - 1;
+        const otherChildPercentage =
+          otherChildrenCount > 0 ? (100 - percentage) / otherChildrenCount : 0;
+        const splitPercentages =
+          otherChildrenCount > 0
+            ? node.children.map((_, j) =>
+                j === childIndex ? percentage : otherChildPercentage,
+              )
+            : [100];
 
-          if (otherChildrenCount === 0) {
-            return [100]; // Only one child
-          }
-
-          const remainingPercentage = 100 - targetChildPercentage;
-          const otherChildPercentage = remainingPercentage / otherChildrenCount;
-
-          // Set target child to desired percentage, others get equal share of remainder
-          for (let j = 0; j < newPercentages.length; j++) {
-            if (j === childIndex) {
-              newPercentages[j] = targetChildPercentage;
-            } else {
-              newPercentages[j] = otherChildPercentage;
-            }
-          }
-
-          return newPercentages;
-        },
-      },
-      children: {
-        [childIndex]: spec,
+        return {
+          ...node,
+          splitPercentages,
+          children: node.children.map((child, j) =>
+            j === childIndex ? update(child, childSpec) : child,
+          ),
+        };
       },
     };
   }

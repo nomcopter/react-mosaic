@@ -5,8 +5,9 @@ import {
   updateTree,
   createRemoveUpdate,
   createDragToUpdates,
+  createExpandUpdate,
 } from './mosaicUpdates';
-import { getNodeAtPath } from './mosaicUtilities';
+import { getLeaves, getNodeAtPath } from './mosaicUtilities';
 import { MosaicDropTargetPosition } from '../internalTypes';
 // Import the new n-ary types
 
@@ -56,6 +57,68 @@ describe('mosaicUpdates', () => {
       expect(getNodeAtPath(simpleUpdatedTree, path)).to.equal(
         getNodeAtPath(NARY_MEDIUM_TREE, path),
       );
+    });
+  });
+
+  describe('createExpandUpdate', () => {
+    it('expands a child of a split without splitPercentages', () => {
+      const tree: MosaicNode<string> = {
+        type: 'split',
+        direction: 'row',
+        children: ['a', 'b'],
+      };
+
+      expect(updateTree(tree, [createExpandUpdate([0], 70)])).toEqual({
+        type: 'split',
+        direction: 'row',
+        children: ['a', 'b'],
+        splitPercentages: [70, 30],
+      });
+    });
+
+    it('expands every split along a deeply nested path', () => {
+      const expanded = updateTree(NARY_MEDIUM_TREE, [
+        createExpandUpdate([1, 0, 1], 80),
+      ]) as MosaicSplitNode<number>;
+
+      expect(expanded.splitPercentages).toEqual([20, 80]);
+      const middle = getNodeAtPath(expanded, [1]) as MosaicSplitNode<number>;
+      expect(middle.splitPercentages).toEqual([80, 20]);
+      const inner = getNodeAtPath(expanded, [1, 0]) as MosaicSplitNode<number>;
+      expect(inner.splitPercentages).toEqual([20, 80]);
+      expect(getLeaves(expanded)).toEqual(getLeaves(NARY_MEDIUM_TREE));
+    });
+
+    it('overrides existing splitPercentages', () => {
+      const tree: MosaicNode<string> = {
+        type: 'split',
+        direction: 'column',
+        children: ['a', 'b', 'c'],
+        splitPercentages: [50, 25, 25],
+      };
+
+      const expanded = updateTree(tree, [
+        createExpandUpdate([2], 60),
+      ]) as MosaicSplitNode<string>;
+
+      expect(expanded.splitPercentages).toEqual([20, 20, 60]);
+    });
+
+    it('stops at a tabs node and expands the tab group in its parent', () => {
+      const tree: MosaicNode<string> = {
+        type: 'split',
+        direction: 'row',
+        children: ['a', { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 }],
+      };
+
+      expect(updateTree(tree, [createExpandUpdate([1, 1], 70)])).toEqual({
+        ...tree,
+        splitPercentages: [30, 70],
+      });
+    });
+
+    it('leaves a single leaf root unchanged', () => {
+      expect(updateTree<string>('a', [createExpandUpdate([], 70)])).toBe('a');
     });
   });
 
@@ -168,7 +231,7 @@ describe('mosaicUpdates', () => {
         expect(collapsedSplit).to.deep.equal({
           type: 'split',
           direction: 'column',
-          children: [2, 3]
+          children: [2, 3],
         });
       });
     });

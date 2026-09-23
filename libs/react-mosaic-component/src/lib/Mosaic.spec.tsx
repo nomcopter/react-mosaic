@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 
 import { Mosaic } from './Mosaic';
+import { MosaicWindow } from './MosaicWindow';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicNode } from './types';
 
@@ -127,5 +128,35 @@ describe('Mosaic drag lifecycle callbacks', () => {
       ]);
     });
     expect(onRelease).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Mosaic expand', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('expands a window whose split has no splitPercentages', () => {
+    const onChange = vi.fn();
+
+    const { container } = render(
+      <Mosaic<string>
+        initialValue={TWO_LEAF_TREE}
+        onChange={onChange}
+        renderTile={(id, path) => (
+          <MosaicWindow<string> path={path} title={id} />
+        )}
+      />,
+    );
+
+    const expandButtons = container.querySelectorAll('.expand-button');
+    expect(expandButtons).toHaveLength(2);
+
+    fireEvent.click(expandButtons[0]);
+
+    expect(onChange).toHaveBeenLastCalledWith({
+      ...TWO_LEAF_TREE,
+      splitPercentages: [70, 30],
+    });
   });
 });
