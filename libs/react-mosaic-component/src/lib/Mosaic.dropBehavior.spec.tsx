@@ -187,7 +187,10 @@ describe('Mosaic dropBehavior', () => {
       const expected = { ...ROW, children: ['b', 'a'] };
       expect(onChange).toHaveBeenLastCalledWith(expected);
       expect(onRelease).toHaveBeenCalledTimes(1);
-      expect(onRelease).toHaveBeenCalledWith(expected);
+      expect(onRelease).toHaveBeenCalledWith(
+        expected,
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
     });
 
     it("'swap' leaves splitPercentages out when the tree had none", async () => {
@@ -207,14 +210,17 @@ describe('Mosaic dropBehavior', () => {
         query(windowTitled(container, 'a'), '.drop-target.swap'),
       );
 
-      expect(onRelease).toHaveBeenCalledWith({
-        type: 'split',
-        direction: 'column',
-        children: [
-          'c',
-          { type: 'split', direction: 'row', children: ['b', 'a'] },
-        ],
-      });
+      expect(onRelease).toHaveBeenCalledWith(
+        {
+          type: 'split',
+          direction: 'column',
+          children: [
+            'c',
+            { type: 'split', direction: 'row', children: ['b', 'a'] },
+          ],
+        },
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
     });
 
     it("'split-and-swap' still splits on an edge", async () => {
@@ -232,6 +238,7 @@ describe('Mosaic dropBehavior', () => {
           direction: 'column',
           children: ['b', 'a'],
         }),
+        expect.objectContaining({ type: 'drop' }),
       );
     });
 
@@ -244,7 +251,10 @@ describe('Mosaic dropBehavior', () => {
         query(windowTitled(container, 'a'), '.drop-target.swap'),
       );
 
-      expect(onRelease).toHaveBeenCalledWith({ ...ROW, children: ['b', 'a'] });
+      expect(onRelease).toHaveBeenCalledWith(
+        { ...ROW, children: ['b', 'a'] },
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
     });
 
     it('swaps a tab with a window and shows the swapped-in panel', async () => {
@@ -268,11 +278,17 @@ describe('Mosaic dropBehavior', () => {
         query(windowTitled(container, 'a'), '.drop-target.swap'),
       );
 
-      expect(onRelease).toHaveBeenLastCalledWith({
-        type: 'split',
-        direction: 'row',
-        children: ['c', { type: 'tabs', tabs: ['b', 'a'], activeTabIndex: 1 }],
-      });
+      expect(onRelease).toHaveBeenLastCalledWith(
+        {
+          type: 'split',
+          direction: 'row',
+          children: [
+            'c',
+            { type: 'tabs', tabs: ['b', 'a'], activeTabIndex: 1 },
+          ],
+        },
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
     });
 
     it('swaps in uncontrolled mode', async () => {
@@ -350,10 +366,13 @@ describe('Mosaic dropBehavior: tab groups, cancels and active tabs', () => {
 
       const group = { type: 'tabs', tabs: ['b', 'c'], activeTabIndex: 0 };
       expect(onRelease).toHaveBeenCalledTimes(1);
-      expect(onRelease).toHaveBeenLastCalledWith({
-        ...WITH_GROUP,
-        children: [group, 'd', 'a'],
-      });
+      expect(onRelease).toHaveBeenLastCalledWith(
+        {
+          ...WITH_GROUP,
+          children: [group, 'd', 'a'],
+        },
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
 
       // The next drag still works
       await dragAndDrop(
@@ -361,10 +380,13 @@ describe('Mosaic dropBehavior: tab groups, cancels and active tabs', () => {
         query(windowTitled(container, 'a'), target),
       );
       expect(onRelease).toHaveBeenCalledTimes(2);
-      expect(onRelease).toHaveBeenLastCalledWith({
-        ...WITH_GROUP,
-        children: [group, 'a', 'd'],
-      });
+      expect(onRelease).toHaveBeenLastCalledWith(
+        {
+          ...WITH_GROUP,
+          children: [group, 'a', 'd'],
+        },
+        expect.objectContaining({ type: 'drop', swap: true }),
+      );
     },
   );
 
@@ -461,11 +483,14 @@ describe('Mosaic dropBehavior: tab groups, cancels and active tabs', () => {
     fireEvent.dragEnd(titleOf(container, 'b'), { dataTransfer });
     await flush();
 
-    expect(onRelease).toHaveBeenLastCalledWith({
-      type: 'split',
-      direction: 'row',
-      children: ['b', 'a', 'e'],
-    });
+    expect(onRelease).toHaveBeenLastCalledWith(
+      {
+        type: 'split',
+        direction: 'row',
+        children: ['b', 'a', 'e'],
+      },
+      expect.objectContaining({ type: 'drop', swap: true }),
+    );
   });
 
   it('keeps the active tab when a background tab is swapped out', async () => {
@@ -492,13 +517,16 @@ describe('Mosaic dropBehavior: tab groups, cancels and active tabs', () => {
       query(windowTitled(container, 'a'), '.drop-target.swap'),
     );
 
-    expect(onRelease).toHaveBeenLastCalledWith({
-      type: 'split',
-      direction: 'row',
-      children: [
-        'd',
-        { type: 'tabs', tabs: ['b', 'c', 'a'], activeTabIndex: 0 },
-      ],
-    });
+    expect(onRelease).toHaveBeenLastCalledWith(
+      {
+        type: 'split',
+        direction: 'row',
+        children: [
+          'd',
+          { type: 'tabs', tabs: ['b', 'c', 'a'], activeTabIndex: 0 },
+        ],
+      },
+      expect.objectContaining({ type: 'drop', swap: true }),
+    );
   });
 });

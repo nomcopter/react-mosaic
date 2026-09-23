@@ -245,19 +245,22 @@ export const DraggableTab = <T extends MosaicKey>({
         // The tab and the dropped-on window trade places. Hiding the tab at
         // drag start switched the active tab away, so restore the one that was
         // active before (tab positions don't change in a swap).
-        mosaicActions.updateTree([
-          ...createDragToUpdates(root, ownPath, dropResult.path, {
-            type: 'swap',
-          }),
-          {
-            path: tabContainerPath,
-            spec: {
-              activeTabIndex: {
-                $set: preDragActiveTabIndex.current ?? tabIndex,
+        mosaicActions.updateTree(
+          [
+            ...createDragToUpdates(root, ownPath, dropResult.path, {
+              type: 'swap',
+            }),
+            {
+              path: tabContainerPath,
+              spec: {
+                activeTabIndex: {
+                  $set: preDragActiveTabIndex.current ?? tabIndex,
+                },
               },
             },
-          },
-        ]);
+          ],
+          { meta: createDropMeta(root, ownPath, dropResult.path, dropResult) },
+        );
         return;
       }
 

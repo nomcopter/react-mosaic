@@ -149,6 +149,7 @@ describe('drag-start / drag-cancel meta from real drags', () => {
       { type: 'drag-start', path: [1, 1] },
       { type: 'drag-cancel', path: [1, 1] },
     ]);
+    // The tree comes back exactly as it was, without percentages it never had
     expect(changes[1][0]).toEqual({
       type: 'split',
       direction: 'row',
@@ -157,7 +158,6 @@ describe('drag-start / drag-cancel meta from real drags', () => {
         {
           type: 'split',
           direction: 'column',
-          splitPercentages: [50, 50],
           children: ['b', 'c'],
         },
       ],

@@ -743,5 +743,6 @@ export function createDropMeta<T extends MosaicKey>(
     ...(dropData.tabReorderIndex !== undefined && {
       tabIndex: dropData.tabReorderIndex,
     }),
+    ...(dropData.swap && { swap: true }),
   };
 }
