@@ -22,6 +22,7 @@ export {
   MosaicWithoutDragDropContext,
 } from './Mosaic';
 export {
+  type MosaicKey,
   type MosaicNode,
   type MosaicSplitNode,
   type MosaicTabsNode,
@@ -45,7 +46,15 @@ export {
   type LegacyMosaicDirection,
   type LegacyMosaicBranch,
   type LegacyMosaicPath,
+  type ResizeOptions,
+  type EnabledResizeOptions,
 } from './types';
+export {
+  MosaicDropTargetPosition,
+  type MosaicDropData,
+  type MosaicDragItem,
+  type DropInfo,
+} from './internalTypes';
 export {
   MosaicContext,
   type MosaicRootActions,
