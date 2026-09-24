@@ -8,6 +8,8 @@
 //   2. Native ESM import of index.mjs.
 //   3. Resolution by package name through the `exports` map (both conditions).
 //   4. CJS/ESM named-export parity.
+//   5. The agent skill (skills/react-mosaic/SKILL.md) ships, and every runtime
+//      name it imports or lists as a helper is really exported.
 //
 // Run via `npm run test:package` (requires `npm run build:lib` first — the
 // nx target `react-mosaic-component:test-package` handles the ordering).
@@ -20,6 +22,7 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
+  readFileSync,
   symlinkSync,
   rmSync,
 } from 'node:fs';
@@ -159,4 +162,34 @@ test('CJS and ESM entry points expose identical named exports', () => {
     pathToFileURL(join(distDir, 'index.mjs')).href,
   ]);
   assert.deepEqual(namedExports(cjs.keys), namedExports(esm.keys));
+});
+
+test('agent skill ships and only names real exports', () => {
+  const skillPath = join(distDir, 'skills', 'react-mosaic', 'SKILL.md');
+  assert.ok(existsSync(skillPath), `missing ${skillPath}`);
+  const skill = readFileSync(skillPath, 'utf8');
+  assert.match(skill, /^---\r?\nname: react-mosaic\r?\ndescription: \S/);
+
+  const named = new Set();
+  // `import { A, type B } from 'react-mosaic-component'` (runtime names only)
+  for (const [, list] of skill.matchAll(
+    /import\s*\{([^}]*)\}\s*from\s*'react-mosaic-component'/g,
+  )) {
+    for (const part of list.split(',')) {
+      const name = part.trim();
+      if (name && !name.startsWith('type ')) named.add(name);
+    }
+  }
+  // helper table rows: | `updateTree(tree, updates)` | ... |
+  for (const [, name] of skill.matchAll(/^\| `(\w+)\(/gm)) named.add(name);
+  assert.ok(named.size > 5, 'expected the skill to name several exports');
+
+  const { keys } = runNode([
+    '--input-type=module',
+    '-e',
+    REPORT_ESM,
+    pathToFileURL(join(distDir, 'index.mjs')).href,
+  ]);
+  const missing = [...named].filter((name) => !keys.includes(name));
+  assert.deepEqual(missing, [], 'SKILL.md names exports that do not exist');
 });
