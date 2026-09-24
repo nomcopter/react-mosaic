@@ -24,13 +24,15 @@ page.
 The multi-backend switches to touch drag and drop on the first touch, so
 everything works with a finger too:
 
+- **A touch becomes a drag after the finger moves 10px**, so a tap on a
+  toolbar button stays a tap even if the finger wobbles a little.
 - **Windows** drag by their title bar, and dividers resize, right away. Title
   bars and tab group handles have `touch-action: none`, so the page doesn't
   scroll instead.
 - **A preview follows your finger.** Touch drag and drop has no native drag
   image, so Mosaic draws one: the window's `renderPreview`, or the tab's title.
 - **Tabs** sit in a strip that scrolls sideways. A quick sideways swipe scrolls
-  it; moving a tab up or down, or holding it for a moment first, drags it.
+  it; moving a tab clearly up or down, or holding it for a moment first, drags it.
   While you drag, resting near either end of the strip scrolls it, so you can
   reach tabs and drop spots that are out of view.
 
@@ -61,6 +63,21 @@ export function App() {
     </DndProvider>
   );
 }
+```
+
+`HTML5toTouch` starts touch drags on the first pixel of movement. To get the
+same tap and swipe handling as `Mosaic`, give its touch backend a
+`touchSlop` of 10:
+
+```ts
+const options = {
+  ...HTML5toTouch,
+  backends: HTML5toTouch.backends.map((backend) =>
+    backend.id === 'touch'
+      ? { ...backend, options: { ...backend.options, touchSlop: 10 } }
+      : backend,
+  ),
+};
 ```
 
 If you create the manager yourself, you can also keep `Mosaic` and pass it the

@@ -298,6 +298,37 @@ describe('Mosaic touch interactions', () => {
     expect(latest()).toEqual('a');
   });
 
+  // Real fingers wobble a few pixels during a tap. On a tab (a drag source)
+  // that must not start a drag, which would swallow the tap on its close
+  // button.
+  it('keeps a tap with a little finger wobble a tap', async () => {
+    const { container, latest } = renderControlled({
+      type: 'tabs',
+      tabs: ['a', 'b', 'c'],
+      activeTabIndex: 0,
+    });
+    await flush();
+
+    const tabBar = query(container, '.mosaic-tabs-container > .mosaic-tab-bar');
+    const closeC = query(
+      tabBar,
+      '.mosaic-tab-button[title="c"] .mosaic-tab-close-button',
+    );
+    elementUnderFinger = closeC;
+    fireEvent.touchStart(closeC, touchAt(5, 5));
+    await flush();
+    fireEvent.touchMove(closeC, touchAt(7, 8));
+    await flush();
+
+    expect(tabBar.querySelector('.-dragging')).toBeNull();
+
+    fireEvent.touchEnd(closeC, liftAt(7, 8));
+    fireEvent.click(closeC);
+    await flush();
+
+    expect(latest()).toEqual(expect.objectContaining({ tabs: ['a', 'b'] }));
+  });
+
   it('selects a tab on tap', async () => {
     const { container, latest } = renderControlled({
       type: 'tabs',
@@ -363,6 +394,37 @@ describe('Mosaic touch interactions', () => {
 
     expect(latest()).toEqual(initial);
     expect(container.querySelector('.mosaic-touch-drag-preview')).toBeNull();
+  });
+
+  // The first pixels of a real swipe go any which way; the direction is
+  // decided only once the finger has really moved.
+  it('scrolls the tab strip when a sideways swipe starts with a downward wobble', async () => {
+    const initial: MosaicNode<string> = {
+      type: 'tabs',
+      tabs: ['a', 'b', 'c'],
+      activeTabIndex: 0,
+    };
+    const { container, latest } = renderControlled(initial);
+    await flush();
+
+    const tabBar = query(container, '.mosaic-tabs-container > .mosaic-tab-bar');
+    const tabA = query(tabBar, '.mosaic-tab-button[title="a"]');
+    const dropTargets = tabBar.querySelectorAll('.tab-drop-target');
+    elementUnderFinger = tabA;
+    fireEvent.touchStart(tabA, touchAt(10, 10));
+    await flush();
+    fireEvent.touchMove(tabA, touchAt(11, 13));
+    await flush();
+    elementUnderFinger = dropTargets[dropTargets.length - 1];
+    fireEvent.touchMove(elementUnderFinger, touchAt(70, 22));
+    await flush();
+
+    expect(container.querySelector('.mosaic-touch-drag-preview')).toBeNull();
+
+    fireEvent.touchEnd(elementUnderFinger, liftAt(70, 22));
+    await flush();
+
+    expect(latest()).toEqual(initial);
   });
 
   it('shows the dragged window under the finger', async () => {

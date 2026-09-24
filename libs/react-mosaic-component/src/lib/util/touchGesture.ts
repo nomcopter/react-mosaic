@@ -14,6 +14,10 @@ export interface TouchGesture {
 // Holding a tab this long before moving it drags it in any direction
 export const TAB_LONG_PRESS_MS = 300;
 
+// A quick move drags a tab only when it's clearly vertical (steeper than
+// ~56 degrees); anything flatter is a swipe that scrolls the strip
+export const TAB_DRAG_MIN_SLOPE = 1.5;
+
 const gestures = new WeakMap<Document, TouchGesture | null>();
 const listenerCounts = new WeakMap<Document, number>();
 
@@ -83,7 +87,9 @@ export function getTouchGesture(doc: Document): TouchGesture | null {
 
 /**
  * Whether a touch gesture on a tab should drag it. A quick horizontal swipe
- * scrolls the tab strip instead; a vertical move, or a long press, drags.
+ * scrolls the tab strip instead; a clearly vertical move, or a long press,
+ * drags. The touch backend asks once the finger has moved past its slop
+ * (see `MOSAIC_TOUCH_SLOP_PX`), so the direction isn't just finger jitter.
  * Returns true when there's no touch gesture (mouse drags are unaffected).
  */
 export function shouldTouchDragTab(
@@ -98,5 +104,5 @@ export function shouldTouchDragTab(
   }
   const dx = Math.abs(gesture.lastX - gesture.startX);
   const dy = Math.abs(gesture.lastY - gesture.startY);
-  return dy > dx;
+  return dy > 0 && dy >= dx * TAB_DRAG_MIN_SLOPE;
 }
