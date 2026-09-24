@@ -37,6 +37,34 @@ export const DraggableTab = <T extends MosaicKey>({
   // Active tab before the drag-start hide switched it away
   const preDragActiveTabIndex = React.useRef<number | undefined>(undefined);
 
+  // Undoes the drag-start hide. Like the hide, it is transient: no onChange
+  // and no onRelease.
+  const restoreActiveTab = () => {
+    const container = getNodeAtPath(mosaicActions.getRoot(), tabContainerPath);
+    const index = preDragActiveTabIndex.current;
+    if (
+      !isTabsNode(container) ||
+      index === undefined ||
+      index >= container.tabs.length ||
+      index === container.activeTabIndex
+    ) {
+      return;
+    }
+    mosaicActions.updateTree(
+      [
+        {
+          path: tabContainerPath,
+          spec: { activeTabIndex: { $set: index } },
+        },
+      ],
+      {
+        suppressOnChange: true,
+        suppressOnRelease: true,
+        meta: { type: 'drag-cancel', path: tabPath },
+      },
+    );
+  };
+
   const [{ isDragging }, connectDragSource, connectDragPreview] = useDrag({
     type: MosaicDragType.WINDOW,
     item: (): MosaicDragItem => {
@@ -47,8 +75,11 @@ export const DraggableTab = <T extends MosaicKey>({
       preDragActiveTabIndex.current = isTabsNode(container)
         ? container.activeTabIndex
         : undefined;
+      // A lone tab has no other tab to switch to, so there is nothing to hide
+      if (isTabsNode(container) && container.tabs.length > 1) {
         mosaicActions.hide(tabPath, true);
-    
+      }
+
       return {
         mosaicId,
         // Add additional properties for tab reordering
@@ -113,7 +144,7 @@ export const DraggableTab = <T extends MosaicKey>({
 
       if (!didDrop || !dropResult || isChildDrop) {
         // Re-show the window if the drop was cancelled or invalid
-        mosaicActions.show(ownPath, true); // suppressOnChange = true for drag operations
+        restoreActiveTab();
         return;
       }
 
@@ -128,31 +159,19 @@ export const DraggableTab = <T extends MosaicKey>({
 
         if (tabsNode && isTabsNode(tabsNode)) {
           const currentTabs = [...tabsNode.tabs];
-          const currentActiveTabIndex = tabsNode.activeTabIndex;
+          // The tab that was active before the drag-start hide switched it
+          const activeTab =
+            currentTabs[
+              preDragActiveTabIndex.current ?? tabsNode.activeTabIndex
+            ];
 
           const [movedTab] = currentTabs.splice(tabIndex, 1);
           // Adjust insertion index if the removed tab was before the drop position
           const adjustedInsertIndex = tabIndex < tabReorderIndex ? tabReorderIndex - 1 : tabReorderIndex;
           currentTabs.splice(adjustedInsertIndex, 0, movedTab);
 
-          // Calculate new active tab index
-          let newActiveTabIndex = currentActiveTabIndex;
-          if (tabIndex === currentActiveTabIndex) {
-            // The active tab was moved
-            newActiveTabIndex = adjustedInsertIndex;
-          } else if (
-            tabIndex < currentActiveTabIndex &&
-            adjustedInsertIndex >= currentActiveTabIndex
-          ) {
-            // A tab before the active tab was moved to after it
-            newActiveTabIndex = currentActiveTabIndex - 1;
-          } else if (
-            tabIndex > currentActiveTabIndex &&
-            adjustedInsertIndex <= currentActiveTabIndex
-          ) {
-            // A tab after the active tab was moved to before it
-            newActiveTabIndex = currentActiveTabIndex + 1;
-          }
+          // Keep that tab active wherever it ended up
+          const newActiveTabIndex = Math.max(0, currentTabs.indexOf(activeTab));
 
           mosaicActions.updateTree(
             [
@@ -236,7 +255,7 @@ export const DraggableTab = <T extends MosaicKey>({
 
       if (isSelfDrop || dropResult.path === undefined) {
         // This is a self-drop but not a reorder - don't allow it
-        mosaicActions.show(ownPath, true); // suppressOnChange = true for drag operations
+        restoreActiveTab();
         return;
       }
 
