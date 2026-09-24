@@ -86,15 +86,19 @@ The legacy types are still exported for as long as you need them:
 
 ```ts
 import type {
-  MosaicParent,
-  MosaicBranch,
-  MosaicDirection,
+  LegacyMosaicNode,
+  LegacyMosaicParent,
+  LegacyMosaicBranch,
+  LegacyMosaicPath,
 } from 'react-mosaic-component';
 ```
 
-- `MosaicParent<T>` — the old binary split shape
-- `MosaicBranch` — `'first' | 'second'`
-- `MosaicDirection` — `'row' | 'column'` (unchanged, re-exported for symmetry)
+- `LegacyMosaicNode<T>` — a whole v6 tree (a parent or a leaf key)
+- `LegacyMosaicParent<T>` — the old binary split shape
+- `LegacyMosaicBranch` — `'first' | 'second'`
+- `LegacyMosaicPath` — `LegacyMosaicBranch[]`, e.g. `['first', 'second']`
+
+`MosaicDirection` (`'row' | 'column'`) didn't change.
 
 New code should use `MosaicNode<T>`, `MosaicSplitNode<T>`, and
 `MosaicTabsNode<T>` instead.

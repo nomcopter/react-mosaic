@@ -70,8 +70,8 @@ All paths are under `libs/react-mosaic-component/`.
 **`mosaicUtilities.ts`** — `isSplitNode`, `isTabsNode`, `getNodeAtPath`,
 `getParentNode`, `getLeaves`, `createBalancedTreeFromLeaves`, `convertLegacyToNary`.
 
-**`mosaicUpdates.ts`** — `updateTree(tree, updates)`, `createRemoveUpdate(path)`,
-`createExpandUpdate(path, %)`, `createHideUpdate(path)`,
+**`mosaicUpdates.ts`** — `updateTree(tree, updates)`, `createRemoveUpdate(tree, path)`,
+`createExpandUpdate(path, %)`, `createHideUpdate(tree, path)`,
 `createDragToUpdates(tree, source, destination, position)`.
 
 ```typescript
@@ -81,7 +81,9 @@ import {
   isSplitNode,
 } from 'react-mosaic-component';
 
-const newTree = updateTree(currentTree, [createRemoveUpdate(path)]);
+const newTree = updateTree(currentTree, [
+  createRemoveUpdate(currentTree, path),
+]);
 if (isSplitNode(node)) {
   /* node is MosaicSplitNode<T> here */
 }
