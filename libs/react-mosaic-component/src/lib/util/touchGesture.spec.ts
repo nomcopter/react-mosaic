@@ -28,6 +28,11 @@ describe('shouldTouchDragTab', () => {
     expect(shouldTouchDragTab(gesture(-30, 4), 1050)).toBe(false);
   });
 
+  it('scrolls on a diagonal swipe that is only a bit more vertical', () => {
+    expect(shouldTouchDragTab(gesture(20, 24), 1050)).toBe(false);
+    expect(shouldTouchDragTab(gesture(0, 0), 1050)).toBe(false);
+  });
+
   it('drags on a quick vertical move', () => {
     expect(shouldTouchDragTab(gesture(4, 30), 1050)).toBe(true);
     expect(shouldTouchDragTab(gesture(4, -30), 1050)).toBe(true);

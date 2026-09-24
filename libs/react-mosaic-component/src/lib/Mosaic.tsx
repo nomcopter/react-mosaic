@@ -218,7 +218,9 @@ export class MosaicWithoutDragDropContext<
     const { className } = this.props;
 
     return (
-      <MosaicContext.Provider value={this.getContextValue() as MosaicContext<any>}>
+      <MosaicContext.Provider
+        value={this.getContextValue() as MosaicContext<any>}
+      >
         <MosaicRootWithDragDetection className={className}>
           {this.renderTree()}
           {this.props.dropBehavior !== 'swap' && <RootDropTargets />}
@@ -608,6 +610,28 @@ function MosaicRootWithDragDetection({
   );
 }
 
+/**
+ * How far a finger has to move before a touch becomes a drag. With the touch
+ * backend's default of 0, the first pixel of jitter starts a drag, so taps on
+ * toolbar buttons get swallowed and a tab can't tell a swipe from a drag.
+ */
+export const MOSAIC_TOUCH_SLOP_PX = 10;
+
+const DND_BACKEND_OPTIONS: typeof HTML5toTouch = {
+  ...HTML5toTouch,
+  backends: HTML5toTouch.backends.map((backend) =>
+    backend.id === 'touch'
+      ? {
+          ...backend,
+          options: {
+            ...(backend.options as Record<string, unknown> | undefined),
+            touchSlop: MOSAIC_TOUCH_SLOP_PX,
+          },
+        }
+      : backend,
+  ),
+};
+
 export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<
   MosaicProps<T>
 > {
@@ -615,7 +639,7 @@ export class Mosaic<T extends MosaicKey = string> extends React.PureComponent<
     return (
       <DndProvider
         backend={MultiBackend}
-        options={HTML5toTouch}
+        options={DND_BACKEND_OPTIONS}
         context={window}
         {...(this.props.dragAndDropManager && {
           manager: this.props.dragAndDropManager,
