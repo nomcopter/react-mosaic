@@ -18,6 +18,7 @@ import {
 import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
+import { registerDragPreview } from './util/dragPreviewRegistry';
 import { findPathToLeaf } from './util/dragSource';
 import {
   applySwapDrop,
@@ -26,6 +27,7 @@ import {
   snapshotParentBeforeDrag,
 } from './util/dragRestore';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
+import { useTabStripAutoScroll } from './util/tabStripAutoScroll';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
 import { OptionalBlueprint } from './util/OptionalBlueprint';
 import { DraggableTab, DraggableTabProps } from './DraggableTab';
@@ -109,6 +111,13 @@ const DefaultTabButton = <T extends MosaicKey>({
       tabContainerPath={path}
       mosaicActions={mosaicActions}
       mosaicId={mosaicId}
+      renderPreview={() => (
+        <div className="mosaic-tab-button -active">
+          <span className="mosaic-tab-button-content">
+            {renderTabTitle({ tabKey, path, isActive: true, index, mosaicId })}
+          </span>
+        </div>
+      )}
     >
       {({ isDragging, connectDragSource, connectDragPreview }) => (
         <button
@@ -247,6 +256,8 @@ export const MosaicTabs = <T extends MosaicKey>({
 
   // A tab of the dragged group, used to find the group again at drop time
   const dragAnchorTab = React.useRef<T | undefined>(undefined);
+  const tabStripRef = React.useRef<HTMLDivElement>(null);
+  useTabStripAutoScroll(tabStripRef);
 
   // Add drag functionality for the entire tab container
   const [, connectDragSource, connectDragPreview] = useDrag<
@@ -264,11 +275,14 @@ export const MosaicTabs = <T extends MosaicKey>({
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(path));
       dragAnchorTab.current = tabs[0];
-      return {
+      const item: MosaicDragItem = {
         mosaicId,
         hideTimer,
         path,
       };
+      // Shown under the finger for touch drags (see TouchDragPreview)
+      registerDragPreview(item, renderPreview);
+      return item;
     },
     end: ({ hideTimer }, monitor) => {
       // If the hide call hasn't happened yet, cancel it
@@ -464,7 +478,7 @@ export const MosaicTabs = <T extends MosaicKey>({
         })}
       >
         {/* Scrollable tabs section */}
-        <div className="mosaic-tab-bar-tabs">
+        <div className="mosaic-tab-bar-tabs" ref={tabStripRef}>
           {/* Drop target at the beginning */}
           <TabDropTarget
             tabContainerPath={path}

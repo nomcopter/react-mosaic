@@ -21,6 +21,8 @@
 
     &.draggable {
       cursor: move;
+      // Dragging the title bar must not scroll the page on iOS Safari
+      touch-action: none;
     }
   }
 
