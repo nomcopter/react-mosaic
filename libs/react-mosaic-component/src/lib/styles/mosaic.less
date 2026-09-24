@@ -382,19 +382,37 @@
   z-index: 1000;
   width: 2px; // Default width when not dragging
 
-  &.tab-drop-target-hover {
-    width: 40px; // Expanded width when hovering during drag
-  }
-
-  // When any item is being dragged, show the drop targets
+  // When any item is being dragged, show the drop targets. The negative
+  // margins cancel the target's width plus the extra flex gap it adds
+  // (width + 4px gap = 2 * 12px), so the tabs don't shift under the cursor
+  // when a drag starts. The 20px hit area ends up centred on the gap.
   &.dragging {
     display: flex;
-    width: 20px; // Medium width when dragging but not hovering
+    width: 20px;
+    margin: 0 -12px;
+
+    // The edge targets would hang half outside the scrolling strip, where
+    // the tab bar's own drop target catches the cursor instead. Keep them
+    // inside: the first overlaps the start of the first tab, the last
+    // overlaps the end of the last tab and fills any free space after it.
+    &:first-child {
+      margin: 0 -24px 0 0;
+      justify-content: flex-start;
+    }
+
+    &:last-child {
+      margin: 0 0 0 -24px;
+      flex-grow: 1;
+      box-sizing: border-box;
+      padding-left: 18px; // Indicator right after the last tab
+      justify-content: flex-start;
+    }
   }
 
   // Drop placeholder when hovering during drag
   .tab-drop-placeholder {
     width: 32px;
+    flex-shrink: 0; // Wider than the target; overflow instead of squashing
     height: 24px;
     background: linear-gradient(135deg, #007acc, #0099ff);
     border-radius: 4px;
