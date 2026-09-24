@@ -32,6 +32,7 @@ import {
   MosaicPath,
   MosaicSplitNode,
 } from './types';
+import { registerDragPreview } from './util/dragPreviewRegistry';
 import { resolveLeafPath } from './util/dragSource';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import {
@@ -446,7 +447,7 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       // The defer is necessary as the element must be present on start for HTML DnD to not cry
       const hideTimer = defer(() => mosaicActions.hide(props.path));
       const node = getNodeAtPath(mosaicActions.getRoot(), props.path);
-      return {
+      const item: MosaicDragItem = {
         mosaicId,
         hideTimer,
         path: props.path,
@@ -455,6 +456,13 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
             ? node
             : undefined,
       };
+      // Shown under the finger for touch drags (see TouchDragPreview)
+      const renderPreview =
+        props.renderPreview ?? InternalMosaicWindow.defaultProps.renderPreview;
+      if (renderPreview) {
+        registerDragPreview(item, () => renderPreview(props));
+      }
+      return item;
     },
     end: ({ hideTimer, path: dragStartPath, nodeKey }, monitor) => {
       // If the hide call hasn't happened yet, cancel it

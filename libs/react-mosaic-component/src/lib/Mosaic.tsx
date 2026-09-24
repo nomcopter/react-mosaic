@@ -12,6 +12,7 @@ import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicRoot } from './MosaicRoot';
 import { MosaicZeroState } from './MosaicZeroState';
 import { RootDropTargets } from './RootDropTargets';
+import { TouchDragPreview } from './TouchDragPreview';
 import {
   CreateNode,
   LegacyMosaicNode,
@@ -221,6 +222,7 @@ export class MosaicWithoutDragDropContext<
         <MosaicRootWithDragDetection className={className}>
           {this.renderTree()}
           {this.props.dropBehavior !== 'swap' && <RootDropTargets />}
+          <TouchDragPreview mosaicId={this.state.mosaicId} />
         </MosaicRootWithDragDetection>
       </MosaicContext.Provider>
     );

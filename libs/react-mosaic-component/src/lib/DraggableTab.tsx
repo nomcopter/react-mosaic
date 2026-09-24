@@ -3,9 +3,15 @@ import { useDrag, DragSourceMonitor, ConnectDragSource, ConnectDragPreview } fro
 import { dropRight, isEqual } from 'lodash-es';
 import { MosaicKey, MosaicTabsNode, MosaicPath, MosaicDragType } from './types';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
+import { registerDragPreview } from './util/dragPreviewRegistry';
 import { resolveLeafPath } from './util/dragSource';
 import { createDragToUpdates, createDropMeta } from './util/mosaicUpdates';
 import { getNodeAtPath, isTabsNode } from './util/mosaicUtilities';
+import {
+  getTouchGesture,
+  shouldTouchDragTab,
+  trackTouchGestures,
+} from './util/touchGesture';
 import { MosaicRootActions } from './contextTypes';
 
 export interface DraggableTabProps<T extends MosaicKey> {
@@ -14,6 +20,8 @@ export interface DraggableTabProps<T extends MosaicKey> {
   tabContainerPath: MosaicPath;
   mosaicActions: MosaicRootActions<T>;
   mosaicId: string;
+  /** What follows the finger while the tab is dragged by touch */
+  renderPreview?: () => React.ReactNode;
   children: (dragProps: {
     isDragging: boolean;
     connectDragSource: ConnectDragSource;
@@ -31,6 +39,7 @@ export const DraggableTab = <T extends MosaicKey>({
   tabContainerPath,
   mosaicActions,
   mosaicId,
+  renderPreview,
   children,
 }: DraggableTabProps<T>) => {
   const tabPath = tabContainerPath.concat(tabIndex);
@@ -65,8 +74,18 @@ export const DraggableTab = <T extends MosaicKey>({
     );
   };
 
+  // Lets a quick horizontal swipe scroll the tab strip on touch screens
+  React.useEffect(
+    () =>
+      typeof document === 'undefined' ? undefined : trackTouchGestures(document),
+    [],
+  );
+
   const [{ isDragging }, connectDragSource, connectDragPreview] = useDrag({
     type: MosaicDragType.WINDOW,
+    canDrag: () =>
+      typeof document === 'undefined' ||
+      shouldTouchDragTab(getTouchGesture(document), Date.now()),
     item: (): MosaicDragItem => {
       const container = getNodeAtPath(
         mosaicActions.getRoot(),
@@ -80,7 +99,7 @@ export const DraggableTab = <T extends MosaicKey>({
         mosaicActions.hide(tabPath, true);
       }
 
-      return {
+      const item: MosaicDragItem = {
         mosaicId,
         // Add additional properties for tab reordering
         isTab: true,
@@ -90,6 +109,10 @@ export const DraggableTab = <T extends MosaicKey>({
         path: tabPath,
         nodeKey: tabKey,
       };
+      if (renderPreview) {
+        registerDragPreview(item, renderPreview);
+      }
+      return item;
     },
     end: (_, monitor: DragSourceMonitor) => {
       const dropResult = monitor.getDropResult<MosaicDropData>();
