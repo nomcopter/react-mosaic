@@ -20,6 +20,10 @@ export const DefaultAddTabButton: React.FC<DefaultAddTabButtonProps> = ({
   children = '+',
 }) => {
   const { mosaicActions } = React.useContext(MosaicContext);
+  // Without createNode there's nothing to add, so don't offer a dead button
+  if (mosaicActions.createNode == null) {
+    return null;
+  }
   return (
     <button
       className={classNames('mosaic-tab-add-button', className)}
