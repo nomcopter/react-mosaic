@@ -19,6 +19,21 @@ instance, and it survives remounts from route changes, hot reload and React
 `StrictMode`. You don't need to do anything to render several mosaics on one
 page.
 
+## Touch screens
+
+The multi-backend switches to touch drag and drop on the first touch, so
+everything works with a finger too:
+
+- **Windows** drag by their title bar, and dividers resize, right away. Title
+  bars and tab group handles have `touch-action: none`, so the page doesn't
+  scroll instead.
+- **A preview follows your finger.** Touch drag and drop has no native drag
+  image, so Mosaic draws one: the window's `renderPreview`, or the tab's title.
+- **Tabs** sit in a strip that scrolls sideways. A quick sideways swipe scrolls
+  it; moving a tab up or down, or holding it for a moment first, drags it.
+  While you drag, resting near either end of the strip scrolls it, so you can
+  reach tabs and drop spots that are out of view.
+
 ## Using your own `DndProvider`
 
 If your app already has a `DndProvider`, don't nest a second one with its own
