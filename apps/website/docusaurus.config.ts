@@ -38,6 +38,20 @@ for (const file of fs.readdirSync(iconsDir)) {
 
 const baseUrl = process.env.SITE_BASE_URL || '/react-mosaic/';
 
+// Shared by the llms.txt files (see docusaurus-plugin-llms below).
+const LLMS_DESCRIPTION =
+  'React tiling window manager (v7): an immutable n-ary tree of resizable, drag-and-drop panels, splits and tab groups.';
+const LLMS_ROOT_CONTENT = [
+  'Coding agents: the npm package ships an Agent Skill with the v7 API and common mistakes, at',
+  '`node_modules/react-mosaic-component/skills/react-mosaic/SKILL.md`',
+  '(or `npx skills add nomcopter/react-mosaic`).',
+  'v7 trees use `{ type: "split", direction, children, splitPercentages }` and numeric paths;',
+  'the v6 `first`/`second` shape is legacy.',
+  '',
+  'The generated API reference is in [llms-api.txt](llms-api.txt).',
+].join('\n');
+const LLMS_ORDER = ['intro.md', 'concepts/**', 'guides/**', 'migration/**'];
+
 const config: Config = {
   title: 'react-mosaic',
   tagline: 'A React tiling window manager',
@@ -149,6 +163,49 @@ const config: Config = {
         sidebar: {
           pretty: true,
         },
+      },
+    ],
+    // Writes llms.txt / llms-full.txt (llmstxt.org) plus a .md copy of every
+    // page into the build, so chat assistants and agents can read the docs
+    // without the site's JS. The typedoc API pages (~300 KB) go in their own
+    // llms-api.txt so llms-full.txt stays small enough for a chat context.
+    [
+      'docusaurus-plugin-llms',
+      {
+        generateLLMsTxt: false,
+        generateLLMsFullTxt: false,
+        // llms.txt links to .md URLs, so emit those files
+        generateMarkdownFiles: true,
+        excludeImports: true,
+        removeDuplicateHeadings: true,
+        customLLMFiles: [
+          {
+            filename: 'llms.txt',
+            includePatterns: ['**/*.{md,mdx}'],
+            ignorePatterns: ['api/**'],
+            orderPatterns: LLMS_ORDER,
+            fullContent: false,
+            description: LLMS_DESCRIPTION,
+            rootContent: LLMS_ROOT_CONTENT,
+          },
+          {
+            filename: 'llms-full.txt',
+            includePatterns: ['**/*.{md,mdx}'],
+            ignorePatterns: ['api/**'],
+            orderPatterns: LLMS_ORDER,
+            fullContent: true,
+            description: LLMS_DESCRIPTION,
+            rootContent: LLMS_ROOT_CONTENT,
+          },
+          {
+            filename: 'llms-api.txt',
+            includePatterns: ['api/**'],
+            fullContent: true,
+            title: 'react-mosaic API reference',
+            description:
+              'Generated from the TypeScript source of react-mosaic-component.',
+          },
+        ],
       },
     ],
   ],

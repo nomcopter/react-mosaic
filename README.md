@@ -81,6 +81,23 @@ For live editable examples, the n-ary tree model, custom toolbars, tabs, theming
 - **Theming.** Works with or without Blueprint; ships a default CSS theme plus CSS variables you can override.
 - **Zero-config migration.** Legacy v6 binary trees are auto-converted at render time. `convertLegacyToNary` is available for explicit upgrades.
 
+## Using with AI coding agents
+
+The package ships an [Agent Skill](./skills/react-mosaic/SKILL.md) with the v7
+API, the tree model and the common mistakes (like writing the old v6
+`first`/`second` trees). It works with Claude Code, Codex, Cursor, GitHub
+Copilot, Gemini CLI and other agents that support skills:
+
+```bash
+npx skills add nomcopter/react-mosaic
+```
+
+Or point your agent at
+`node_modules/react-mosaic-component/skills/react-mosaic/SKILL.md`, e.g. from
+your `AGENTS.md` or `CLAUDE.md`. For chat assistants, the docs are also
+available as [llms.txt](https://nomcopter.github.io/react-mosaic/llms.txt) and
+[llms-full.txt](https://nomcopter.github.io/react-mosaic/llms-full.txt).
+
 ## Browser support
 
 Current versions of Chrome, Edge, Firefox and Safari, on desktop and mobile
