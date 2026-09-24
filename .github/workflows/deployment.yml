@@ -41,6 +41,12 @@ jobs:
       - name: Npm install
         run: npm ci
 
+      # PRs are tested against master as it was when their CI last ran, so two
+      # PRs can each pass and still break master once both are merged. Test the
+      # merged result too, and don't deploy docs for a broken master.
+      - name: Run tests
+        run: npm run test
+
       # The website imports the library from its built ESM bundle (see the
       # webpack alias in apps/website/docusaurus.config.ts), so the library
       # must be built before Docusaurus.
