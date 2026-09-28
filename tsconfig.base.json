@@ -18,7 +18,11 @@
       "react-mosaic-component/styles": [
         "libs/react-mosaic-component/src/lib/styles/index.less"
       ]
-    }
+    },
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["docs", "lib", "node_modules"]
 }

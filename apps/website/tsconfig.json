@@ -6,7 +6,8 @@
     "resolveJsonModule": true,
     "paths": {
       "@site/*": ["./*"]
-    }
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*", "docusaurus.config.ts", "sidebars.ts"],
   "exclude": ["node_modules", "build", ".docusaurus"]
