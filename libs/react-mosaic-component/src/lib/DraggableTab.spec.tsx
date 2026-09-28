@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render } from '@testing-library/react';
 
 import { Mosaic } from './Mosaic';
 import { MosaicWindow } from './MosaicWindow';
-import { MosaicNode } from './types';
+import { MosaicNode, TabButtonRenderer, TabTitleRenderer } from './types';
 
 // jsdom has no DataTransfer, and the HTML5 backend touches it on every event
 function createDataTransfer() {
@@ -44,11 +44,18 @@ async function drag(source: Element, target?: Element) {
   await flush();
 }
 
-function renderUncontrolled(initial: MosaicNode<string>) {
+function renderUncontrolled(
+  initial: MosaicNode<string>,
+  tabProps: {
+    renderTabTitle?: TabTitleRenderer<string>;
+    renderTabButton?: TabButtonRenderer<string>;
+  } = {},
+) {
   const onChange = vi.fn();
   const onRelease = vi.fn();
   const utils = render(
     <Mosaic<string>
+      {...tabProps}
       initialValue={initial}
       onChange={onChange}
       onRelease={onRelease}
@@ -187,5 +194,163 @@ describe('DraggableTab: the active tab across a tab drag', () => {
     expect(tabOrder()).toEqual(['b']);
     expect(activeTab()).toBe('b');
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+// Starts a drag the way a browser does, mouse down first, and records what
+// the HTML5 backend hands to setDragImage and whether it was shown then
+function startDrag(source: Element) {
+  const snapshots: { node: Element; shown: boolean }[] = [];
+  const dataTransfer = {
+    ...createDataTransfer(),
+    setDragImage: (node: Element) => {
+      snapshots.push({ node, shown: node.classList.contains('-drag-image') });
+    },
+  };
+  fireEvent.mouseDown(source);
+  fireEvent.dragStart(source, { dataTransfer });
+  return {
+    snapshots,
+    end: async () => {
+      await flush();
+      fireEvent.dragEnd(source, { dataTransfer });
+      await flush();
+    },
+  };
+}
+
+async function dragImageTitle(source: Element): Promise<string | undefined> {
+  const { snapshots, end } = startDrag(source);
+  await end();
+  expect(snapshots).toHaveLength(1);
+  return (
+    snapshots[0].node.querySelector('.mosaic-window-title')?.textContent ??
+    undefined
+  );
+}
+
+describe('DraggableTab: the drag image', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('is the window card, shown just for the dragstart snapshot', async () => {
+    const { tab } = renderUncontrolled(THREE_TABS);
+    await flush();
+
+    const { snapshots, end } = startDrag(tab('c'));
+    await flush();
+
+    expect(snapshots).toHaveLength(1);
+    const { node, shown } = snapshots[0];
+    expect(node.classList.contains('mosaic-preview')).toBe(true);
+    expect(node.querySelector('.mosaic-window-title')?.textContent).toBe(
+      'Tab c',
+    );
+    expect(shown).toBe(true);
+    expect(node.classList.contains('-drag-image')).toBe(false);
+    await end();
+  });
+
+  it('shows a custom tab title', async () => {
+    const { tab } = renderUncontrolled(THREE_TABS, {
+      renderTabTitle: ({ tabKey }) => <b>Custom {tabKey}</b>,
+    });
+    await flush();
+
+    expect(await dragImageTitle(tab('d'))).toBe('Custom d');
+  });
+
+  it('follows the dragged tab, also after a reorder', async () => {
+    const { tab, slot, tabOrder } = renderUncontrolled(THREE_TABS);
+    await flush();
+
+    expect(await dragImageTitle(tab('c'))).toBe('Tab c');
+    expect(await dragImageTitle(tab('d'))).toBe('Tab d');
+
+    fireEvent.mouseDown(tab('d'));
+    await drag(tab('d'), slot(0));
+    expect(tabOrder()).toEqual(['d', 'b', 'c']);
+
+    expect(await dragImageTitle(tab('c'))).toBe('Tab c');
+    expect(await dragImageTitle(tab('d'))).toBe('Tab d');
+  });
+
+  it('works for a single-tab group', async () => {
+    const { tab } = renderUncontrolled({
+      type: 'split',
+      direction: 'row',
+      children: ['a', { type: 'tabs', tabs: ['b'], activeTabIndex: 0 }],
+    });
+    await flush();
+
+    expect(await dragImageTitle(tab('b'))).toBe('Tab b');
+  });
+
+  it('works for a deeply nested group', async () => {
+    const { tab } = renderUncontrolled({
+      type: 'split',
+      direction: 'row',
+      children: [
+        'a',
+        {
+          type: 'split',
+          direction: 'column',
+          children: [
+            'x',
+            {
+              type: 'split',
+              direction: 'row',
+              children: [
+                'y',
+                { type: 'tabs', tabs: ['p', 'q'], activeTabIndex: 1 },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    await flush();
+
+    expect(await dragImageTitle(tab('p'))).toBe('Tab p');
+  });
+
+  it('is not rendered for custom tab buttons', async () => {
+    const { container } = renderUncontrolled(THREE_TABS, {
+      renderTabButton: ({ tabKey, onTabClick }) => (
+        <button
+          className="mosaic-tab-button"
+          title={tabKey}
+          onClick={onTabClick}
+        >
+          {tabKey}
+        </button>
+      ),
+    });
+    await flush();
+
+    expect(
+      container.querySelector('.mosaic-tabs-container > .mosaic-preview.-tab'),
+    ).toBeNull();
+  });
+
+  it('of the whole group is shown just for the dragstart snapshot', async () => {
+    const { container } = renderUncontrolled(THREE_TABS);
+    await flush();
+
+    const handle = container.querySelector('.mosaic-tab-drag-button');
+    if (handle == null) {
+      throw new Error('No tab group drag handle');
+    }
+    const { snapshots, end } = startDrag(handle);
+    await flush();
+
+    expect(snapshots).toHaveLength(1);
+    const { node, shown } = snapshots[0];
+    expect(node.matches('.mosaic-tabs-container > .mosaic-preview')).toBe(true);
+    expect(node.classList.contains('-tab')).toBe(false);
+    expect(shown).toBe(true);
+    expect(node.classList.contains('-drag-image')).toBe(false);
+    await end();
   });
 });

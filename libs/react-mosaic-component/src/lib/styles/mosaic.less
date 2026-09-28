@@ -182,8 +182,9 @@
   flex-direction: column;
   overflow: hidden;
 
-  // Drag preview for tab containers
-  .mosaic-preview {
+  // Drag images of the tab group and its tabs. Not the previews of windows
+  // inside the tabs, which stay visible under their window body.
+  > .mosaic-preview {
     height: 100%;
     width: 100%;
     position: absolute;
@@ -193,6 +194,23 @@
     pointer-events: none; // Make sure it doesn't interfere with mouse events
     opacity: 0; // Hide by default, react-dnd will handle showing during drag
     visibility: hidden; // Completely hide it from layout
+
+    // Shown for the drag start snapshot only (see util/dragImage)
+    &.-drag-image {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mosaic-window-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h4 {
+      margin-bottom: 10px;
+    }
   }
 
   .mosaic-tab-bar {
@@ -484,19 +502,5 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
-  }
-
-  &.-tab {
-    height: auto;
-    display: flex;
-    justify-content: center;
-    overflow: visible;
-
-    .mosaic-tab-button {
-      padding: 4px 10px;
-      border-radius: 4px;
-      background: white;
-      box-shadow: 0 1px 4px fade(black, 30%);
-    }
   }
 }

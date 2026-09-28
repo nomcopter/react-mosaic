@@ -19,6 +19,7 @@ import { BoundingBox, boundingBoxAsStyles } from './util/BoundingBox';
 import { MosaicContext, MosaicRootActions } from './contextTypes';
 import { MosaicDragItem, MosaicDropData } from './internalTypes';
 import { registerDragPreview } from './util/dragPreviewRegistry';
+import { revealForDragImage } from './util/dragImage';
 import { findPathToLeaf } from './util/dragSource';
 import {
   applySwapDrop,
@@ -39,6 +40,41 @@ import { TabDragButton } from './buttons/TabDragButton';
 // give it a new element type every render, remounting the consumer's entire
 // renderTabToolbar subtree on every tree update.
 const TabContainerPathContext = React.createContext<MosaicPath>([]);
+
+// The drag image shared by a group's default tabs. MosaicTabs renders it in
+// the container so it gets the container's size, like a window's preview gets
+// the window's. `show` points it at the tab about to be dragged.
+interface TabDragImage {
+  node: React.RefObject<HTMLDivElement | null>;
+  show: (tabKey: MosaicKey) => void;
+}
+
+const TabDragImageContext = React.createContext<TabDragImage | null>(null);
+
+const defaultTabTitle: TabTitleRenderer<MosaicKey> = ({ tabKey }) =>
+  `Tab ${tabKey}`;
+
+// Same card a dragged window shows, so tab and window drags look alike
+function renderTabPreviewCard(
+  title: React.ReactNode,
+  ref?: React.Ref<HTMLDivElement>,
+): React.ReactElement {
+  return (
+    <div className="mosaic-preview -tab" ref={ref} aria-hidden>
+      <div className="mosaic-window-toolbar">
+        <div className="mosaic-window-title">{title}</div>
+      </div>
+      <div className="mosaic-window-body">
+        <h4>{title}</h4>
+        <OptionalBlueprint.Icon
+          className="default-preview-icon"
+          size="large"
+          icon="APPLICATION"
+        />
+      </div>
+    </div>
+  );
+}
 
 function ToolbarDraggableTab<T extends MosaicKey>(
   props: Pick<DraggableTabProps<T>, 'tabKey' | 'tabIndex' | 'children'>,
@@ -79,7 +115,7 @@ const DefaultTabButton = <T extends MosaicKey>({
   mosaicId,
   onTabClick,
   mosaicActions,
-  renderTabTitle = ({ tabKey }) => `Tab ${tabKey}`,
+  renderTabTitle = defaultTabTitle,
   canClose = () => 'canClose',
   onTabClose,
   tabs,
@@ -104,6 +140,8 @@ const DefaultTabButton = <T extends MosaicKey>({
   // Get the close state
   const closeState = canClose(tabKey, tabs, index, path);
 
+  const dragImage = React.useContext(TabDragImageContext);
+
   return (
     <DraggableTab
       tabKey={tabKey}
@@ -111,13 +149,11 @@ const DefaultTabButton = <T extends MosaicKey>({
       tabContainerPath={path}
       mosaicActions={mosaicActions}
       mosaicId={mosaicId}
-      renderPreview={() => (
-        <div className="mosaic-tab-button -active">
-          <span className="mosaic-tab-button-content">
-            {renderTabTitle({ tabKey, path, isActive: true, index, mosaicId })}
-          </span>
-        </div>
-      )}
+      renderPreview={() =>
+        renderTabPreviewCard(
+          renderTabTitle({ tabKey, path, isActive: true, index, mosaicId }),
+        )
+      }
     >
       {({ isDragging, connectDragSource, connectDragPreview }) => (
         <button
@@ -126,10 +162,22 @@ const DefaultTabButton = <T extends MosaicKey>({
             '-dragging': isDragging,
           })}
           onClick={onTabClick}
+          // Mouse down commits before the drag starts, so the drag image
+          // already shows this tab by then
+          onMouseDown={() => dragImage?.show(tabKey)}
+          onDragStart={() =>
+            revealForDragImage(dragImage?.node.current ?? null)
+          }
           title={`${tabKey}`}
           ref={(node) => {
             connectDragSource(node);
-            connectDragPreview(node);
+            // The drag image renders before the tab bar and refs attach in
+            // tree order, so it is mounted here. Without it the tab itself
+            // stays the drag image.
+            const preview = dragImage?.node.current;
+            if (preview) {
+              connectDragPreview(preview);
+            }
           }}
         >
           <span className="mosaic-tab-button-content">
@@ -258,6 +306,14 @@ export const MosaicTabs = <T extends MosaicKey>({
   const dragAnchorTab = React.useRef<T | undefined>(undefined);
   const tabStripRef = React.useRef<HTMLDivElement>(null);
   useTabStripAutoScroll(tabStripRef);
+  const hasDefaultTabs = !renderTabToolbar && !renderTabButton;
+  const tabDragImageRef = React.useRef<HTMLDivElement>(null);
+  const groupDragImageRef = React.useRef<HTMLDivElement>(null);
+  const [dragImageTabKey, setDragImageTabKey] = React.useState<MosaicKey>();
+  const tabDragImage = React.useMemo<TabDragImage>(
+    () => ({ node: tabDragImageRef, show: setDragImageTabKey }),
+    [],
+  );
 
   // Add drag functionality for the entire tab container
   const [, connectDragSource, connectDragPreview] = useDrag<
@@ -281,7 +337,8 @@ export const MosaicTabs = <T extends MosaicKey>({
         path,
       };
       // Shown under the finger for touch drags (see TouchDragPreview)
-      registerDragPreview(item, renderPreview);
+      registerDragPreview(item, () => renderPreview());
+      revealForDragImage(groupDragImageRef.current);
       return item;
     },
     end: ({ hideTimer }, monitor) => {
@@ -375,7 +432,11 @@ export const MosaicTabs = <T extends MosaicKey>({
         });
       } else {
         // Canceled or invalid drop: put the pre-drag sizes back
-        restoreAfterCancelledDrag(mosaicActions, ownPath, preDragParent.current);
+        restoreAfterCancelledDrag(
+          mosaicActions,
+          ownPath,
+          preDragParent.current,
+        );
       }
     },
   });
@@ -533,8 +594,8 @@ export const MosaicTabs = <T extends MosaicKey>({
   const tilePath = path.concat(activeTabIndex);
 
   // Drag preview for the entire tab container
-  const renderPreview = () => (
-    <div className="mosaic-preview">
+  const renderPreview = (ref?: React.Ref<HTMLDivElement>) => (
+    <div className="mosaic-preview" ref={ref}>
       <div className="mosaic-tab-bar">
         <div className="mosaic-tab-bar-tabs">
           {tabs.map((tabKey, index) => (
@@ -570,6 +631,21 @@ export const MosaicTabs = <T extends MosaicKey>({
     </div>
   );
 
+  const renderTabDragImage = () => {
+    const found = tabs.findIndex((tabKey) => tabKey === dragImageTabKey);
+    const index = found === -1 ? activeTabIndex : found;
+    return renderTabPreviewCard(
+      (renderTabTitle ?? defaultTabTitle)({
+        tabKey: tabs[index],
+        path,
+        isActive: true,
+        index,
+        mosaicId,
+      }),
+      tabDragImageRef,
+    );
+  };
+
   return (
     // This is the container for the entire tab group.
     // Its position and size are determined ONLY by the boundingBox.
@@ -577,6 +653,10 @@ export const MosaicTabs = <T extends MosaicKey>({
       className="mosaic-tabs-container"
       style={boundingBoxAsStyles(boundingBox)}
     >
+      {/* Drag image for the default tabs, ahead of the tab bar so it mounts
+          before the tabs connect to it */}
+      {hasDefaultTabs && renderTabDragImage()}
+
       {/* Use the custom toolbar renderer if provided, otherwise use our default */}
       {renderTabToolbar ? (
         <TabContainerPathContext.Provider value={path}>
@@ -588,7 +668,9 @@ export const MosaicTabs = <T extends MosaicKey>({
           })}
         </TabContainerPathContext.Provider>
       ) : (
-        renderDefaultToolbar()
+        <TabDragImageContext.Provider value={tabDragImage}>
+          {renderDefaultToolbar()}
+        </TabDragImageContext.Provider>
       )}
 
       {connectDropTarget(
@@ -596,7 +678,7 @@ export const MosaicTabs = <T extends MosaicKey>({
       )}
 
       {/* Drag preview for the entire tab container */}
-      {connectDragPreview(renderPreview())}
+      {connectDragPreview(renderPreview(groupDragImageRef))}
     </div>
   );
 };

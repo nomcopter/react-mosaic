@@ -93,11 +93,7 @@ function TouchDragPreviewLayer({ mosaicId }: { mosaicId: string }) {
   }px)`;
   return (
     <div
-      className={
-        item.isTab
-          ? 'mosaic-touch-drag-preview -tab'
-          : 'mosaic-touch-drag-preview'
-      }
+      className="mosaic-touch-drag-preview"
       style={{ transform, WebkitTransform: transform }}
     >
       {render()}

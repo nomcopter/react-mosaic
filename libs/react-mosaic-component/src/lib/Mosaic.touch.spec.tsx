@@ -444,7 +444,6 @@ describe('Mosaic touch interactions', () => {
 
     const preview = query(container, '.mosaic-touch-drag-preview');
     expect(preview.textContent).toContain('b');
-    expect(preview.classList.contains('-tab')).toBe(false);
     expect((preview as HTMLElement).style.transform).toBe(
       'translate(50px, 65px)',
     );
@@ -469,10 +468,12 @@ describe('Mosaic touch interactions', () => {
     fireEvent.touchMove(tab, touchAt(12, 60));
     await flush();
 
-    const preview = query(container, '.mosaic-touch-drag-preview.-tab');
-    expect(preview.querySelector('.mosaic-tab-button')?.textContent).toBe(
-      'Tab b',
-    );
+    // The same window card a dragged window shows
+    const preview = query(container, '.mosaic-touch-drag-preview');
+    expect(
+      preview.querySelector('.mosaic-preview .mosaic-window-title')
+        ?.textContent,
+    ).toBe('Tab b');
 
     fireEvent.touchEnd(document.body, liftAt(12, 60));
     await flush();
