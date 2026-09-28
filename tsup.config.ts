@@ -55,6 +55,6 @@ export default defineConfig([
       'lodash-es',
     ],
     // Still external (all ship CJS): react (peer), classnames,
-    // immutability-helper, prop-types, uuid.
+    // immutability-helper,uuid.
   },
 ]);
