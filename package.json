@@ -24,7 +24,7 @@
     "build-lib:less": "lessc --autoprefix=defaults ./libs/react-mosaic-component/src/lib/styles/index.less ./dist/libs/react-mosaic-component/react-mosaic-component.css",
     "build-lib:js": "tsup",
     "build-lib:check": "tsc -p ./libs/react-mosaic-component/tsconfig.lib.json --noEmit",
-    "build-lib:types": "tsup",
+    "build-lib:types": "tsup --dts-only",
     "clean": "shx rm -rf ./dist/libs/react-mosaic-component/",
     "copy": "shx mv ./dist/libs/react-mosaic-component/index.d.ts ./dist/libs/react-mosaic-component/index.d.cts && shx cp ./libs/react-mosaic-component/package.json ./dist/libs/react-mosaic-component/package.json && shx cp README.md ./dist/libs/react-mosaic-component/README.md && shx cp LICENSE ./dist/libs/react-mosaic-component/LICENSE && shx cp -r skills ./dist/libs/react-mosaic-component/skills",
     "prepare": "lefthook install",

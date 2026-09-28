@@ -3,7 +3,10 @@ import { esbuildPluginFilePathExtensions } from 'esbuild-plugin-file-path-extens
 
 const base: Options = {
   bundle: true,
-  dts: true,
+  // Declarations come only from `build-lib:types` (`tsup --dts-only`, whose
+  // CLI flag overrides this). It runs in parallel with `build-lib:js`, so each
+  // must write its own files or the two race on the same outputs.
+  dts: false,
   outDir: './dist/libs/react-mosaic-component',
   platform: 'neutral',
   outExtension({ format }) {
