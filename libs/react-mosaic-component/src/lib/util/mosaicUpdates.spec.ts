@@ -341,3 +341,53 @@ describe('createDropMeta', () => {
     });
   });
 });
+
+describe('createDragToUpdates when removing the source collapses a split', () => {
+  const split = (
+    direction: 'row' | 'column',
+    children: MosaicNode<string>[],
+  ): MosaicSplitNode<string> => ({ type: 'split', direction, children });
+
+  const drag = (
+    tree: MosaicNode<string>,
+    sourcePath: MosaicPath,
+    destinationPath: MosaicPath,
+    position: MosaicDropTargetPosition,
+  ) =>
+    updateTree(
+      tree,
+      createDragToUpdates(tree, sourcePath, destinationPath, {
+        type: 'split',
+        position,
+      }),
+    );
+
+  it('splits the destination when its split collapses into the root', () => {
+    // a | b over a full-width c; drop c on the bottom of b
+    const tree = split('column', [split('row', ['a', 'b']), 'c']);
+    const result = drag(tree, [1], [0, 1], MosaicDropTargetPosition.BOTTOM);
+
+    expect(result).toMatchObject(
+      split('row', ['a', split('column', ['b', 'c'])]),
+    );
+  });
+
+  it('splits the destination when it is deeply nested', () => {
+    const tree = split('column', [
+      split('row', ['a', split('column', ['b', 'd'])]),
+      'c',
+    ]);
+    const result = drag(tree, [1], [0, 1, 0], MosaicDropTargetPosition.RIGHT);
+
+    expect(result).toMatchObject(
+      split('row', ['a', split('column', [split('row', ['b', 'c']), 'd'])]),
+    );
+  });
+
+  it('still splits the root when dropping on a split that contains the source', () => {
+    const tree = split('column', [split('row', ['a', 'b']), 'c']);
+    const result = drag(tree, [1], [], MosaicDropTargetPosition.LEFT);
+
+    expect(result).toMatchObject(split('row', ['c', 'a', 'b']));
+  });
+});

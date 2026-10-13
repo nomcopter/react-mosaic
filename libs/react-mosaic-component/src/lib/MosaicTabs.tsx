@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useDrop, useDrag, DropTargetMonitor } from 'react-dnd';
-import { defer, drop as _drop, isEqual } from 'lodash-es';
+import { defer, isEqual } from 'lodash-es';
 import {
   MosaicKey,
   MosaicTabsNode,
@@ -387,10 +387,7 @@ export const MosaicTabs = <T extends MosaicKey>({
       const isChildDrop =
         dropped &&
         destinationPath.length > ownPath.length &&
-        isEqual(
-          ownPath,
-          _drop(destinationPath, destinationPath.length - ownPath.length),
-        );
+        isEqual(ownPath, destinationPath.slice(0, ownPath.length));
 
       if (dropped && !isSelfDrop && !isChildDrop && dropResult.swap) {
         // Swap target: the group trades places with the window, sizes stay put

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { defer, drop, isEqual, values } from 'lodash-es';
+import { defer, isEqual, values } from 'lodash-es';
 import React, { useContext, useRef, ReactElement, createRef } from 'react';
 import {
   ConnectDragPreview,
@@ -517,10 +517,7 @@ function ConnectedInternalMosaicWindow<T extends MosaicKey = string>(
       const isChildDrop =
         dropped &&
         destinationPath.length > ownPath.length &&
-        isEqual(
-          ownPath,
-          drop(destinationPath, destinationPath.length - ownPath.length),
-        );
+        isEqual(ownPath, destinationPath.slice(0, ownPath.length));
 
       if (dropped && !isSelfDrop && dropResult.swap) {
         // Every pane keeps its size and only the two windows trade places

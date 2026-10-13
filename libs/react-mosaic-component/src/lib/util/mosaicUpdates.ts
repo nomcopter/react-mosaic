@@ -325,14 +325,15 @@ export function createDragToUpdates<T extends MosaicKey>(
       // Remove the source node
       updates.push(createRemoveUpdate(root, sourcePath));
 
-      // Calculate the adjusted destination path after removal
-      let adjustedDestinationPath = adjustPathAfterRemoval(
-        sourcePath,
-        destinationPath,
-      );
-
       // Get the destination node after the source removal
       const rootAfterRemoval = updateTree(root, updates);
+
+      // Removing the source can collapse a split above the destination, which
+      // changes every path through it, so look for the destination node itself
+      // first. It's only rebuilt (and not found) when it contained the source.
+      let adjustedDestinationPath =
+        findPathToNode(rootAfterRemoval, destinationNode) ??
+        adjustPathAfterRemoval(sourcePath, destinationPath);
 
       // Check if the adjusted destination path is still valid
       let destinationAfterRemoval = getNodeAtPath(
@@ -482,6 +483,29 @@ export function createSwapUpdates<T extends MosaicKey>(
     { path: pathA, spec: { $set: nodeB } },
     { path: pathB, spec: { $set: nodeA } },
   ];
+}
+
+/**
+ * Finds the path to `target` in `root`. Untouched subtrees keep their identity
+ * through `updateTree`, and leaf keys are unique, so `===` is enough.
+ */
+function findPathToNode<T extends MosaicKey>(
+  root: MosaicNode<T>,
+  target: MosaicNode<T>,
+  path: MosaicPath = [],
+): MosaicPath | null {
+  if (root === target) {
+    return path;
+  }
+  if (isSplitNode(root)) {
+    for (let i = 0; i < root.children.length; i++) {
+      const found = findPathToNode(root.children[i], target, [...path, i]);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
 }
 
 /**
