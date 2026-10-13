@@ -476,8 +476,11 @@ describe('stable tile mounts across rearrangement', () => {
 
     expect(capturedActions!.getRoot()).toMatchObject({
       children: [
-        { children: ['b', 'c'] },
-        { direction: 'column', children: ['d', 'a'] },
+        {
+          direction: 'column',
+          children: [{ direction: 'column', children: ['b', 'a'] }, 'c'],
+        },
+        'd',
       ],
     });
     expect(mountCounts).toEqual({ a: 1, b: 1, c: 1, d: 1 });
